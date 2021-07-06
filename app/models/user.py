@@ -4,15 +4,10 @@ from marshmallow import Schema, fields
 
 class User(Schema):
 
+    _id = fields.String()
     # name equals the name in the database which is a string
     name = fields.Str()
 
     # the age in the database which is an integer
-    age = fields.Int()
-    DOB = fields.Date()
-
-    # def __init__(self, name) -> None:
-    #     super().__init__()
-    #     self.name = name
-
-
+    DOB = fields.DateTime()
+    phone = fields.Int()

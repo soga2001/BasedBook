@@ -1,3 +1,5 @@
+Don't skip mongodb tutorial and go through it completely
+
 1) Flesh out the schema for collections
 2) Add input/update functionality
 3) Do Json validation on input
