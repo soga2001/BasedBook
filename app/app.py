@@ -7,28 +7,17 @@ from marshmallow.fields import Date
 from models.user import User
 from bson.objectid import ObjectId
 
-app = Flask(__name__)
-
-#connecting to mongo running on the computer
-app.config["MONGO_URI"] = "mongodb://localhost:27017/test_database"
-    
-#using local reference
-mongo = PyMongo(app)
-
-@app.route("/")
-def hello():
-    return 'hello'
 
 
-@app.route('/result', methods = ['GET', 'POST'])
-def result():
-    if request.method == 'GET':
-        place = request.args.get('place', None)
-        if place:
-            return place
-        return "No place information is given"
 
 def create_app(env=None):
+    app = Flask(__name__)
+
+    #connecting to mongo running on the computer
+    app.config["MONGO_URI"] = "mongodb://localhost:27017/test_database"
+        
+    #using local reference
+    mongo = PyMongo(app)
 
     @app.route("/users", methods = ['GET'])
     def get_users():
@@ -82,7 +71,3 @@ def create_app(env=None):
         return jsonify(update_user, data)
 
     return app
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
