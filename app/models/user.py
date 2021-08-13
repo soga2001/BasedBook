@@ -1,19 +1,32 @@
 from marshmallow import Schema, fields
+import pymongo
 from datetime import date
 from flask_bcrypt import Bcrypt
 from bson.objectid import ObjectId
+import flask_praetorian
+
 # marshmallow makes it easier to serialize
 # Schema is the object and fields is the types
 
 
-class User(Schema):
+class UserSchema(Schema):
 
     _id = fields.String()
-    # name equals the name in the database which is a string
     username = fields.Str()
-
-    # the age in the database which is an integer
     # DOB = fields.Date()
     phone = fields.Int()
-    email = fields.Str()
+    email = fields.Email()
     password = fields.Str()
+    roles = fields.Str()
+
+    # class Meta:
+    #     ordered = True
+
+
+class User:
+    def __init__(self, email, username, phone, password, roles):
+        self.email = email
+        self.username = username
+        self.phone = phone
+        self.password = password
+        self.roles = roles
