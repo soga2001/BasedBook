@@ -46,12 +46,12 @@ class User(Schema):
 
     @ property
     def identity(self):
-        print("identity", "user id", self._id)
+        # print("identity", "user id", self._id)
         return self._id
 
     @ property
     def rolenames(self):
-        print("rolenames", self.roles)
+        # print("rolenames", self.roles)
         try:
             return self.roles.split(",")
         except Exception:
@@ -63,18 +63,14 @@ class User(Schema):
 
     @ classmethod
     def lookup(cls, username):
-        # print("lookup", username)
-        user_dict = User().dump(mongo.db.users.find_one({"username": username}))
-        # print("user dict", user_dict)
-        # user_credentials = UserCredentials().load(user_dict, unknown=EXCLUDE)
-        # print(type(user_credentials))
-        return User(username, user_dict['password'])
+
+        return User(User().dump(mongo.db.users.find_one({"username": username})))
 
     @ classmethod
-    def identify(cls, id):
-        print("identify", id)
-        return cls.query.get(id)
-        # return mongo.db.users.find_one({"_id": id})
+    def identify(cls, _id):
+        # print("identify", id)
+        # return cls.query.get(id)
+        return mongo.db.users.find_one({"_id": _id})
 
 
 ##############################
@@ -169,11 +165,9 @@ def login():
     req = request.get_json(force=True)
     username = req.get("username")
     password = req.get("password")
-    hashed_password = guard.hash_password(password)
 
-    print("login", username, password)
     # its breaking on the next line with the error -- 'dict' object has no attribute 'password'
-    user = guard.authenticate(username, hashed_password)
+    user = guard.authenticate(username, password)
     ret = {"access_token": guard.encode_jwt_token(user)}
     return (jsonify(ret), 200)
 
