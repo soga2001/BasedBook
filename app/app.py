@@ -12,9 +12,9 @@ from marshmallow import Schema, fields
 # from models.user import User
 from bson import ObjectId
 from marshmallow import Schema, fields
-from marshmallow.utils import EXCLUDE
+# from marshmallow.utils import EXCLUDE
 
-Schema.TYPE_MAPPING[ObjectId] = fields.String
+# Schema.TYPE_MAPPING[ObjectId] = fields.String
 
 
 app = Flask(__name__)
@@ -40,20 +40,9 @@ class User(Schema):
     username = fields.Str()
     # DOB = fields.Date()
     phone = fields.Int()
+    hashed_password = fields.Str()
     email = fields.Str()
     roles = fields.Str()
-
-
-class UserCredentials():
-    def __init__(self, username: str, password: str):
-        self.username = None
-        self.password = None
-
-
-class UserWithPassword(User):
-    password = fields.Str()
-
-
 
     @ property
     def identity(self):
@@ -70,28 +59,28 @@ class UserWithPassword(User):
 
     @property
     def password(self):
-        return self.password
+        return self.hashed_password
 
     @ classmethod
     def lookup(cls, username):
         # print("lookup", username)
-        user_dict = mongo.db.users.find_one({"username": username})
+        user_dict = User().dump(mongo.db.users.find_one({"username": username}))
         # print("user dict", user_dict)
         # user_credentials = UserCredentials().load(user_dict, unknown=EXCLUDE)
         # print(type(user_credentials))
-        return UserCredentials(username, user_dict['password'])
+        return User(username, user_dict['password'])
 
     @ classmethod
     def identify(cls, id):
-        # print("identify", id)
-        # return cls.query.get(id)
-        return mongo.db.users.find_one({"_id": id})
+        print("identify", id)
+        return cls.query.get(id)
+        # return mongo.db.users.find_one({"_id": id})
 
 
 ##############################
 
 
-guard.init_app(app, UserWithPassword)
+guard.init_app(app, User)
 
 
 # connecting to mongo running on the computer
@@ -119,9 +108,21 @@ def post_user():
 
     data = request.json
 
-    user = UserWithPassword().load(data)
-    result = mongo.db.users.insert_one(user)
-    new_user = User().dump(mongo.db.users.find_one(user))
+    # "email": "soga2058@gmail.com",
+    # "username": "bob",
+    # "password": "my123",
+    # "phone": 7209370783,
+    # "roles": "admin, moderator"
+    email = request.json["email"]
+    username = request.json["username"]
+    password = request.json["password"]
+    hashed_password = guard.hash_password(password)
+    phone = request.json["phone"]
+    roles = request.json["roles"]
+
+    # user = User().load(data)
+    result = mongo.db.users.insert_one({"email": email, "username": username, "hashed_password": hashed_password, "phone": phone, "roles": roles})
+    new_user = User().dump(mongo.db.users.find_one({"email": email}))
 
     return jsonify(new_user)
 
