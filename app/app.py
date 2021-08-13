@@ -1,5 +1,5 @@
 # importing flask and flask_pymongo
-from flask_bcrypt import Bcrypt
+# from flask_bcrypt import Bcrypt
 import flask_praetorian
 from flask_cors import CORS
 from re import DEBUG
@@ -18,7 +18,7 @@ from marshmallow import Schema, fields
 
 
 app = Flask(__name__)
-bcrypt = Bcrypt(app)
+# bcrypt = Bcrypt(app)
 guard = flask_praetorian.Praetorian()
 CORS(app)
 
@@ -26,6 +26,7 @@ app.config["SECRET_KEY"] = "supo5458"
 app.config["JWT_ACCESS_LIFESPAN"] = {"hours": 24}
 app.config["JWT_REFRESH_LIFESPAN"] = {"days": 30}
 
+# connecting to mongo running on the computer
 app.config["MONGO_URI"] = "mongodb://localhost:27017/test_database"
 
 # using local reference
@@ -40,7 +41,7 @@ class User(Schema):
     username = fields.Str()
     # DOB = fields.Date()
     phone = fields.Int()
-    hashed_password = fields.Str()
+    password = fields.Str()
     email = fields.Str()
     roles = fields.Str()
 
@@ -57,19 +58,16 @@ class User(Schema):
         except Exception:
             return []
 
-    @property
-    def password(self):
-        return self.hashed_password
+    # @property
+    # def password(self):
+    #     return self.hashed_password
 
     @ classmethod
     def lookup(cls, username):
-
-        return User(User().dump(mongo.db.users.find_one({"username": username})))
+        return mongo.db.users.find_one({"username": username})
 
     @ classmethod
     def identify(cls, _id):
-        # print("identify", id)
-        # return cls.query.get(id)
         return mongo.db.users.find_one({"_id": _id})
 
 
@@ -78,8 +76,6 @@ class User(Schema):
 
 guard.init_app(app, User)
 
-
-# connecting to mongo running on the computer
 
 
 @ app.route("/")
@@ -90,25 +86,20 @@ def home():
 @ app.route("/users", methods=['GET'])
 def get_users():
 
-    # user_list = [User().dump(user_doc) for user_doc in mongo.db.users.find()]
+    user_list = [User().dump(user_doc) for user_doc in mongo.db.users.find()]
     # for users in user_list:
     #     if user_list:
-    #         users.pop('password')
-    #     print(users, User.id)
+    #         users.pop('hashed_password')
+    #     print("user", User.username)
 
-    return jsonify(User(many=True).dump(mongo.db.users.find()))
+    return jsonify(user_list)
 
 
 @ app.route("/users", methods=['POST'])
 def post_user():
 
     data = request.json
-
-    # "email": "soga2058@gmail.com",
-    # "username": "bob",
-    # "password": "my123",
-    # "phone": 7209370783,
-    # "roles": "admin, moderator"
+    
     email = request.json["email"]
     username = request.json["username"]
     password = request.json["password"]
@@ -117,7 +108,7 @@ def post_user():
     roles = request.json["roles"]
 
     # user = User().load(data)
-    result = mongo.db.users.insert_one({"email": email, "username": username, "hashed_password": hashed_password, "phone": phone, "roles": roles})
+    mongo.db.users.insert_one({"email": email, "username": username, "password": hashed_password, "phone": phone, "roles": roles})
     new_user = User().dump(mongo.db.users.find_one({"email": email}))
 
     return jsonify(new_user)
@@ -133,9 +124,7 @@ def get_user_by_id(user_id):
 
 @ app.route("/users/<user_id>", methods=['DELETE'])
 def remove_user_by_id(user_id):
-    remove_user = User().dump(
-        mongo.db.users.find_one_and_delete({"_id": ObjectId(user_id)}))
-    print("Bitch", remove_user)
+    remove_user = User().dump(mongo.db.users.find_one_and_delete({"_id": ObjectId(user_id)}))
 
     return jsonify(remove_user)
 

@@ -22,11 +22,3 @@ class UserSchema(Schema):
     # class Meta:
     #     ordered = True
 
-
-class User:
-    def __init__(self, email, username, phone, password, roles):
-        self.email = email
-        self.username = username
-        self.phone = phone
-        self.password = password
-        self.roles = roles
