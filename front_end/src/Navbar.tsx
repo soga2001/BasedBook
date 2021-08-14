@@ -4,7 +4,7 @@ import './App.css';
 
 function Navbar() {
   return (
-    <div className="App">
+    <div className="navbar">
       <div>
         <nav className="topnav">
           <div>

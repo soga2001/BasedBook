@@ -1,14 +1,30 @@
 .App {
-  width: 100%;
+  width: 50%;
+  margin: auto;
   text-align: center;
+  font-size: 20px;
+  background-color:blanchedalmond;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.navbar {
+  width: 70%;
+  margin: auto;
 }
 
+label {
+  display: inline-block;
+  width: 140px;
+  text-align: center;
+  font-size: 20px;
+}​
 
+input {
+  font-size: 20px;
+}
+
+button {
+  width: 100px;
+}
 
 form {
   padding: 10%;

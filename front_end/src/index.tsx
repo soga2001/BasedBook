@@ -14,7 +14,6 @@ ReactDOM.render(
     <Navbar />
     <Router>
       <Route path="/App" exact component={App}/>
-      {/* <Route path="/Interest" exact component={Discover}/> */}
       <Route path="/Login" exact component={Login}/>
       <Route path="/Register" exact component={Register}/>
     </Router>

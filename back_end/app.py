@@ -35,7 +35,6 @@ class User:
 
     @property
     def identity(self):
-        print("id", self._id)
         return self._id
 
 
@@ -53,7 +52,7 @@ class User:
     def deserialize(cls, user):
         return User(_id=str(user["_id"]),
                     username=user["username"],
-                    password=user["hashed_password"])
+                    password=user["password"])
 
     def to_dict(self):
         user = asdict(self)
@@ -83,7 +82,7 @@ def post_user(email, username, password):
     mongo.db.users.insert_one({
         "email": email,
         "username": username,
-        "hashed_password": hashed_password
+        "password": hashed_password
     })
     
     new_user = User.deserialize(mongo.db.users.find_one({"email": email}))
@@ -125,9 +124,17 @@ def register():
         email = request.json["email"]
         username = request.json["username"]
         password = request.json["password"]
-        if(email and username and password):
-            post_user(email, username, password)
-            return jsonify({"success": True})
+        #check if the email and username is already in the database
+        found_email = mongo.db.users.find_one({"email": email})
+        found_username = mongo.db.users.find_one({"username": username})
+        if found_email and found_username:
+            return jsonify("The email and username you entered is already taken.")
+        if found_email:
+            return jsonify("The email you entered is already taken.")
+        if found_username:
+            return jsonify("The username you entered is already taken.")
+        post_user(email, username, password)
+        return jsonify({"success": True})
     except:
         return jsonify("Please don't leave anything empty")
 
@@ -137,7 +144,7 @@ def register():
 def protected():
     # This link has the file with current_user()
     """ https://github.com/dusktreader/flask-praetorian/blob/master/flask_praetorian/utilities.py """
-    # PraetorianError: Could not identify the current user from the current id
+    # PraetorianError: Could not identify the current user from the current id  
     return jsonify(current_user().username)
 
     
