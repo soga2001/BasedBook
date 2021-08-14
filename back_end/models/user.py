@@ -1,3 +1,4 @@
+
 from marshmallow import Schema, fields
 import pymongo
 from datetime import date
@@ -21,4 +22,3 @@ class UserSchema(Schema):
 
     # class Meta:
     #     ordered = True
-
