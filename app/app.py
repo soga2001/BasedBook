@@ -1,34 +1,23 @@
-# importing flask and flask_pymongo
-# from flask_bcrypt import Bcrypt
-import flask_praetorian
+from logging import NullHandler
+from flask_bcrypt import Bcrypt
 from flask_cors import CORS
-from re import DEBUG
-from flask import Flask, json, jsonify, request, make_response, redirect, url_for
+from dataclasses import dataclass, field, asdict
+from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
-from marshmallow.decorators import pre_load
-from marshmallow.fields import Date, Str, String
-from marshmallow import Schema, fields
-# importing user class from user.py
-# from models.user import User
 from bson import ObjectId
-from marshmallow import Schema, fields
-# from marshmallow.utils import EXCLUDE
+from flask_praetorian import Praetorian, auth_required, current_user
 
-# Schema.TYPE_MAPPING[ObjectId] = fields.String
-
-
+#create the app
 app = Flask(__name__)
-# bcrypt = Bcrypt(app)
-guard = flask_praetorian.Praetorian()
+bcrypt = Bcrypt(app)
+guard = Praetorian()
 CORS(app)
 
 app.config["SECRET_KEY"] = "supo5458"
-app.config["JWT_ACCESS_LIFESPAN"] = {"hours": 24}
+app.config["JWT_ACCESS_LIFESPAN"] = {"hours": 4}
 app.config["JWT_REFRESH_LIFESPAN"] = {"days": 30}
 
-# connecting to mongo running on the computer
 app.config["MONGO_URI"] = "mongodb://localhost:27017/test_database"
-
 # using local reference
 mongo = PyMongo(app)
 app.debug = True
@@ -36,130 +25,131 @@ app.debug = True
 ############################
 
 
-class User(Schema):
-    _id = fields.Str()
-    username = fields.Str()
-    # DOB = fields.Date()
-    phone = fields.Int()
-    password = fields.Str()
-    email = fields.Str()
-    roles = fields.Str()
+@dataclass
+class User:
+    _id: str = field(default_factory=str)
+    email: str = field(default_factory=str)
+    username: str = field(default_factory=str)
+    password: str = field(default_factory=str)
+    rolenames: list = field(default_factory=lambda: [])
 
-    @ property
+    @property
     def identity(self):
-        # print("identity", "user id", self._id)
         return self._id
 
-    @ property
-    def rolenames(self):
-        # print("rolenames", self.roles)
-        try:
-            return self.roles.split(",")
-        except Exception:
-            return []
+    
 
-    # @property
-    # def password(self):
-    #     return self.hashed_password
-
-    @ classmethod
+    @classmethod
     def lookup(cls, username):
-        return mongo.db.users.find_one({"username": username})
+        user = mongo.db.users.find_one({"username": username})
+        return User.deserialize(user)
 
-    @ classmethod
+    @classmethod
     def identify(cls, _id):
+        # print("identify", id)
+        # return cls.query.get(id)
         return mongo.db.users.find_one({"_id": _id})
+
+    @classmethod
+    def deserialize(cls, user):
+        return User(_id=str(user["_id"]),
+                    username=user["username"],
+                    password=user["hashed_password"])
+
+    def to_dict(self):
+        user = asdict(self)
+        del user["password"]
+        return user
+
 
 
 ##############################
 
-
 guard.init_app(app, User)
 
+# connecting to mongo running on the computer
 
 
-@ app.route("/")
+@app.route("/")
 def home():
     return "Hello this is a home page"
 
 
-@ app.route("/users", methods=['GET'])
+@app.route("/users", methods=['GET'])
 def get_users():
-
-    user_list = [User().dump(user_doc) for user_doc in mongo.db.users.find()]
-    # for users in user_list:
-    #     if user_list:
-    #         users.pop('hashed_password')
-    #     print("user", User.username)
-
-    return jsonify(user_list)
+    return jsonify(
+        [User.deserialize(x).to_dict() for x in mongo.db.users.find()])
 
 
-@ app.route("/users", methods=['POST'])
-def post_user():
-
-    data = request.json
-    
+#email, username, password
+# @app.route("/users", methods=['POST'])
+def post_user(email, username, password):
     email = request.json["email"]
     username = request.json["username"]
     password = request.json["password"]
+    
     hashed_password = guard.hash_password(password)
-    phone = request.json["phone"]
-    roles = request.json["roles"]
 
-    # user = User().load(data)
-    mongo.db.users.insert_one({"email": email, "username": username, "password": hashed_password, "phone": phone, "roles": roles})
-    new_user = User().dump(mongo.db.users.find_one({"email": email}))
+    
+    # phone = request.json["phone"]
+    mongo.db.users.insert_one({
+        "email": email,
+        "username": username,
+        "hashed_password": hashed_password
+    })
+    
+    new_user = User.deserialize(mongo.db.users.find_one({"email": email}))
+    
+    return jsonify(new_user.to_dict())
 
-    return jsonify(new_user)
 
-
-@ app.route("/users/<user_id>", methods=['GET'])
+@app.route("/users/<user_id>", methods=['GET'])
 def get_user_by_id(user_id):
-    user = User().dump(mongo.db.users.find_one({"_id": ObjectId(user_id)}))
+    user = User.deserialize(mongo.db.users.find_one({"_id":
+                                                     ObjectId(user_id)}))
+    return jsonify(user.to_dict())
 
-    print("Hi", user)
-    return jsonify(user)
 
-
-@ app.route("/users/<user_id>", methods=['DELETE'])
+@app.route("/users/<user_id>", methods=['DELETE'])
 def remove_user_by_id(user_id):
-    remove_user = User().dump(mongo.db.users.find_one_and_delete({"_id": ObjectId(user_id)}))
+    remove_user = User.deserialize(
+        mongo.db.users.find_one_and_delete({"_id": ObjectId(user_id)}))
+    return jsonify(remove_user.to_dict())
 
-    return jsonify(remove_user)
-
-
-@ app.route("/users", methods=['DELETE'])
-def remove_all():
-    remove_all = User().dump(mongo.db.users.remove({}))
-
-    return jsonify(remove_all)
-
-
-@ app.route("/users/<user_id>", methods=['PUT'])
+@app.route("/users/<user_id>", methods=['PUT'])
 def update_user_by_id(user_id):
-
     data = request.json
-
-    user = User().load(data)
-
-    update_user = User().dump(mongo.db.users.find_one_and_update(
-        {"_id": ObjectId(user_id)}, {"$set": user}))
-
-    return jsonify(update_user, data)
+    user = User.deserialize(data)
+    update_user = User.deserialize(
+        mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)},
+                                           {"$set": user}))
+    return jsonify(update_user.to_dict())
 
 
-@ app.route("/login", methods=["POST"])
+@app.route("/login", methods=['POST'])
 def login():
     req = request.get_json(force=True)
-    username = req.get("username")
-    password = req.get("password")
-
-    # its breaking on the next line with the error -- 'dict' object has no attribute 'password'
+    username = req.get("username", None)
+    password = req.get("password", None)
     user = guard.authenticate(username, password)
-    ret = {"access_token": guard.encode_jwt_token(user)}
-    return (jsonify(ret), 200)
+    token = guard.encode_jwt_token(user)
+    return jsonify({"access_token": token})
 
 
+@app.route("/register", methods=['POST'])
+def register():
+    try:
+        email = request.json["email"]
+        username = request.json["username"]
+        password = request.json["password"]
+        if(email and username and password):
+            post_user(email, username, password)
+            return jsonify({"success": True})
+    except:
+        return jsonify("Please don't leave anything empty")
+    
+
+
+#Run the example
 if __name__ == "__main__":
     app.run(debug=True)

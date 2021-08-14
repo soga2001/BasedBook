@@ -1,13 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import Navbar from './Navbar';
 import App from './App';
+import Register from './Register';
+import Login from './Login';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <React.Fragment>
+    <Navbar />
+    <Router>
+      <Route path="/App" exact component={App}/>
+      {/* <Route path="/Interest" exact component={Discover}/> */}
+      <Route path="/Login" exact component={Login}/>
+      <Route path="/Register" exact component={Register}/>
+    </Router>
+      
+    
+    
+  </React.Fragment>,
   document.getElementById('root')
 );
 
