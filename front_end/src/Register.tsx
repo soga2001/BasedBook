@@ -1,14 +1,13 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { valueToNode } from "@babel/types";
 
 class Register extends Component {
-  register = (e: React.FormEvent) => {
-    axios.post("http://localhost:5000/register", {
-      email: document.getElementById("email")?.nodeValue,
-      username: document.getElementById("username")?.nodeValue,
-      password: document.getElementById("password")?.nodeValue
-
+  register = (e: any) => {
+    e.preventDefault();
+    axios.post("http://127.0.0.1:5000/register", {
+      email: (document.getElementById("email") as HTMLInputElement).value,
+      username: (document.getElementById("username") as HTMLInputElement).value,
+      password: (document.getElementById("password") as HTMLInputElement).value
     })
       .then((res) => {
         console.log(res.data);
@@ -25,7 +24,7 @@ class Register extends Component {
                 </p>
                 <p>
                   <label htmlFor="username">Username:</label>
-                  <input type="username" className="" />
+                  <input type="username" className="" id="username"/>
                 </p>
                 <p>
                   <label htmlFor="password">Password:</label>

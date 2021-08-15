@@ -10,7 +10,7 @@ function Navbar() {
           <div>
             <ul>
               <div className="left" >
-                <li><a href="/App">Home</a></li>
+                <li active-style={{background: "red", color: "white"}}><a href="/App">Home</a></li>
                 <li><a href="/Discover">Discover</a></li>
                 {/* <li><a href="/Contact">Contact</a></li> */}
               </div>

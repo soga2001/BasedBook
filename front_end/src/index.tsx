@@ -6,7 +6,7 @@ import App from './App';
 import Register from './Register';
 import Login from './Login';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
 
 ReactDOM.render(

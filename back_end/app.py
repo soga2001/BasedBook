@@ -1,5 +1,3 @@
-# from flask_bcrypt import Bcrypt
-import re
 from flask_cors import CORS
 from dataclasses import dataclass, field, asdict
 from flask import Flask, jsonify, request
@@ -9,7 +7,6 @@ from flask_praetorian import Praetorian, auth_required, current_user
 
 #create the app
 app = Flask(__name__)
-# bcrypt = Bcrypt(app)
 guard = Praetorian()
 CORS(app)
 
@@ -62,6 +59,7 @@ class User:
                     email=user["email"],
                     roles=user["roles"])
 
+    #removes the password so that when data is printed, it doesn't show to password
     def to_dict(self):
         user = asdict(self)
         del user["password"]
@@ -79,15 +77,9 @@ def get_users():
 
 # @app.route("/users", methods=['POST'])
 def post_user(email, username, password, roles=None):
-    email = request.json["email"]
-    username = request.json["username"]
-    password = request.json["password"]
-    roles = request.json["roles"]
-    
+    #hash the password
     hashed_password = guard.hash_password(password)
 
-    
-    # phone = request.json["phone"]
     mongo.db.users.insert_one({
         "email": email,
         "username": username,
@@ -108,14 +100,6 @@ def get_user_by_id(user_id):
         return jsonify("There is no user with that user_id in the database")
 
 
-@app.route("/users/<user_id>", methods=['DELETE'])
-def remove_user(user_id):
-    try:
-        remove_user = User.deserialize(mongo.db.users.find_one_and_delete({"_id": ObjectId(user_id)}))
-        return jsonify(remove_user.to_dict())
-    except:
-        return jsonify("There is no user with that user_id in the database")
-
 #update_user_by_id doesn't work when a user is trying to update is password as of right now
 @app.route("/users/<user_id>", methods=['PUT'])
 def update_user_by_id(user_id):
@@ -126,41 +110,6 @@ def update_user_by_id(user_id):
     except:
         return jsonify("There is no user with that user_id in the database")
 
-
-@app.route("/login", methods=['POST'])
-def login():
-    try:
-        username = request.json["username"]
-        password = request.json["password"]
-        user = guard.authenticate(username, password)
-        token = guard.encode_jwt_token(user)
-        return jsonify({"access_token": token})
-    except:
-        return jsonify("Invalid username or password.")
-
-
-@app.route("/register", methods=['POST'])
-def register():
-    try:
-        email = request.json["email"]
-        username = request.json["username"]
-        password = request.json["password"]
-        roles = request.json["roles"]
-        #check if the email and username is already in the database
-        found_email = mongo.db.users.find_one({"email": email})
-        found_username = mongo.db.users.find_one({"username": username})
-        #if found_email and found_username aren't empty and the database returned something
-        #don't add the data into the database
-        if found_email and found_username:
-            return jsonify("The email and username you entered is already taken.")
-        if found_email:
-            return jsonify("The email you entered is already taken.")
-        if found_username:
-            return jsonify("The username you entered is already taken.")
-        post_user(email, username, password, roles)
-        return jsonify({"success": True})
-    except:
-        return jsonify("Please don't leave anything empty.")
 
 @app.route('/users', methods=["DELETE"])
 def delete():
@@ -177,6 +126,44 @@ def delete():
         return jsonify("Invalid Username or Password")
     except:
         return jsonify("Invalid information")
+
+
+@app.route("/login", methods=['POST'])
+def login():
+    try:
+        username = request.json["username"] 
+        password = request.json["password"]
+        user = guard.authenticate(username, password)
+        token = guard.encode_jwt_token(user)
+        return jsonify({"access_token": token})
+    except:
+        return jsonify("Invalid username or password.")
+
+
+@app.route("/register", methods=['POST'])
+def register():
+    try:
+        email = request.json["email"]
+        username = request.json["username"]
+        password = request.json["password"]
+        # roles = request.json["roles"]
+        #check if the email and username is already in the database
+        found_email = mongo.db.users.find_one({"email": email})
+        found_username = mongo.db.users.find_one({"username": username})
+        #if found_email and found_username aren't empty and the database returned something
+        #don't add the user into the database otherwise, add the user
+        if found_email and found_username:
+            return jsonify("The email and username you entered is already taken.")
+        if found_email:
+            return jsonify("The email you entered is already taken.")
+        if found_username:
+            return jsonify("The username you entered is already taken.")
+        post_user(email, username, password)
+        return jsonify({"success": True})
+    except:
+        return jsonify("Please don't leave anything empty.")
+
+
 
 @app.route("/protected")
 @auth_required
