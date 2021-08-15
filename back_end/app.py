@@ -1,4 +1,5 @@
 # from flask_bcrypt import Bcrypt
+import re
 from flask_cors import CORS
 from dataclasses import dataclass, field, asdict
 from flask import Flask, jsonify, request
@@ -100,21 +101,30 @@ def post_user(email, username, password, roles=None):
 
 @app.route("/users/<user_id>", methods=['GET'])
 def get_user_by_id(user_id):
-    user = User.deserialize(mongo.db.users.find_one({"_id": ObjectId(user_id)}))
-    return jsonify(user.to_dict())
+    try:
+        user = User.deserialize(mongo.db.users.find_one({"_id": ObjectId(user_id)}))
+        return jsonify(user.to_dict())
+    except:
+        return jsonify("There is no user with that user_id in the database")
 
 
 @app.route("/users/<user_id>", methods=['DELETE'])
-def remove_user_by_id(user_id):
-    remove_user = User.deserialize(mongo.db.users.find_one_and_delete({"_id": ObjectId(user_id)}))
-    return jsonify(remove_user.to_dict())
+def remove_user(user_id):
+    try:
+        remove_user = User.deserialize(mongo.db.users.find_one_and_delete({"_id": ObjectId(user_id)}))
+        return jsonify(remove_user.to_dict())
+    except:
+        return jsonify("There is no user with that user_id in the database")
 
+#update_user_by_id doesn't work when a user is trying to update is password as of right now
 @app.route("/users/<user_id>", methods=['PUT'])
 def update_user_by_id(user_id):
-    data = request.json
-    user = User.deserialize(data)
-    update_user = User.deserialize(mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": user}))
-    return jsonify(update_user.to_dict())
+    try:
+        data = request.json
+        update_user = User.deserialize(mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": data}))
+        return jsonify(update_user.to_dict())
+    except:
+        return jsonify("There is no user with that user_id in the database")
 
 
 @app.route("/login", methods=['POST'])
@@ -152,6 +162,21 @@ def register():
     except:
         return jsonify("Please don't leave anything empty.")
 
+@app.route('/users', methods=["DELETE"])
+def delete():
+    try:
+        username = request.json["username"]
+        password = request.json["password"]
+        user = User.deserialize(mongo.db.users.find_one({"username": username}))
+        #guard._verify_password checks the password that the user inputs to the password in the database
+        #and returns True or False depending on whether the password match or not.
+        user_password = guard._verify_password(password, user.password)
+        if user_password:
+            remove_user = User.deserialize(mongo.db.users.find_one_and_delete({"_id": ObjectId(user._id)}))
+            return jsonify(remove_user.to_dict())
+        return jsonify("Invalid Username or Password")
+    except:
+        return jsonify("Invalid information")
 
 @app.route("/protected")
 @auth_required
