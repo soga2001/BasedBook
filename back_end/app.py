@@ -1,5 +1,4 @@
-from logging import NullHandler
-from flask_bcrypt import Bcrypt
+# from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from dataclasses import dataclass, field, asdict
 from flask import Flask, jsonify, request
@@ -9,7 +8,7 @@ from flask_praetorian import Praetorian, auth_required, current_user
 
 #create the app
 app = Flask(__name__)
-bcrypt = Bcrypt(app)
+# bcrypt = Bcrypt(app)
 guard = Praetorian()
 CORS(app)
 
@@ -31,12 +30,18 @@ class User:
     email: str = field(default_factory=str)
     username: str = field(default_factory=str)
     password: str = field(default_factory=str)
-    rolenames: list = field(default_factory=lambda: [])
+    roles: str = field(default_factory=str)
 
     @property
     def identity(self):
         return self._id
 
+    @property
+    def rolenames(self):
+        try:
+            return self.roles.split(",")
+        except:
+            return []
 
     @classmethod
     def lookup(cls, username):
@@ -52,7 +57,9 @@ class User:
     def deserialize(cls, user):
         return User(_id=str(user["_id"]),
                     username=user["username"],
-                    password=user["password"])
+                    password=user["password"],
+                    email=user["email"],
+                    roles=user["roles"])
 
     def to_dict(self):
         user = asdict(self)
@@ -70,10 +77,11 @@ def get_users():
 
 
 # @app.route("/users", methods=['POST'])
-def post_user(email, username, password):
+def post_user(email, username, password, roles=None):
     email = request.json["email"]
     username = request.json["username"]
     password = request.json["password"]
+    roles = request.json["roles"]
     
     hashed_password = guard.hash_password(password)
 
@@ -82,9 +90,9 @@ def post_user(email, username, password):
     mongo.db.users.insert_one({
         "email": email,
         "username": username,
-        "password": hashed_password
+        "password": hashed_password,
+        "roles": roles
     })
-    
     new_user = User.deserialize(mongo.db.users.find_one({"email": email}))
     
     return jsonify(new_user.to_dict())
@@ -111,11 +119,14 @@ def update_user_by_id(user_id):
 
 @app.route("/login", methods=['POST'])
 def login():
-    username = request.json["username"]
-    password = request.json["password"]
-    user = guard.authenticate(username, password)
-    token = guard.encode_jwt_token(user)
-    return jsonify({"access_token": token})
+    try:
+        username = request.json["username"]
+        password = request.json["password"]
+        user = guard.authenticate(username, password)
+        token = guard.encode_jwt_token(user)
+        return jsonify({"access_token": token})
+    except:
+        return jsonify("Invalid username or password.")
 
 
 @app.route("/register", methods=['POST'])
@@ -124,19 +135,22 @@ def register():
         email = request.json["email"]
         username = request.json["username"]
         password = request.json["password"]
+        roles = request.json["roles"]
         #check if the email and username is already in the database
         found_email = mongo.db.users.find_one({"email": email})
         found_username = mongo.db.users.find_one({"username": username})
+        #if found_email and found_username aren't empty and the database returned something
+        #don't add the data into the database
         if found_email and found_username:
             return jsonify("The email and username you entered is already taken.")
         if found_email:
             return jsonify("The email you entered is already taken.")
         if found_username:
             return jsonify("The username you entered is already taken.")
-        post_user(email, username, password)
+        post_user(email, username, password, roles)
         return jsonify({"success": True})
     except:
-        return jsonify("Please don't leave anything empty")
+        return jsonify("Please don't leave anything empty.")
 
 
 @app.route("/protected")
@@ -146,8 +160,6 @@ def protected():
     """ https://github.com/dusktreader/flask-praetorian/blob/master/flask_praetorian/utilities.py """
     # PraetorianError: Could not identify the current user from the current id  
     return jsonify(current_user().username)
-
-    
 
 
 #Run the example

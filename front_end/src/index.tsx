@@ -17,9 +17,6 @@ ReactDOM.render(
       <Route path="/Login" exact component={Login}/>
       <Route path="/Register" exact component={Register}/>
     </Router>
-      
-    
-    
   </React.Fragment>,
   document.getElementById('root')
 );
