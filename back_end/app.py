@@ -48,8 +48,8 @@ class User:
 
     @classmethod
     def identify(cls, _id):
-        # return cls.query.get(id)
-        return mongo.db.users.find_one({"_id": _id})
+        user =  mongo.db.users.find_one({"_id": ObjectId(_id)})
+        return User.deserialize(user)
 
     @classmethod
     def deserialize(cls, user):
@@ -74,21 +74,6 @@ guard.init_app(app, User)
 def get_users():
     return jsonify([User.deserialize(x).to_dict() for x in mongo.db.users.find()])
 
-
-# @app.route("/users", methods=['POST'])
-def post_user(email, username, password, roles=None):
-    #hash the password
-    hashed_password = guard.hash_password(password)
-
-    mongo.db.users.insert_one({
-        "email": email,
-        "username": username,
-        "password": hashed_password,
-        "roles": roles
-    })
-    new_user = User.deserialize(mongo.db.users.find_one({"email": email}))
-    
-    return jsonify(new_user.to_dict())
 
 
 @app.route("/users/<user_id>", methods=['GET'])
@@ -115,6 +100,7 @@ def update_user_by_id(user_id):
 def delete():
     try:
         username = request.json["username"]
+        username = username.lower()
         password = request.json["password"]
         user = User.deserialize(mongo.db.users.find_one({"username": username}))
         #guard._verify_password checks the password that the user inputs to the password in the database
@@ -131,10 +117,12 @@ def delete():
 @app.route("/login", methods=['POST'])
 def login():
     try:
-        username = request.json["username"] 
+        username = request.json["username"]
+        username = username.lower()
         password = request.json["password"]
         user = guard.authenticate(username, password)
         token = guard.encode_jwt_token(user)
+        print("login successful")
         return jsonify({"access_token": token})
     except:
         return jsonify("Invalid username or password.")
@@ -144,8 +132,11 @@ def login():
 def register():
     try:
         email = request.json["email"]
+        email = email.lower()
         username = request.json["username"]
+        username = username.lower()
         password = request.json["password"]
+        hashed_password = guard.hash_password(password)
         # roles = request.json["roles"]
         #check if the email and username is already in the database
         found_email = mongo.db.users.find_one({"email": email})
@@ -158,7 +149,14 @@ def register():
             return jsonify("The email you entered is already taken.")
         if found_username:
             return jsonify("The username you entered is already taken.")
-        post_user(email, username, password)
+
+        mongo.db.users.insert_one({
+            "email": email,
+            "username": username,
+            "password": hashed_password,
+            "roles": "N/A"
+        })
+        print("register successful")
         return jsonify({"success": True})
     except:
         return jsonify("Please don't leave anything empty.")
@@ -168,9 +166,6 @@ def register():
 @app.route("/protected")
 @auth_required
 def protected():
-    # This link has the file with current_user()
-    """ https://github.com/dusktreader/flask-praetorian/blob/master/flask_praetorian/utilities.py """
-    # PraetorianError: Could not identify the current user from the current id  
     return jsonify(current_user().username)
 
 
