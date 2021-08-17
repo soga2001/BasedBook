@@ -1,4 +1,5 @@
-from typing import Text
+from contextlib import nullcontext
+from typing import KeysView, Text
 from flask_cors import CORS, cross_origin
 from dataclasses import dataclass, field, asdict
 from flask import Flask, jsonify, request
@@ -78,17 +79,15 @@ class User:
 
 @dataclass
 class Post():
-    author: str
+    author: str = field(default_factory=str)
     title: str = field(default_factory=str)
-    uuid: str = field(default_factory=str)
     content: str = field(default_factory=str)
     date_posted: datetime = field(default_factory=datetime)
 
     @classmethod
     def deserialize(cls, post):
-        return Post(author=str(post["author"]),
+        return Post(author=post["author"],
                     title=post["title"],
-                    uuid=post["uuid"],
                     content=post["content"],
                     date_posted=post["date_posted"])
 
@@ -189,23 +188,38 @@ def register():
             "password": hashed_password,
             "roles": "N/A"
         })
+        user = User.deserialize(mongo.db.users.find_one({"email": email})).to_dict()
         return jsonify({"success": "You have been registered"})
     except:
         return jsonify("Please don't leave anything empty.")
 
 
 
-# @app.route("/post", methods=['POST'])
-# @auth_required
-# def post():
+@app.route("/post", methods=['POST'])
+@auth_required
+def post():
+    try:
+        author = current_user()._id
+        title = request.json["Title"]
+        content = request.json["Content"]
+        uuid = uuid4()
+        print(uuid)
+        date_posted = datetime.now()
+        mongo.db.post.insert_one({
+            "author": author,
+            "title": title,
+            "content": content,
+            "date_posted": date_posted
+        })
+        post = Post.deserialize(mongo.db.post.find_one({"author": author}))
+        return jsonify({"success": True}, post)
+    except:
+        return jsonify({"error": "The user has been removed from the database"})
 
-#     author = current_user()._id
-#     title = request.json["Title"]
-#     content = request.json["Content"]
-#     date_posted = datetime.now()
-#     (mongo.db.post.insert_one({"author": author, "title": title, "uuid": uuid4(), 
-#     "content": content, "date_posted": date_posted}))
-#     return jsonify({"success": True})
+
+@app.route("/post", methods=['GET'])
+def get_all_post():
+    return jsonify([Post.deserialize(x) for x in mongo.db.post.find()])
 
 @app.route("/protected")
 @auth_required
@@ -216,6 +230,4 @@ def protected():
 
 #Run the example
 if __name__ == "__main__":
-    mongo.db.users.create_index("email", unique=True )
-    mongo.db.users.create_index("username", unique=True)
     app.run(debug=True)
