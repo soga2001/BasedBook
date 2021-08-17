@@ -155,7 +155,7 @@ def login():
         password = request.json["password"]
         user = guard.authenticate(username, password)
         token = guard.encode_jwt_token(user)
-        return jsonify({"access_token": token})
+        return jsonify({"access_token": token, "success": "You have been logged in"})
     except:
         return jsonify({"error": "Invalid username or password."})
 
@@ -189,29 +189,28 @@ def register():
             "password": hashed_password,
             "roles": "N/A"
         })
-        print("register successful")
         return jsonify({"success": "You have been registered"})
     except:
         return jsonify("Please don't leave anything empty.")
 
 
 
-@app.route("/post", methods=['POST'])
-@auth_required
-def post():
+# @app.route("/post", methods=['POST'])
+# @auth_required
+# def post():
 
-    author = current_user()._id
-    title = request.json["Title"]
-    content = request.json["Content"]
-    date_posted = datetime.now()
-    posted = (mongo.db.post.insert_one({"author": author, "title": title, "uuid": uuid4(), 
-    "content": content, "date_posted": date_posted}))
-    return jsonify({"success": True})
+#     author = current_user()._id
+#     title = request.json["Title"]
+#     content = request.json["Content"]
+#     date_posted = datetime.now()
+#     (mongo.db.post.insert_one({"author": author, "title": title, "uuid": uuid4(), 
+#     "content": content, "date_posted": date_posted}))
+#     return jsonify({"success": True})
 
 @app.route("/protected")
 @auth_required
 def protected():
-    return
+    return jsonify("Success")
     
 
 
