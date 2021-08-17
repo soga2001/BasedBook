@@ -6,16 +6,18 @@ import App from './App';
 import Register from './Register';
 import Login from './Login';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 
 ReactDOM.render(
   <React.Fragment>
     <Navbar />
     <Router>
-      <Route path="/App" exact component={App}/>
-      <Route path="/Login" exact component={Login}/>
-      <Route path="/Register" exact component={Register}/>
+        <Switch>
+          <Route path="/" exact component={App}/>
+          <Route path="/Login" exact component={Login}/>
+          <Route path="/Register" exact component={Register}/>
+        </Switch>
     </Router>
   </React.Fragment>,
   document.getElementById('root')

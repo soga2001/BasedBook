@@ -1,8 +1,11 @@
-from flask_cors import CORS
+from typing import Text
+from flask_cors import CORS, cross_origin
 from dataclasses import dataclass, field, asdict
 from flask import Flask, jsonify, request
-from flask_pymongo import PyMongo
+from flask_pymongo import ASCENDING, PyMongo
+from datetime import date, datetime
 from bson import ObjectId
+from uuid import uuid4
 from flask_praetorian import Praetorian, auth_required, current_user
 
 #create the app
@@ -19,8 +22,9 @@ app.config["MONGO_URI"] = "mongodb://localhost:27017/test_database"
 # using local reference
 mongo = PyMongo(app)
 
-#############################
-
+############################
+######## User Class ########
+############################
 
 @dataclass
 class User:
@@ -66,7 +70,35 @@ class User:
         return user
 
 
-#############################
+############################
+
+############################
+#### Post Content Class ####
+############################
+
+@dataclass
+class Post():
+    author: str
+    title: str = field(default_factory=str)
+    uuid: str = field(default_factory=str)
+    content: str = field(default_factory=str)
+    date_posted: datetime = field(default_factory=datetime)
+
+    @classmethod
+    def deserialize(cls, post):
+        return Post(author=str(post["author"]),
+                    title=post["title"],
+                    uuid=post["uuid"],
+                    content=post["content"],
+                    date_posted=post["date_posted"])
+
+
+
+
+
+############################
+
+
 
 guard.init_app(app, User)
 
@@ -115,6 +147,7 @@ def delete():
 
 
 @app.route("/login", methods=['POST'])
+@cross_origin(origin="*")
 def login():
     try:
         username = request.json["username"]
@@ -122,13 +155,13 @@ def login():
         password = request.json["password"]
         user = guard.authenticate(username, password)
         token = guard.encode_jwt_token(user)
-        print("login successful")
         return jsonify({"access_token": token})
     except:
-        return jsonify("Invalid username or password.")
+        return jsonify({"error": "Invalid username or password."})
 
 
 @app.route("/register", methods=['POST'])
+@cross_origin(origin="*")
 def register():
     try:
         email = request.json["email"]
@@ -144,11 +177,11 @@ def register():
         #if found_email and found_username aren't empty and the database returned something
         #don't add the user into the database otherwise, add the user
         if found_email and found_username:
-            return jsonify("The email and username you entered is already taken.")
+            return jsonify({"error": "The email and username you entered is already taken."})
         if found_email:
-            return jsonify("The email you entered is already taken.")
+            return jsonify({"error":"The email you entered is already taken."})
         if found_username:
-            return jsonify("The username you entered is already taken.")
+            return jsonify({"error": "The username you entered is already taken."})
 
         mongo.db.users.insert_one({
             "email": email,
@@ -157,18 +190,33 @@ def register():
             "roles": "N/A"
         })
         print("register successful")
-        return jsonify({"success": True})
+        return jsonify({"success": "You have been registered"})
     except:
         return jsonify("Please don't leave anything empty.")
 
 
 
+@app.route("/post", methods=['POST'])
+@auth_required
+def post():
+
+    author = current_user()._id
+    title = request.json["Title"]
+    content = request.json["Content"]
+    date_posted = datetime.now()
+    posted = (mongo.db.post.insert_one({"author": author, "title": title, "uuid": uuid4(), 
+    "content": content, "date_posted": date_posted}))
+    return jsonify({"success": True})
+
 @app.route("/protected")
 @auth_required
 def protected():
-    return jsonify(current_user().username)
+    return
+    
 
 
 #Run the example
 if __name__ == "__main__":
+    mongo.db.users.create_index("email", unique=True )
+    mongo.db.users.create_index("username", unique=True)
     app.run(debug=True)

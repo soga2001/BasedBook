@@ -9,7 +9,12 @@ class Login extends Component {
       password: (document.getElementById("password") as HTMLInputElement).value
     })
     .then((res) => {
-      console.log(res.data)
+      if(res.data.error) {
+        console.log(res.data.error) 
+      }
+      else {
+        console.log({login: true})
+      }
     });
   }
   render() {

@@ -4,8 +4,7 @@ import './App.css';
 
 function Navbar() {
   return (
-    <div className="navbar">
-      <div>
+    <div className="App">
         <nav className="topnav">
           <div>
             <ul>
@@ -21,7 +20,6 @@ function Navbar() {
             </ul>
           </div>
         </nav>
-      </div>
     </div>
   );
 }
