@@ -79,21 +79,19 @@ class User:
 
 @dataclass
 class Post():
-    author: str = field(default_factory=str)
+    author: str 
+    _id: str = field(default_factory=str)
     title: str = field(default_factory=str)
     content: str = field(default_factory=str)
     date_posted: datetime = field(default_factory=datetime)
 
     @classmethod
     def deserialize(cls, post):
-        return Post(author=post["author"],
+        return Post(_id = str(post["_id"]),
+                    author=post["author"],
                     title=post["title"],
                     content=post["content"],
-                    date_posted=post["date_posted"])
-
-
-
-
+                    date_posted=post["date_posted"])    
 
 ############################
 
@@ -198,28 +196,36 @@ def register():
 @app.route("/post", methods=['POST'])
 @auth_required
 def post():
-    try:
-        author = current_user()._id
-        title = request.json["Title"]
-        content = request.json["Content"]
-        uuid = uuid4()
-        print(uuid)
-        date_posted = datetime.now()
-        mongo.db.post.insert_one({
-            "author": author,
-            "title": title,
-            "content": content,
-            "date_posted": date_posted
-        })
-        post = Post.deserialize(mongo.db.post.find_one({"author": author}))
-        return jsonify({"success": True}, post)
-    except:
-        return jsonify({"error": "The user has been removed from the database"})
+    author = current_user()._id
+    title = request.json["Title"]
+    content = request.json["Content"]
+    uuid = uuid4()
+    print(uuid)
+    date_posted = datetime.now()
+    mongo.db.post.insert_one({
+        "author": author,
+        "title": title,
+        "content": content,
+        "date_posted": date_posted
+    })
+    post = Post.deserialize(mongo.db.post.find_one({"author": author}))
+    return jsonify({"success": True}, post)
 
 
 @app.route("/post", methods=['GET'])
 def get_all_post():
-    return jsonify([Post.deserialize(x) for x in mongo.db.post.find()])
+    posts = [Post.deserialize(x) for x in mongo.db.post.find()]
+    return jsonify(posts)
+
+
+@app.route("/user_post", methods=['GET'])
+@auth_required
+def get_user_posts():
+    author = current_user()._id
+    post = [Post.deserialize(x) for x in mongo.db.post.find({"author" : author})]
+    if post:
+        return jsonify(post)
+    return jsonify({"Message": "You have made no posts."})
 
 @app.route("/protected")
 @auth_required

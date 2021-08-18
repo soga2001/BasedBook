@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import Navbar from './Navbar';
-import App from './App';
+import Home from './Home';
 import Register from './Register';
 import Login from './Login';
 import reportWebVitals from './reportWebVitals';
@@ -14,7 +14,7 @@ ReactDOM.render(
     <Navbar />
     <Router>
         <Switch>
-          <Route path="/" exact component={App}/>
+          <Route path="/Home" exact component={Home}/>
           <Route path="/Login" exact component={Login}/>
           <Route path="/Register" exact component={Register}/>
         </Switch>
