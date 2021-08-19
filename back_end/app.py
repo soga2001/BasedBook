@@ -128,17 +128,18 @@ def update_user_by_id():
 
 
 @app.route('/users', methods=["DELETE"])
+@auth_required
 def delete():
     try:
-        username = request.json["username"]
-        username = username.lower()
+        username = current_user().username
         password = request.json["password"]
-        user = User.deserialize(mongo.db.users.find_one({"username": username}))
+        _id = current_user()._id
         #guard._verify_password checks the password that the user inputs to the password in the database
         #and returns True or False depending on whether the password match or not.
-        user_password = guard._verify_password(password, user.password)
+        user_password = guard._verify_password(password, current_user().password)
         if user_password:
-            remove_user = User.deserialize(mongo.db.users.find_one_and_delete({"_id": ObjectId(user._id)}))
+            remove_user = User.deserialize(mongo.db.users.find_one_and_delete({"_id": ObjectId(_id)}))
+            remove_post = mongo.db.post.delete_many({"author": username})
             return jsonify(remove_user.to_dict())
         return jsonify("Invalid Username or Password")
     except:
