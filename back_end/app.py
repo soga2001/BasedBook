@@ -3,7 +3,7 @@ from typing import KeysView, Text
 from flask_cors import CORS, cross_origin
 from dataclasses import dataclass, field, asdict
 from flask import Flask, jsonify, request
-from flask_pymongo import ASCENDING, PyMongo
+from flask_pymongo import ASCENDING, DESCENDING, PyMongo
 from datetime import date, datetime
 from bson import ObjectId
 from uuid import uuid4
@@ -115,9 +115,11 @@ def get_user_by_id(user_id):
 
 
 #update_user_by_id doesn't work when a user is trying to update is password as of right now
-@app.route("/users/<user_id>", methods=['PUT'])
-def update_user_by_id(user_id):
+@app.route("/users", methods=['PUT'])
+@auth_required
+def update_user_by_id():
     try:
+        user_id = current_user()._id
         data = request.json
         update_user = User.deserialize(mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": data}))
         return jsonify(update_user.to_dict())
@@ -196,11 +198,9 @@ def register():
 @app.route("/post", methods=['POST'])
 @auth_required
 def post():
-    author = current_user()._id
-    title = request.json["Title"]
-    content = request.json["Content"]
-    uuid = uuid4()
-    print(uuid)
+    author = current_user().username
+    title = request.json["title"]
+    content = request.json["content"]
     date_posted = datetime.now()
     mongo.db.post.insert_one({
         "author": author,
@@ -209,13 +209,14 @@ def post():
         "date_posted": date_posted
     })
     post = Post.deserialize(mongo.db.post.find_one({"author": author}))
-    return jsonify({"success": True}, post)
+    return jsonify(post)
 
 
 @app.route("/post", methods=['GET'])
 def get_all_post():
-    posts = [Post.deserialize(x) for x in mongo.db.post.find()]
+    posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING)]
     return jsonify(posts)
+
 
 
 @app.route("/user_post", methods=['GET'])
@@ -226,6 +227,8 @@ def get_user_posts():
     if post:
         return jsonify(post)
     return jsonify({"Message": "You have made no posts."})
+
+
 
 @app.route("/protected")
 @auth_required

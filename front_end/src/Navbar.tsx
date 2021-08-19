@@ -1,5 +1,6 @@
 import React from "react";
 import './App.css';
+import { NavLink, Router} from "react-router-dom"
 
 
 function Navbar() {
@@ -9,9 +10,8 @@ function Navbar() {
           <div>
             <ul>
               <div className="left" >
-                <li active-style={{background: "red", color: "white"}}><a href="/Home">Home</a></li>
+                <li><a href="/Home">Home</a></li>
                 <li><a href="/Discover">Discover</a></li>
-                {/* <li><a href="/Contact">Contact</a></li> */}
               </div>
               <div className="right">
                 <li><a href="/Login">Login</a></li>

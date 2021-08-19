@@ -1,38 +1,59 @@
-import React, {Component} from 'react'
-import axios from 'axios'
+import React, { Component } from "react";
+import axios from "axios";
 
+
+interface Post {
+  author: string;
+  title: string;
+  content: string;
+  date_posted: string;
+}
 
 class Home extends Component {
-    state = {err: "", data: []}
+  state: { err: string; data: Post[] } = { err: "", data: [] };
 
-    home = (e: any) => {
-        e.preventDefault();
-        axios.get("http://127.0.0.1:5000/post")
-        .then((res) => {
-            this.setState({data: res.data})
-            console.log(this.state.data[0])
-            console.log(this.state.data[1])
-            console.log(this.state.data[2])
-            console.log(this.state.data[3])
-            console.log(this.state.data[4])
-        })
-    }
+  constructor(props: any) {
+    super(props);
+    this.setData();
+  }
 
-    render() {
-        return(
-            <div className="App">
-                <h3>Home Page</h3>
+  setData() {
+    axios.get("http://127.0.0.1:5000/post").then((res) => {
+      this.setState({ data: res.data });
+    });
+  }
 
-                <div>
-                    <h1>Title</h1>
-                    <p>Date Posted</p>
-                    <h4>Content</h4>
-                </div>
-                <button onClick={this.home}>Submit</button>
+  home = (e: any) => {
+    this.setData();
+  };
+
+  renderData(post: Post) {
+      return (
+        <div className="posts">
+            <h3>{post.title}</h3>
+            <p className="author"><strong>Author: </strong> {post.author} </p>
+            <p className="date"><strong>Date Posted: </strong>{post.date_posted}</p>
+            <p className="content">{post.content}</p>
+      </div>
+      )
+    
+  }
+
+  render() {
+    return (
+      <div className="App">
+        <h1>Home Page</h1>
+        <div>
+          {this.state.data.map((post) => (
+            <div>
+              {this.renderData(post)}
             </div>
-            
-        )
-    }
+          ))}
+        </div>
+      </div>
+    );
+  }
 }
+
 
 export default Home;
