@@ -12,12 +12,6 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 ReactDOM.render(
   <React.Fragment>
     <Navbar />
-    <Router>
-        <Route path="/" exact component={Home}/>
-        <Route path="/Home" exact component={Home}/>
-        <Route path="/Login" exact component={Login}/>
-        <Route path="/Register" exact component={Register}/>
-    </Router>
   </React.Fragment>,
   document.getElementById('root')
 );

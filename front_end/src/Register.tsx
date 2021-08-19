@@ -15,12 +15,10 @@ class Register extends Component {
         if (res.data.error) {
           this.setState({registered: ''})
           this.setState({err: res.data.error})
-          console.log(this.state.registered)
         }
         else if(res.data.success) {
           this.setState({err: ''})
           this.setState({registered: res.data.success})
-          console.log(this.state.registered)
         }
     });
   }

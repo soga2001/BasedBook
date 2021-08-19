@@ -36,6 +36,7 @@ ul {
   padding: 0;
   overflow: hidden;
   background-color: #333;
+  color: White !important;
 }
 
 li {
@@ -91,3 +92,4 @@ li a:hover:not(.active) {
   text-align: justify;
   text-indent: 50px;
 }
+
