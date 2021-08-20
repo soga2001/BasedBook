@@ -1,7 +1,10 @@
+html {
+  background-color: #DEFBFC;
+}
 .App {
   text-align: center;
   font-size: 20px;
-  background-color:blanchedalmond;
+  color: black;
   padding: 2%;
 }
 
@@ -9,9 +12,9 @@
 
 label {
   display: inline-block;
-  width: 140px;
-  text-align: center;
+  width: 300px;
   font-size: 20px;
+  margin: 1%;
 }​
 
 input {
@@ -25,7 +28,6 @@ button {
 form {
   padding: 2%;
   font-size: 30px;
-  
 }
 
 /* NavBar */
@@ -35,8 +37,7 @@ ul {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background-color: #333;
-  color: White !important;
+  background-color:#7EF7FF;
 }
 
 li {
@@ -45,14 +46,14 @@ li {
 
 li a {
   display: block;
-  color: white;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
 }
 
 li a:hover:not(.active) {
-  background-color: #111;
+  background-color: black;
+  color: white;
 }
 
 .left {
@@ -76,6 +77,8 @@ li a:hover:not(.active) {
   text-align: center;
 }
 
+/* Home Page */
+
 .posts {
   width: 50%;
   margin: auto;
@@ -92,4 +95,3 @@ li a:hover:not(.active) {
   text-align: justify;
   text-indent: 50px;
 }
-

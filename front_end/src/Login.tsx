@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 import axios from "axios"
+import './App.css';
+
+
 
 class Login extends Component {
   state = {err: "", logged_in: ""};
@@ -13,12 +16,14 @@ class Login extends Component {
     })
     .then((res) => {
       if (res.data.error) {
-        this.setState({logged_in: ''})
         this.setState({err: res.data.error})
       }
-      else if(res.data.success) {
+      else if(res.data) {
         this.setState({err: ''})
-        this.setState({logged_in: res.data.success})
+        this.setState({logged_in: "You have been logged in"})
+        // console.log(res.data)
+        localStorage.setItem("token", res.data)
+        console.log(localStorage.getItem("token"))
       }
     });
   }
@@ -26,7 +31,7 @@ class Login extends Component {
     return (
       <div className="App">
         <header className="header">Login</header>
-        {this.state.err ? <h3 className="message">{this.state.err}</h3> : <h3 className="message">{this.state.logged_in}</h3>} 
+        {this.state.err ? <h3 className="message">{this.state.err}</h3> : <h3>{this.state.logged_in}</h3>} 
         <form onSubmit={this.login}>
           <div>
             <label>Username: </label>
@@ -36,7 +41,7 @@ class Login extends Component {
             <label>Password: </label>
             <input type="password" id="password" required></input>
           </div>
-          <div>
+          <div className="button">
             <button type="submit">Submit</button>
           </div>
         </form>
@@ -46,4 +51,4 @@ class Login extends Component {
   }
 }
 
-  export default Login
+  export default Login;

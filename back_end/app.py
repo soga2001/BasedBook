@@ -1,4 +1,5 @@
 from contextlib import nullcontext
+from sys import meta_path
 from typing import KeysView, Text
 from flask_cors import CORS, cross_origin
 from dataclasses import dataclass, field, asdict
@@ -113,6 +114,12 @@ def get_user_by_id(user_id):
     except:
         return jsonify("There is no user with that user_id in the database")
 
+@app.route("/update-token", methods=['GET'])
+def refresh():
+    old_token = guard.read_token_from_header()
+    new_token = guard.refresh_jwt_token(old_token)
+    ret = {'access_token': new_token}
+    return jsonify(ret)
 
 #update_user_by_id doesn't work when a user is trying to update is password as of right now
 @app.route("/users", methods=['PUT'])
@@ -153,9 +160,11 @@ def login():
         username = request.json["username"]
         username = username.lower()
         password = request.json["password"]
+        
         user = guard.authenticate(username, password)
-        token = guard.encode_jwt_token(user)
-        return jsonify({"access_token": token, "success": "You have been logged in"})
+        # token = guard.encode_jwt_token(user)
+        # print(username, password)
+        return jsonify(guard.encode_jwt_token(user))
     except:
         return jsonify({"error": "Invalid username or password."})
 
@@ -210,7 +219,7 @@ def post():
         "date_posted": date_posted
     })
     post = Post.deserialize(mongo.db.post.find_one({"author": author}))
-    return jsonify(post)
+    return jsonify({"success": 'Posted'})
 
 
 @app.route("/post", methods=['GET'])
@@ -223,7 +232,7 @@ def get_all_post():
 @app.route("/user_post", methods=['GET'])
 @auth_required
 def get_user_posts():
-    author = current_user()._id
+    author = current_user().username
     post = [Post.deserialize(x) for x in mongo.db.post.find({"author" : author})]
     if post:
         return jsonify(post)
@@ -231,7 +240,7 @@ def get_user_posts():
 
 
 
-@app.route("/protected")
+@app.route("/protected", methods=['GET'])
 @auth_required
 def protected():
     return jsonify("Success")

@@ -2,11 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import Navbar from './Navbar';
-import Home from './Home';
-import Register from './Register';
-import Login from './Login';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+
 
 
 ReactDOM.render(
