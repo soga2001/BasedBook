@@ -16,9 +16,10 @@ class Register extends Component {
           this.setState({registered: ''})
           this.setState({err: res.data.error})
         }
-        else if(res.data.success) {
+        else if(res.data) {
           this.setState({err: ''})
-          this.setState({registered: res.data.success})
+          this.setState({registered: 'You have been registered. Redirecting to the login page....'})
+          setTimeout(()=>window.location.href = '/Login', 800)
         }
     });
   }
@@ -26,8 +27,7 @@ class Register extends Component {
     render() {
         return (
             <div className="App">
-              <header className="header">Register</header>
-              {this.state.err ? <h3 className="message">{this.state.err}</h3> : <h3 className="message">{this.state.registered}</h3>} 
+              <header className="header">Register</header> 
               <form onSubmit={this.register}>
                 <p>
                   <label htmlFor="email">Email:</label>
@@ -43,6 +43,7 @@ class Register extends Component {
                 </p>
                   <button type="submit" className="">Register</button>
               </form>
+              {this.state.err ? <h3 className="message">{this.state.err}</h3> : <h3 className="message">{this.state.registered}</h3>}
             </div>
         );
     }

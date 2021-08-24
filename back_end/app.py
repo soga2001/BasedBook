@@ -1,13 +1,8 @@
-from contextlib import nullcontext
-from sys import meta_path
-from typing import KeysView, Text
 from flask_cors import CORS, cross_origin
-from dataclasses import dataclass, field, asdict
 from flask import Flask, jsonify, request
 from flask_pymongo import ASCENDING, DESCENDING, PyMongo
-from datetime import date, datetime
+from datetime import datetime
 from bson import ObjectId
-from uuid import uuid4
 from flask_praetorian import Praetorian, auth_required, current_user
 
 #create the app
@@ -24,79 +19,9 @@ app.config["MONGO_URI"] = "mongodb://localhost:27017/test_database"
 # using local reference
 mongo = PyMongo(app)
 
-############################
-######## User Class ########
-############################
-
-@dataclass
-class User:
-    _id: str = field(default_factory=str)
-    email: str = field(default_factory=str)
-    username: str = field(default_factory=str)
-    password: str = field(default_factory=str)
-    roles: str = field(default_factory=str)
-
-    @property
-    def identity(self):
-        return self._id
-
-    @property
-    def rolenames(self):
-        try:
-            return self.roles.split(",")
-        except:
-            return []
-
-    @classmethod
-    def lookup(cls, username):
-        user = mongo.db.users.find_one({"username": username})
-        return User.deserialize(user)
-
-    @classmethod
-    def identify(cls, _id):
-        user =  mongo.db.users.find_one({"_id": ObjectId(_id)})
-        return User.deserialize(user)
-
-    @classmethod
-    def deserialize(cls, user):
-        return User(_id=str(user["_id"]),
-                    username=user["username"],
-                    password=user["password"],
-                    email=user["email"],
-                    roles=user["roles"])
-
-    #removes the password so that when data is printed, it doesn't show to password
-    def to_dict(self):
-        user = asdict(self)
-        del user["password"]
-        return user
-
-
-############################
-
-############################
-#### Post Content Class ####
-############################
-
-@dataclass
-class Post():
-    author: str 
-    _id: str = field(default_factory=str)
-    title: str = field(default_factory=str)
-    content: str = field(default_factory=str)
-    date_posted: datetime = field(default_factory=datetime)
-
-    @classmethod
-    def deserialize(cls, post):
-        return Post(_id = str(post["_id"]),
-                    author=post["author"],
-                    title=post["title"],
-                    content=post["content"],
-                    date_posted=post["date_posted"])    
-
-############################
-
-
+#import User and Post dataclass from user.py and post.py files
+from user import User
+from post import Post
 
 guard.init_app(app, User)
 
@@ -114,12 +39,12 @@ def get_user_by_id(user_id):
     except:
         return jsonify("There is no user with that user_id in the database")
 
-@app.route("/update-token", methods=['GET'])
+@app.route("/refresh-token", methods=['POST'])
+@cross_origin(origin="*")
 def refresh():
     old_token = guard.read_token_from_header()
     new_token = guard.refresh_jwt_token(old_token)
-    ret = {'access_token': new_token}
-    return jsonify(ret)
+    return jsonify(new_token)
 
 #update_user_by_id doesn't work when a user is trying to update is password as of right now
 @app.route("/users", methods=['PUT'])
@@ -136,7 +61,7 @@ def update_user_by_id():
 
 @app.route('/users', methods=["DELETE"])
 @auth_required
-def delete():
+def delete_user():
     try:
         username = current_user().username
         password = request.json["password"]
@@ -162,9 +87,9 @@ def login():
         password = request.json["password"]
         
         user = guard.authenticate(username, password)
-        # token = guard.encode_jwt_token(user)
+        token = guard.encode_jwt_token(user)
         # print(username, password)
-        return jsonify(guard.encode_jwt_token(user))
+        return jsonify({"access_token": token, "username": username})
     except:
         return jsonify({"error": "Invalid username or password."})
 
@@ -238,12 +163,17 @@ def get_user_posts():
         return jsonify(post)
     return jsonify({"Message": "You have made no posts."})
 
+@app.route("/post/<post_id>", methods=['DELETE'])
+@cross_origin(origin="*")
+@auth_required
+def delete_post(post_id):
+    mongo.db.post.find_one_and_delete({"_id": ObjectId(post_id)})
+    return jsonify({'success': 'Your post has been deleted. Refreshing the page...'})
 
-
-@app.route("/protected", methods=['GET'])
+@app.route("/protected", methods=['POST'])
 @auth_required
 def protected():
-    return jsonify("Success")
+    return jsonify({"success": True})
     
 
 

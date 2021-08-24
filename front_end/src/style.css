@@ -1,5 +1,6 @@
 html {
   background-color: #DEFBFC;
+  max-width: 100%;
 }
 .App {
   text-align: center;
@@ -12,14 +13,23 @@ html {
 
 label {
   display: inline-block;
-  width: 300px;
+  width: 500px;
   font-size: 20px;
   margin: 1%;
 }​
 
-input {
-  font-size: 20px;
+.title {
+  display: inline-block;
+  width: 500px;
+  margin: 1%;
 }
+
+.post_content {
+  display: inline-block;
+  width: 500px;
+  margin: 1%;
+}
+
 
 button {
   width: 100px;
@@ -34,14 +44,16 @@ form {
 
 ul {
   list-style-type: none;
-  margin: 0;
-  padding: 0;
   overflow: hidden;
-  background-color:#7EF7FF;
+  /* background-color:#7EF7FF; */
+  width: 70%;
+  margin: auto;
 }
 
 li {
   float: left;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 li a {
@@ -49,6 +61,7 @@ li a {
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
+  color: black;
 }
 
 li a:hover:not(.active) {
@@ -64,10 +77,18 @@ li a:hover:not(.active) {
   float: right;
 }
 
+nav {
+  background-color: lightskyblue;
+}
+
 /* Message */
 
 .message {
-  color: red
+  width: 20%;
+  margin: auto;
+  color: darkred;
+  background-color: #FCDEE8;
+  border-radius: 50% 20% / 10% 40%;
 }
 
 /* Header */
@@ -83,15 +104,31 @@ li a:hover:not(.active) {
   width: 50%;
   margin: auto;
   padding: 2%;
+  width: 40%;
+  margin: auto;
 }
 
 .date, .author {
   display: inline-block;
   width: 50%;
   margin: auto;
+  font-size: 15px;
 }
 
 .content {
   text-align: justify;
   text-indent: 50px;
+  word-wrap: break-word;
+  hyphens: auto;
+  white-space: pre-wrap;
+}
+
+.delete {
+  background-color: black;
+  color: white;
+  padding: 1%;
+}
+
+.delete_content {
+  padding: 1%;
 }

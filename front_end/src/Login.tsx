@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios"
-import './App.css';
-
-
+import './style.css';
 
 class Login extends Component {
   state = {err: "", logged_in: ""};
@@ -20,18 +18,18 @@ class Login extends Component {
       }
       else if(res.data) {
         this.setState({err: ''})
-        this.setState({logged_in: "You have been logged in"})
-        // console.log(res.data)
-        localStorage.setItem("token", res.data)
-        console.log(localStorage.getItem("token"))
+        this.setState({login: true})
+        this.setState({logged_in: "You have been logged in. Redirecting to home page...."})
+        localStorage.setItem("token", res.data.access_token)
+        localStorage.setItem("username", res.data.username)
+        setTimeout(()=>window.location.href = '/Home', 800)
       }
     });
   }
   render() {
     return (
       <div className="App">
-        <header className="header">Login</header>
-        {this.state.err ? <h3 className="message">{this.state.err}</h3> : <h3>{this.state.logged_in}</h3>} 
+        <header className="header">Login</header> 
         <form onSubmit={this.login}>
           <div>
             <label>Username: </label>
@@ -42,9 +40,10 @@ class Login extends Component {
             <input type="password" id="password" required></input>
           </div>
           <div className="button">
-            <button type="submit">Submit</button>
+            <button type="submit">Login</button>
           </div>
         </form>
+        {this.state.err ? <h3 className="message">{this.state.err}</h3> : <h3 className="message">{this.state.logged_in}</h3>}
       </div>
       
     );
