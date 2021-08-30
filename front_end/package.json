@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@popperjs/core": "^2.9.3",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
@@ -12,6 +13,7 @@
     "@types/react-bootstrap": "^0.32.26",
     "@types/react-dom": "^17.0.9",
     "@types/react-router-dom": "^5.1.8",
+    "@types/reactstrap": "^8.7.2",
     "axios": "^0.21.1",
     "bootstrap": "^5.1.0",
     "react": "^17.0.2",
@@ -22,6 +24,7 @@
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
+    "reactstrap": "^8.9.0",
     "redux": "^4.1.1",
     "redux-thunk": "^2.3.0",
     "redux-token-auth": "^0.19.0",

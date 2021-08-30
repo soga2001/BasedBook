@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 import axios from "axios";
+import './style.css'
+import 'bootstrap/dist/css/bootstrap.css';
+import {Jumbotron} from 'reactstrap'
 
 interface Post {
   _id: string;
@@ -48,16 +51,19 @@ class Home extends Component {
 
   renderData(post: Post) {
       return (
-        <div className="posts">
-          <h3 key={post.title}>{post.title} <p hidden>Id: {post._id}</p></h3>
-          <input type="text" id="post_id" value={post._id} key={post._id} hidden readOnly></input>
-          <p key={post.author}className="author"><strong>Author: </strong> {post.author} </p>
-          <p key={post.date_posted}className="date"><strong>Date Posted: </strong>{post.date_posted}</p>
-          <p key={post.content}className="content">{post.content}</p>
-          <div className="delete_content">
-            {post.author === localStorage.getItem('username') ? <button key='delete' className="delete" onClick={this.delete}>Delete</button> : '' }
-          </div>
+        <div>
+            <div className="posts">
+              <h3 key={post.title}>{post.title} <p hidden>Id: {post._id}</p></h3>
+              <input type="text" id="post_id" value={post._id} key={post._id} hidden readOnly></input>
+              <p key={post.author}className="author"><strong>Author: </strong> {post.author} </p>
+              <p key={post.date_posted}className="date"><strong>Date Posted: </strong>{post.date_posted}</p>
+              <p key={post.content}className="content">{post.content}</p>
+              <div className="delete_content">
+                {post.author === localStorage.getItem('username') ? <button key='delete' className="delete" onClick={this.delete}>Delete</button> : '' }
+              </div>
+            </div>
         </div>
+        
       )
   }
 

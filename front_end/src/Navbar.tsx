@@ -1,48 +1,59 @@
-import React, { Component } from "react";
-import './style.css';
-import { NavLink, BrowserRouter as Router, Route} from "react-router-dom"
-import Home from './Home';
-import Register from './Register';
-import Login from './Login';
-import Post from "./Post";
+import React, { useState } from 'react';
+import {
+  Collapse,
+  Navbar,
+  NavbarToggler, NavbarBrand, Nav, NavItem, NavLink, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem, NavbarText
+} from 'reactstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    window.location.href ='/';
+  localStorage.removeItem('token');
+  localStorage.removeItem('username');
+  window.location.href ='/';
 }
 
 
-export default class NavBar extends Component {
-  render() {
-    return(
-      <Router>
-        
-        <nav className="topnav">
-          <div>
-            <ul>
-            <li className="logo"><NavLink exact to='/' activeClassName="selected" ><img src='logo.png' id='logo' alt="Logo"/></NavLink></li>
-              <div className="left" >
-                
-                <li><NavLink to='/Home' activeClassName="active">Home</NavLink></li>
-                <li>{localStorage.getItem('token') && <NavLink to='/Post' activeClassName="active">Post</NavLink>}</li>
-              </div>
-              <div className="right">
-                <li>{!localStorage.getItem('token') && <NavLink to='/Login' activeClassName="active">Login</NavLink>}</li>
-                <li> {!localStorage.getItem('token') && <NavLink to='/Register' activeClassName="active">Register</NavLink>}</li>
-                <li className="logout" onClick={logout} >{localStorage.getItem('token') && <NavLink to='/' activeClassName='logout'>Logout</NavLink>}</li>
-              </div>
-            </ul>
-          </div>
-        </nav>
-        <Route path="/" exact component={Home}/>
-        <Route path="/Home" exact component={Home}/>
-        <Route path="/Post" exact component ={Post}/>
-        <Route path="/Login" exact component={Login}/>
-        <Route path="/Register" exact component={Register}/>
-    </Router>
-  )
-  }
-  
+const NavBar = (props:any) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const toggle = () => setIsOpen(!isOpen);
 
+  return (
+    <Navbar color="dark" dark expand="md">
+      <NavbarBrand href="/Home">Social Media</NavbarBrand>
+      <NavbarToggler onClick={toggle} />
+      <Collapse isOpen={isOpen} navbar>
+        <Nav className="justify-content-center" navbar>
+          <NavItem>
+            <NavLink href="/Home">Home</NavLink>
+          </NavItem>
+          <NavItem className="right">
+            {!localStorage.getItem('token') && <NavLink href="/Login">Login</NavLink>}
+          </NavItem>
+          <NavItem>
+            {!localStorage.getItem('token') && <NavLink href="/Register">Register</NavLink> }
+          </NavItem>
+            {localStorage.getItem('token') &&
+            <UncontrolledDropdown nav inNavbar>
+              <DropdownToggle nav caret>
+                {localStorage.getItem('username')}
+              </DropdownToggle>
+              <DropdownMenu right>
+                <DropdownItem>
+                  Option 1
+                </DropdownItem>
+                <DropdownItem>
+                  Option 2
+                </DropdownItem>
+                <DropdownItem divider />
+                <DropdownItem onClick={logout}>
+                  Logout
+                </DropdownItem>
+              </DropdownMenu>
+            </UncontrolledDropdown> }
+        </Nav>
+      </Collapse>
+    </Navbar>
+  );
 }
+
+export default NavBar;

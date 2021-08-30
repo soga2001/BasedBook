@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios"
-import './style.css';
+import './style.css'
+import {Container, Jumbotron} from 'reactstrap';
 
 class Login extends Component {
   state = {err: "", logged_in: ""};
@@ -45,7 +46,6 @@ class Login extends Component {
         </form>
         {this.state.err ? <h3 className="message">{this.state.err}</h3> : <h3 className="message">{this.state.logged_in}</h3>}
       </div>
-      
     );
   }
 }
