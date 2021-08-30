@@ -1,14 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import Navbar from './Navbar';
+import NavBar from './Navbar';
 import reportWebVitals from './reportWebVitals';
 
 
 
 ReactDOM.render(
   <React.Fragment>
-    <Navbar />
+    <NavBar />
   </React.Fragment>,
   document.getElementById('root')
 );

@@ -9,29 +9,28 @@ import Post from "./Post";
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
-    window.location.href ='/Home';
+    window.location.href ='/';
 }
 
-export default class Navbar extends Component {
 
-  
-  
+export default class NavBar extends Component {
   render() {
-    return (
+    return(
       <Router>
+        
         <nav className="topnav">
           <div>
             <ul>
+            <li className="logo"><NavLink exact to='/' activeClassName="selected" ><img src='logo.png' id='logo' alt="Logo"/></NavLink></li>
               <div className="left" >
-                <li><NavLink to='/Home' activeStyle={{background: 'white'}}>Home</NavLink></li>
-                <li>{localStorage.getItem('token') && <NavLink to='/Post' activeStyle={{background: 'white'}}>Post</NavLink>}</li>
-                {/* <li><Link to='/Discover'>Discover</Link></li> */}
+                
+                <li><NavLink to='/Home' activeClassName="active">Home</NavLink></li>
+                <li>{localStorage.getItem('token') && <NavLink to='/Post' activeClassName="active">Post</NavLink>}</li>
               </div>
               <div className="right">
-                <li>{!localStorage.getItem('token') && <NavLink to='/Login' activeStyle={{background: 'white'}}>Login</NavLink>}</li>
-                <li> {!localStorage.getItem('token') && <NavLink to='/Register' activeStyle={{background: 'white'}}>Register</NavLink>}</li>
-                <li className="logout" onClick={logout} >{localStorage.getItem('token') && <NavLink to='/'>Logout</NavLink>}</li>
-                
+                <li>{!localStorage.getItem('token') && <NavLink to='/Login' activeClassName="active">Login</NavLink>}</li>
+                <li> {!localStorage.getItem('token') && <NavLink to='/Register' activeClassName="active">Register</NavLink>}</li>
+                <li className="logout" onClick={logout} >{localStorage.getItem('token') && <NavLink to='/' activeClassName='logout'>Logout</NavLink>}</li>
               </div>
             </ul>
           </div>
@@ -41,7 +40,9 @@ export default class Navbar extends Component {
         <Route path="/Post" exact component ={Post}/>
         <Route path="/Login" exact component={Login}/>
         <Route path="/Register" exact component={Register}/>
-      </Router>
-    );
+    </Router>
+  )
   }
+  
+
 }

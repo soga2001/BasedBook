@@ -163,12 +163,15 @@ def get_user_posts():
         return jsonify(post)
     return jsonify({"Message": "You have made no posts."})
 
+
+
 @app.route("/post/<post_id>", methods=['DELETE'])
 @cross_origin(origin="*")
 @auth_required
 def delete_post(post_id):
     mongo.db.post.find_one_and_delete({"_id": ObjectId(post_id)})
     return jsonify({'success': 'Your post has been deleted. Refreshing the page...'})
+
 
 @app.route("/protected", methods=['POST'])
 @auth_required
