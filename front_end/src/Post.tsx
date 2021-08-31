@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
+import {Button, Card, Row, Col, Container} from 'react-bootstrap';
+
 
 class Post extends Component {
     state = {err: '', message: ''}
@@ -40,24 +42,26 @@ class Post extends Component {
 
     render() {
         return (
-            <div className="App">
-                <header className="header">Post Content</header>
-                <form className="post"onSubmit={this.post}>
-                    <div>
-                        <label className="title">Title: </label>
-                        <input type="text" id="title" required></input>
-                    </div>
-                    <div >
-                        <label className="post_content" >Content:</label>
-                        <textarea rows={5} cols={50} id="content"></textarea>
-                    </div>
-                    <div>
-                        <button type="submit">Post</button>
-                    </div>
-                </form>
-                {this.state.err ? <h3 className="message" >{this.state.err}</h3> : <h3 className="message">{this.state.message}</h3>}
+            <Container style={{padding: '1%'}}>
+                <Card style={{ width: '100%', margin: 'auto' }} className="text-center">
+                    <Card.Header as='h3'>Post Content</Card.Header>
+                    <Card.Body style={{width: '100%'}}>
+                        <form className="post"onSubmit={this.post}>
+                            <Row>
+                                <Col xs={4} md={4}><label className="title">Title: </label></Col>
+                                <Col xs={10} md={6}><input type="text" id="title" required style={{width: '100%'}}></input></Col>
+                            </Row>
+                            <Row >
+                                <Col xs={4} md={4}><label className="post_content" >Content:</label></Col>
+                                <Col xs={10} md={6}><textarea id="content" style={{width: '100%'}} rows={10}></textarea></Col>
+                            </Row>
+                            <Button style={{margin: '1%'}} type="submit">Post</Button>
+                        </form>
+                        {this.state.err ? <h3 className="message" >{this.state.err}</h3> : <h3 className="message">{this.state.message}</h3>}
+                    </Card.Body>
+                </Card>
                 
-            </div>
+            </Container>
         )
     }
 }

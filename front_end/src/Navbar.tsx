@@ -1,42 +1,61 @@
-import React, { useState } from 'react';
+import React, {Component} from 'react';
 import {
-  Collapse,
-  Navbar, NavbarBrand, Nav, NavItem, NavLink, Container, NavDropdown
+  Navbar, 
+  Container, 
+  Nav, 
+  NavDropdown
 } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('username');
-  window.location.href ='/';
+  window.location.href ='/Home';
 }
 
 
-const NavBar = (props:any) => {
-  return (
-    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
-  <Container>
-  <Navbar.Brand href="/Home">Social Media</Navbar.Brand>
-  <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-  <Navbar.Collapse id="responsive-navbar-nav">
-    <Nav className="me-auto">
-      <Nav.Link href="/Home">Home</Nav.Link>
-      {localStorage.getItem('token') && <Nav.Link href="/Post">Post</Nav.Link>}
-    </Nav>
-    <Nav>
-    {!localStorage.getItem('token') && <Nav.Link href="/Login">Login</Nav.Link>}
-    {!localStorage.getItem('token') && <Nav.Link href="/Register">Register</Nav.Link>}
-    {localStorage.getItem('token') &&
-      <NavDropdown title={localStorage.getItem('username')} id="collasible-nav-dropdown">
-          <NavDropdown.Item href="#action/3.1">Profile</NavDropdown.Item>
-          <NavDropdown.Divider />
-          <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
-        </NavDropdown>}
-    </Nav>
-  </Navbar.Collapse>
-  </Container>
-</Navbar>
-  );
+class NavBar extends Component {
+  state = {activeKey: ''}
+  getInitialState() {
+    return {activeKey: 1};
+  }
+  
+  handleSelect(selectedKey: any) {
+    this.setState({activeKey: selectedKey});
+  }
+  render() {
+    return (
+      <Navbar collapseOnSelect expand="sm" bg="dark" variant="dark">
+        <Container>
+        <Navbar.Brand href="/Home"><img id="logo"
+            alt="Logo"
+            src="/logo.png"
+            width="30"
+            height="30"
+            className="d-inline-block align-top"
+          />{' '}Social Media</Navbar.Brand>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="me-auto" variant="pills">
+            <Nav.Link href="/Home">Home</Nav.Link>
+            {localStorage.getItem('token') && <Nav.Link  href="/Post">Post</Nav.Link>}
+          </Nav>
+          <Nav>
+            {!localStorage.getItem('token') && <Nav.Link eventKey="/Login" href="/Login">Login</Nav.Link>}
+            {!localStorage.getItem('token') && <Nav.Link eventKey="/Register" href="/Register">Register</Nav.Link>}
+            {localStorage.getItem('token') &&
+              <NavDropdown title={localStorage.getItem('username')} id="collasible-nav-dropdown">
+                <NavDropdown.Item href="/Profile">Profile</NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
+              </NavDropdown>}
+          </Nav>
+        </Navbar.Collapse>
+        </Container>
+      </Navbar>
+    );
+  }
+  
 }
 
 export default NavBar;

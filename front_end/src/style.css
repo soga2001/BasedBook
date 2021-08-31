@@ -5,24 +5,28 @@
   padding: 2%;
 }
 
+/* NavBar */
+.Navbar {
+  color: white !important;
+}
+
 /* Form */
 
 label {
-  display: inline-block;
   width: 500px;
   font-size: 20px;
   margin: 1%;
 }​
 
-.title {
+/* .title {
   display: inline-block;
   width: 500px;
   margin: 1%;
-}
+} */
 
 .post_content {
   display: inline-block;
-  width: 500px;
+  width: 0px;
   margin: 1%;
 }
 
@@ -53,14 +57,21 @@ form {
   text-align: center;
 }
 
+/* Logo */
+
+#logo:hover {
+  background-color: transparent !important;
+  filter: invert(20%) sepia(50%) saturate(3207%) hue-rotate(360deg) brightness(80%) contrast(200%);
+}
+
 /* Home Page */
 
 .posts {
-  width: 50%;
-  margin: auto;
-  padding: 2%;
-  width: 40%;
-  margin: auto;
+  text-align: justify;
+  text-indent: 50px;
+  word-wrap: break-word;
+  hyphens: auto;
+  white-space: pre-wrap;
 }
 
 .date, .author {
@@ -70,13 +81,6 @@ form {
   font-size: 15px;
 }
 
-.content {
-  text-align: justify;
-  text-indent: 50px;
-  word-wrap: break-word;
-  hyphens: auto;
-  white-space: pre-wrap;
-}
 
 .delete {
   background-color: #FADBD8;

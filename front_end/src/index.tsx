@@ -8,6 +8,7 @@ import Home from './Home';
 import Register from './Register';
 import Login from './Login';
 import Post from "./Post";
+import Profile from './Profile';
 
 
 
@@ -20,6 +21,7 @@ ReactDOM.render(
         <Route path="/Post"><Post/></Route>
         <Route path="/Login"> <Login /> </Route>
         <Route path="/Register"> <Register /> </Route>
+        <Route path="/Profile"><Profile/></Route>
       </Switch>
     </Router>
   </React.Fragment>,

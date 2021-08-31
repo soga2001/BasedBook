@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import axios from "axios";
-import './style.css'
+import './style.css';
+import {Button, Card, Row, Col, Container} from 'react-bootstrap';
+import Alert from 'react-bootstrap/Alert';
 
 class Register extends Component {
   state = {err: "", registered: ""};
@@ -27,25 +29,32 @@ class Register extends Component {
         
     render() {
         return (
-            <div className="App">
-              <header className="header">Register</header> 
-              <form onSubmit={this.register}>
-                <p>
-                  <label htmlFor="email">Email:</label>
-                  <input type="email" className="" id="email" required/>
-                </p>
-                <p>
-                  <label htmlFor="username">Username:</label>
-                  <input type="username" className="" id="username" required/>
-                </p>
-                <p>
-                  <label htmlFor="password">Password:</label>
-                  <input type="password" className="" id="password" required />
-                </p>
-                  <button type="submit" className="">Register</button>
-              </form>
-              {this.state.err ? <h3 className="message">{this.state.err}</h3> : <h3 className="message">{this.state.registered}</h3>}
-            </div>
+            <Container style={{padding: '1%'}}>
+              <Card style={{ width: '50rem', margin: 'auto' }} className="text-center">
+                <Card.Header as='h3'>Register</Card.Header>
+                <Card.Body>
+                  <form onSubmit={this.register}>
+                    <Row>
+                      <Col><label htmlFor="email">Email:</label></Col>
+                      <Col><input type="email" className="" id="email" placeholder="user123@example.com" required/></Col>
+                    </Row>
+                    <Row>
+                      <Col><label htmlFor="username">Username:</label></Col>
+                      <Col><input type="username" className="" id="username" placeholder="user123" required/></Col>
+                    </Row>
+                    <Row>
+                      <Col><label htmlFor="password">Password:</label></Col>
+                      <Col><input type="password" className="" id="password" required /></Col>
+                    </Row>
+                      <Button type="submit">Register</Button>
+                  </form>
+                  {this.state.err ? <Alert variant="danger"> {this.state.err} </Alert> : 
+                  this.state.registered &&  <Alert variant="danger">
+                  {this.state.registered}
+                  </Alert>}
+                </Card.Body>
+              </Card>
+            </Container>
         );
     }
 }
