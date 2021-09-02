@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import axios from "axios"
 import './style.css'
 import Alert from 'react-bootstrap/Alert'
-import {Button, Card, Row, Col, Container} from 'react-bootstrap';
+import {Button, Card, Row, Col, Container, FloatingLabel, Form} from 'react-bootstrap';
 
 
 class Login extends Component {
@@ -22,6 +22,7 @@ class Login extends Component {
       else if(res.data) {
         this.setState({err: ''})
         this.setState({login: true})
+        localStorage.setItem("logged_in", 'true')
         this.setState({logged_in: "You have been logged in. Redirecting to home page...."})
         localStorage.setItem("token", res.data.access_token)
         localStorage.setItem("username", res.data.username)
@@ -32,23 +33,28 @@ class Login extends Component {
   render() {
     return (
       <Container style={{padding: '1%'}}>
-        <Card style={{ width: '70%', margin: 'auto' }} className="text-center">
-          <Card.Header as='h3'>Login</Card.Header>
+        <Card style={{ width: '70%', margin: 'auto' }}>
+          <Card.Header as='h3' className="header">Login</Card.Header>
           <Card.Body style={{padding: '3%'}}>
             <form onSubmit={this.login}>
               <Row>
-                <Col xs={6} md={4}><label>Username: </label></Col>
-                <Col xs={12} md={8}><input type="text" id="username" placeholder="user123" required></input></Col>
+                <Col>
+                  <FloatingLabel label="Username" className="mb-3">
+                    <Form.Control type="text" id="username" placeholder="username" required />
+                  </FloatingLabel>
+                </Col>
+                <Col>
+                  <FloatingLabel label="Password" className="mb-3">
+                    <Form.Control type="password" id="password" placeholder="Password" required />
+                  </FloatingLabel>
+                </Col>
               </Row>
-              <Row>
-                <Col xs={6} md={4}><label>Password: </label></Col>
-                <Col xs={12} md={8}><input type="password" id="password" required></input></Col>
-              </Row>
-                <Button type="submit">Login</Button>
+              <Button type="submit" variant="outline-primary" className='button'>Login</Button>
+              
             </form>
             {this.state.err ? 
               <Alert variant="danger"> {this.state.err} </Alert> :
-              this.state.logged_in &&  <Alert variant="danger">
+              this.state.logged_in &&  <Alert>
               {this.state.logged_in}
               </Alert> }
           </Card.Body>

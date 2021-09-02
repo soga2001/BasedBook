@@ -51,25 +51,28 @@ class Home extends Component {
 
   renderData(post: Post) {
       return (
-        <Card style={{margin: 'auto', width: '60rem'}} className="text-center">
-          <Card.Header as="h3"> {post.title}</Card.Header>
-          <Card.Body>
-            <Row>
-              <Col>
-                  <Card.Text><strong>Author: </strong> {post.author}</Card.Text>
-                  <Card.Text hidden>{post._id}</Card.Text>
-                  <input type="text" id="post_id" value={post._id} hidden readOnly></input>
-              </Col>
-              <Col>
-                  <Card.Text><strong>Date Posted: </strong>{post.date_posted}</Card.Text>
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={14} md={10}><Card.Text className="posts">{post.content}</Card.Text></Col>
-              <Col xs={1} md={2}>{post.author === localStorage.getItem('username') ? <Button key='delete' variant="secondary" onClick={this.delete}>Delete</Button> : '' }</Col>
-            </Row>
-          </Card.Body>
-        </Card>
+        <Container>
+          <Card border="light" style={{margin: 'auto', width: '70%'}} className="text-center">
+            <Card.Header style={{background: '#C6F5FF'}} as="h3"> {post.title}</Card.Header>
+            <Card.Body style={{background: '#E3FAFF'}}>
+              <Row>
+                <Col>
+                    <Card.Text><strong>Author: </strong> {post.author}</Card.Text>
+                    <Card.Text hidden>{post._id}</Card.Text>
+                    <input type="text" id="post_id" value={post._id} hidden readOnly></input>
+                </Col>
+                <Col>
+                    <Card.Text><strong>Date Posted: </strong>{post.date_posted}</Card.Text>
+                </Col>
+              </Row>
+              <Row>
+                <Col xs={14} md={10}><Card.Text className="posts">{post.content}</Card.Text></Col>
+                <Col xs={1} md={2}>{post.author === localStorage.getItem('username') ? <Button key='delete' variant="outline-primary" onClick={this.delete}>Delete</Button> : '' }</Col>
+              </Row>
+            </Card.Body>
+          </Card>
+        </Container>
+        
       )
   }
 

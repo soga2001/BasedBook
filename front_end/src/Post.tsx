@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import axios from "axios";
-import {Button, Card, Row, Col, Container} from 'react-bootstrap';
+import {Button, Card, Row, Col, Container, FloatingLabel, Form} from 'react-bootstrap';
+import Alert from 'react-bootstrap/Alert';
+import {Check_token} from './Token';
 
 
 class Post extends Component {
@@ -23,15 +25,11 @@ class Post extends Component {
         })
         .catch((err) => {
             if (localStorage.getItem('token')) {
-                axios.post("http://127.0.0.1:5000/refresh-token", {}, {
-                    headers: {
-                        'Authorization': 'Bearer' + localStorage.getItem('token')
-                    }
-                })
-                .then((res) => {
+                console.log("token", localStorage.getItem('token'));
+                if(Check_token()) {
+                    console.log(localStorage.getItem('token'))
                     this.setState({message: "Access Token has been refreshed, please try again."})
-                    localStorage.setItem('token', res.data)
-                })
+                }
             }
             else {
                 this.setState({message: ''})
@@ -43,21 +41,28 @@ class Post extends Component {
     render() {
         return (
             <Container style={{padding: '1%'}}>
-                <Card style={{ width: '100%', margin: 'auto' }} className="text-center">
-                    <Card.Header as='h3'>Post Content</Card.Header>
-                    <Card.Body style={{width: '100%'}}>
+                <Card border="light" style={{ width: '70%', margin: 'auto' }}>
+                    <Card.Header as='h3' className="header" style={{background: '#FFD9AE'}}>Post Content</Card.Header>
+                    <Card.Body style={{width: '100%', margin: 'auto', background: "#FFEBD4"}}>
                         <form className="post"onSubmit={this.post}>
                             <Row>
-                                <Col xs={4} md={4}><label className="title">Title: </label></Col>
-                                <Col xs={10} md={6}><input type="text" id="title" required style={{width: '100%'}}></input></Col>
+                                <Col>
+                                    <FloatingLabel label="Title" className="mb-3">
+                                    <Form.Control type="text" id="title" placeholder="title" required/>
+                                    </FloatingLabel>
+                                </Col>
                             </Row>
                             <Row >
-                                <Col xs={4} md={4}><label className="post_content" >Content:</label></Col>
-                                <Col xs={10} md={6}><textarea id="content" style={{width: '100%'}} rows={10}></textarea></Col>
+                                <Col>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Content</Form.Label>
+                                        <Form.Control as="textarea" id="content" rows={10} />
+                                    </Form.Group>
+                                </Col>
                             </Row>
-                            <Button style={{margin: '1%'}} type="submit">Post</Button>
+                            <Button type="submit" variant="outline-primary" className='button'>Post</Button>
                         </form>
-                        {this.state.err ? <h3 className="message" >{this.state.err}</h3> : <h3 className="message">{this.state.message}</h3>}
+                        {this.state.err ? <Alert className="message">{this.state.err}</Alert>: this.state.message && <Alert className="message">{this.state.message}</Alert>}
                     </Card.Body>
                 </Card>
                 

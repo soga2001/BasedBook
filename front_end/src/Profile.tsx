@@ -3,6 +3,7 @@ import axios from "axios";
 import './style.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import {Button, Card, Row, Col, Container} from 'react-bootstrap';
+import Alert from 'react-bootstrap/Alert'
 
 interface Post {
   _id: string;
@@ -49,7 +50,7 @@ class Profile extends Component {
       if(res.data.success) {
         this.setState({posted_content: false})
         this.setState({message: res.data.success})
-        // setTimeout(() => window.location.href = '/Profile', 800)
+        setTimeout(() => window.location.href = '/Profile', 800)
       }
     })
   }
@@ -75,7 +76,7 @@ class Profile extends Component {
                         </Row>
                         <Row>
                             <Col xs={14} md={10}><Card.Text className="posts">{post.content}</Card.Text></Col>
-                            <Col xs={1} md={2}>{post.author === localStorage.getItem('username') ? <Button key='delete' variant="secondary" onClick={this.delete}>Delete</Button> : '' }</Col>
+                            <Col xs={1} md={2}>{post.author === localStorage.getItem('username') ? <Button key='delete' variant="outline-primary" onClick={this.delete}>Delete</Button> : '' }</Col>
                         </Row>
                     </Card.Body>
                 </Card>
@@ -95,12 +96,17 @@ class Profile extends Component {
     return (
       <div className="">
         <header className="header">Profile</header>
+        <Card  style={{width: '50%', margin: 'auto'}}>
+          <Card.Body>
+            <Card.Text>Username: {localStorage.getItem('username')}</Card.Text>
+          </Card.Body>
+        </Card>
         <div>
           {this.state.posted_content === true ? this.state.data.map((post) => (
             <div>
               {this.renderData(post)}
             </div>
-          )) : this.state.message}
+          )) : <Alert className="message">{this.state.message}</Alert> }
         </div>
       </div>
     );

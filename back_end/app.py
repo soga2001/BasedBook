@@ -11,8 +11,8 @@ guard = Praetorian()
 CORS(app)
 
 app.config["SECRET_KEY"] = "supo5458"
-app.config["JWT_ACCESS_LIFESPAN"] = {"hours": 4}
-app.config["JWT_REFRESH_LIFESPAN"] = {"days": 30}
+app.config["JWT_ACCESS_LIFESPAN"] = {"seconds": 30}
+app.config["JWT_REFRESH_LIFESPAN"] = {"seconds": 31}
 
 # connecting to mongo running on the computer
 app.config["MONGO_URI"] = "mongodb://localhost:27017/test_database"
@@ -44,6 +44,7 @@ def get_user_by_id(user_id):
 def refresh():
     old_token = guard.read_token_from_header()
     new_token = guard.refresh_jwt_token(old_token)
+    print("old", old_token, "new", new_token)
     return jsonify(new_token)
 
 #update_user_by_id doesn't work when a user is trying to update is password as of right now
@@ -98,6 +99,9 @@ def login():
 @cross_origin(origin="*")
 def register():
     try:
+        firstname = request.json["firstname"]
+        lastname = request.json["lastname"]
+        phone = request.json["phone"]
         email = request.json["email"]
         email = email.lower()
         username = request.json["username"]
@@ -118,6 +122,9 @@ def register():
             return jsonify({"error": "The username you entered is already taken."})
 
         mongo.db.users.insert_one({
+            "firstname": firstname,
+            "lastname": lastname,
+            "phone": phone,
             "email": email,
             "username": username,
             "password": hashed_password,
@@ -158,10 +165,10 @@ def get_all_post():
 @auth_required
 def get_user_posts():
     author = current_user().username
-    post = [Post.deserialize(x) for x in mongo.db.post.find({"author" : author})]
+    post = [Post.deserialize(x) for x in mongo.db.post.find({"author" : author}).sort("date_posted", DESCENDING)]
     if post:
         return jsonify(post)
-    return jsonify({"Message": "You have made no posts."})
+    return jsonify({"message": "You have made no posts."})
 
 
 
@@ -176,6 +183,7 @@ def delete_post(post_id):
 @app.route("/protected", methods=['POST'])
 @auth_required
 def protected():
+    print("protected")
     return jsonify({"success": True})
     
 

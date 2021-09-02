@@ -9,7 +9,10 @@ from bson import ObjectId
 @dataclass
 class User:
     _id: str = field(default_factory=str)
+    firstname: str = field(default_factory=str)
+    lastname: str = field(default_factory=str)
     email: str = field(default_factory=str)
+    phone: str = field(default_factory=str)
     username: str = field(default_factory=str)
     password: str = field(default_factory=str)
     roles: str = field(default_factory=str)
@@ -38,6 +41,9 @@ class User:
     @classmethod
     def deserialize(cls, user):
         return User(_id=str(user["_id"]),
+                    firstname=user["firstname"],
+                    lastname=user["lastname"],
+                    phone=user["phone"],
                     username=user["username"],
                     password=user["password"],
                     email=user["email"],

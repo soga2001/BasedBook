@@ -6,10 +6,12 @@ import {
   NavDropdown
 } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {Check_token} from './Token';
 
 function logout() {
   localStorage.removeItem('token');
   localStorage.removeItem('username');
+  localStorage.setItem("logged_in", 'false');
   window.location.href ='/Home';
 }
 
@@ -38,12 +40,12 @@ class NavBar extends Component {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto" variant="pills">
             <Nav.Link href="/Home">Home</Nav.Link>
-            {localStorage.getItem('token') && <Nav.Link  href="/Post">Post</Nav.Link>}
+            {Check_token() && localStorage.getItem("token") && <Nav.Link  href="/Post">Post</Nav.Link>}
           </Nav>
           <Nav>
-            {!localStorage.getItem('token') && <Nav.Link eventKey="/Login" href="/Login">Login</Nav.Link>}
-            {!localStorage.getItem('token') && <Nav.Link eventKey="/Register" href="/Register">Register</Nav.Link>}
-            {localStorage.getItem('token') &&
+            {Check_token() && !localStorage.getItem("token") && <Nav.Link eventKey="/Login" href="/Login">Login</Nav.Link>}
+            {Check_token() && !localStorage.getItem("token") && <Nav.Link eventKey="/Register" href="/Register">Register</Nav.Link>}
+            {Check_token() &&  localStorage.getItem("token") &&
               <NavDropdown title={localStorage.getItem('username')} id="collasible-nav-dropdown">
                 <NavDropdown.Item href="/Profile">Profile</NavDropdown.Item>
                 <NavDropdown.Divider />

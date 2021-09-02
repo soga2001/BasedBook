@@ -9,7 +9,7 @@ import Register from './Register';
 import Login from './Login';
 import Post from "./Post";
 import Profile from './Profile';
-
+import Footer from './Footer';
 
 
 ReactDOM.render(
@@ -24,6 +24,7 @@ ReactDOM.render(
         <Route path="/Profile"><Profile/></Route>
       </Switch>
     </Router>
+    <Footer/>
   </React.Fragment>,
   document.getElementById('root')
 );
