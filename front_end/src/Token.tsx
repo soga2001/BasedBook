@@ -1,5 +1,4 @@
 import axios from 'axios';
-import React from 'react';
 
 async function Check_token() {
     try {
@@ -28,9 +27,17 @@ async function Check_token() {
         .catch((error) =>{
             localStorage.removeItem("token")
             localStorage.removeItem("username")
+            if(window.location.href === '/Post' || window.location.href === '/Profile')
+            {
+                window.location.href = '/Home'
+            }
+            else {
+                window.location.reload();
+            }
             return false;
         })
     }
 }
+
 
 export {Check_token};

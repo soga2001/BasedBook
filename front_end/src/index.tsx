@@ -3,28 +3,28 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import NavBar from './Navbar';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import { BrowserRouter as Router, Route} from "react-router-dom";
 import Home from './Home';
 import Register from './Register';
 import Login from './Login';
 import Post from "./Post";
 import Profile from './Profile';
-import Footer from './Footer';
+// import Footer from './Footer';
+import Setting from './Setting';
 
 
 ReactDOM.render(
   <React.Fragment>
     <NavBar />
     <Router>
-      <Switch>
-        <Route path="/Home"> <Home /> </Route>
-        <Route path="/Post"><Post/></Route>
-        <Route path="/Login"> <Login /> </Route>
-        <Route path="/Register"> <Register /> </Route>
-        <Route path="/Profile"><Profile/></Route>
-      </Switch>
+      <Route exact path="/"><Home/></Route>
+        <Route exact path="/Home"> <Home /> </Route>
+        <Route exact path="/Post"><Post/></Route>
+        <Route exact path="/Login"> <Login /> </Route>
+        <Route exact path="/Register"> <Register /> </Route>
+        <Route exact path="/Profile"><Profile/></Route>
+        <Route exact path="/Setting"><Setting /></Route>
     </Router>
-    <Footer/>
   </React.Fragment>,
   document.getElementById('root')
 );

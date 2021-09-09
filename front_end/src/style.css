@@ -1,14 +1,49 @@
-html, body {
-  padding:0;
-	margin:0;
-}
-.App {
-  text-align: center;
-  font-size: 20px;
-  color: black;
-  padding: 2%;
+body {
+  background-color: green;
 }
 
+/* NavBar */
+
+/* #dropdown {
+  color: white;
+} */
+
+
+#dropdown{
+  color: white;
+}
+
+#navbar {
+  color: white;
+  /* background-color: black; */
+}
+
+/* #dropdown {
+  background-color: skyblue;
+} */
+
+#item {
+  color: white;
+  text-align: center;
+  /* width: 80px; */
+}
+
+#item:hover {
+  background-color: #6A6767;
+}
+
+#brand {
+  color: white;
+}
+
+
+
+/* Logo */
+
+#logo:hover {
+  background-color: transparent !important;
+  filter: invert(20%) sepia(50%) saturate(3207%) hue-rotate(360deg) brightness(80%) contrast(200%);
+}
 
 
 /* Form */
@@ -44,16 +79,9 @@ form {
 /* Header */
 
 .header {
-  font-size: 30px;
   text-align: center;
 }
 
-/* Logo */
-
-#logo:hover {
-  background-color: transparent !important;
-  filter: invert(20%) sepia(50%) saturate(3207%) hue-rotate(360deg) brightness(80%) contrast(200%);
-}
 
 /* Home Page */
 
@@ -73,29 +101,21 @@ form {
 }
 
 
-.delete {
-  background-color: #FADBD8;
-  color: black;
-  padding: 1%;
-  border-color: none;
+#delete {
+  padding: 10%;
+  font-size: 80%;
 }
 
-.delete:hover {
-  background-color: lightblue;
-  color: black;
+#heart {
+  background-color: transparent;
+  border-style: hidden;
+  color: red;
+  width: 90%;
+  margin: auto;
+  margin-top: 10%;
 }
 
-.delete_content {
-  padding: 1%;
-}
-
-
-/* Footer */
-
-footer {
-  color: black;
-}
-
-.footer {
-  flex: 1 0 auto;
+/* Profile */
+#info {
+  font-size: 15px;
 }

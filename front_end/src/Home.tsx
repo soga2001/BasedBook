@@ -3,6 +3,8 @@ import axios from "axios";
 import './style.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import {Button, Card, Row, Col, Container} from 'react-bootstrap';
+import {FaHeart} from "react-icons/fa";
+import {FiHeart} from "react-icons/fi";
 
 interface Post {
   _id: string;
@@ -10,6 +12,7 @@ interface Post {
   title: string;
   content: string;
   date_posted: string;
+  likes: number;
 }
 
 class Home extends Component {
@@ -30,7 +33,6 @@ class Home extends Component {
     this.setData();
   };
 
-  
   delete = (e: any) => {
     const post_id = {post_id: (document.getElementById("post_id") as HTMLInputElement).value
     }
@@ -46,6 +48,23 @@ class Home extends Component {
       }
     })
   }
+
+  liked = async() => {
+      await axios.patch("http://127.0.0.1:5000/like", {
+        _id: (document.getElementById("post_id") as HTMLInputElement).value,
+        likes: (document.getElementById("likes") as HTMLInputElement).value
+      }, {
+        headers:{
+          'Authorization': 'Bearer' + localStorage.getItem('token')}
+      } )
+      .then((res) => {
+        if(res.data) {
+            (document.getElementById("likes") as InnerHTML).innerHTML = res.data
+            console.log(res.data)
+        }
+      })
+    } 
+
 
 
 
@@ -66,8 +85,14 @@ class Home extends Component {
                 </Col>
               </Row>
               <Row>
-                <Col xs={14} md={10}><Card.Text className="posts">{post.content}</Card.Text></Col>
-                <Col xs={1} md={2}>{post.author === localStorage.getItem('username') ? <Button key='delete' variant="outline-primary" onClick={this.delete}>Delete</Button> : '' }</Col>
+                <Col xs={13} md={10}><Card.Text className="posts">{post.content}</Card.Text></Col>
+                <Col xs={2} md={2}>
+                  <Row>
+                    <Col xs={14} md={10}>{post.author === localStorage.getItem('username') ? <Button key='delete' variant="outline-primary" id="delete" onClick={this.delete}>Delete</Button> : '' }</Col>
+                    <Col xs={14} md={10}>{localStorage.getItem("token") && <Button id="heart" onClick={this.liked} onChange={this.liked}><FiHeart /> {post.likes}</Button>}</Col>
+                    <input type="text" id="likes" hidden readOnly value={post.likes}></input>
+                  </Row>
+                </Col>
               </Row>
             </Card.Body>
           </Card>
@@ -78,8 +103,8 @@ class Home extends Component {
 
   render() {
     return (
-      <div className="">
-        <header className="header">Home Page</header>
+      <div className="app">
+        <h1 className="header">Home Page</h1>
           {this.state.data.map((post) => (
             <div style={{margin: '1%'}}>
               {this.renderData(post)}

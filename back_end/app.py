@@ -11,8 +11,8 @@ guard = Praetorian()
 CORS(app)
 
 app.config["SECRET_KEY"] = "supo5458"
-app.config["JWT_ACCESS_LIFESPAN"] = {"seconds": 30}
-app.config["JWT_REFRESH_LIFESPAN"] = {"seconds": 31}
+app.config["JWT_ACCESS_LIFESPAN"] = {"hours": 4}
+app.config["JWT_REFRESH_LIFESPAN"] = {"days": 30}
 
 # connecting to mongo running on the computer
 app.config["MONGO_URI"] = "mongodb://localhost:27017/test_database"
@@ -31,13 +31,16 @@ def get_users():
 
 
 
-@app.route("/users/<user_id>", methods=['GET'])
-def get_user_by_id(user_id):
+@app.route("/user", methods=['GET'])
+@auth_required
+def get_user():
     try:
-        user = User.deserialize(mongo.db.users.find_one({"_id": ObjectId(user_id)}))
-        return jsonify(user.to_dict())
+        id = current_user()._id
+        user = [User.deserialize(mongo.db.users.find_one({"_id": ObjectId(id)})).to_dict()]
+        return jsonify(user)
+        # return jsonify({"error": "There is no user with that user_id in the database"})
     except:
-        return jsonify("There is no user with that user_id in the database")
+        return jsonify({"error": "There is no user with that user_id in the database"})
 
 @app.route("/refresh-token", methods=['POST'])
 @cross_origin(origin="*")
@@ -48,8 +51,9 @@ def refresh():
     return jsonify(new_token)
 
 #update_user_by_id doesn't work when a user is trying to update is password as of right now
-@app.route("/users", methods=['PUT'])
+@app.route("/user", methods=['PUT'])
 @auth_required
+@cross_origin(origin="*")
 def update_user_by_id():
     try:
         user_id = current_user()._id
@@ -60,8 +64,9 @@ def update_user_by_id():
         return jsonify("There is no user with that user_id in the database")
 
 
-@app.route('/users', methods=["DELETE"])
+@app.route('/user', methods=["DELETE"])
 @auth_required
+@cross_origin(origin="*")
 def delete_user():
     try:
         username = current_user().username
@@ -148,10 +153,23 @@ def post():
         "author": author,
         "title": title,
         "content": content,
-        "date_posted": date_posted
+        "date_posted": date_posted,
+        "likes": '0'
     })
     post = Post.deserialize(mongo.db.post.find_one({"author": author}))
     return jsonify({"success": 'Posted'})
+
+
+@app.route("/like", methods=["PATCH"])
+@auth_required
+def likes():
+    _id = request.json["_id"]
+    likes = int(request.json["likes"])
+    likes = likes + 1
+    Post.deserialize(mongo.db.post.find_one_and_update({"_id": ObjectId(_id) }, {"$set": {"likes": likes }}))
+    updated_likes = Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(_id)}))
+    return jsonify(updated_likes.likes)
+    
 
 
 @app.route("/post", methods=['GET'])
@@ -160,8 +178,8 @@ def get_all_post():
     return jsonify(posts)
 
 
-
 @app.route("/user_post", methods=['GET'])
+@cross_origin(origin="*")
 @auth_required
 def get_user_posts():
     author = current_user().username
@@ -183,7 +201,6 @@ def delete_post(post_id):
 @app.route("/protected", methods=['POST'])
 @auth_required
 def protected():
-    print("protected")
     return jsonify({"success": True})
     
 

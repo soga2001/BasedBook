@@ -3,7 +3,8 @@ import axios from "axios";
 import './style.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import {Button, Card, Row, Col, Container} from 'react-bootstrap';
-import Alert from 'react-bootstrap/Alert'
+import Alert from 'react-bootstrap/Alert';
+// import {Redirect} from './Token';
 
 interface Post {
   _id: string;
@@ -13,8 +14,24 @@ interface Post {
   date_posted: string;
 }
 
+interface User {
+  _id: string;
+  firstname: string;
+  lastname: string;
+  username: string;
+  email: string;
+  phone: string;
+  roles: string;
+}
+  
+
 class Profile extends Component {
-  state: { err: string; data: Post[], username: string, message: string, posted_content: boolean } = { err: "", data: [], username: '', message: '', posted_content: false };
+  state: { 
+    err: string; data: Post[], info: User[], username: string, message: string, posted_content: boolean
+  } 
+  = { 
+    err: "", data: [], info: [], username: '', message: '', posted_content: false
+  };
 
   constructor(props: any) {
     super(props);
@@ -26,12 +43,20 @@ class Profile extends Component {
         'Authorization': 'Bearer' + localStorage.getItem('token')
     }}).then((res) => {
         if(res.data.message) {
-            this.setState({posted_content: false})
             this.setState({message: res.data.message})
+            this.setState({posted_content: false});
         }
         else {
-            this.setState({posted_content: true})
+            this.setState({posted_content: true});
             this.setState({data: res.data });
+        }
+    })
+    axios.get("http://127.0.0.1:5000/user", {headers: {
+        'Authorization': 'Bearer' + localStorage.getItem('token')
+    }}).then((res) => {
+        if(res.data) {
+          this.setState({info: res.data});
+          console.log(this.state.info)
         }
     })
   }
@@ -60,27 +85,25 @@ class Profile extends Component {
   renderData(post: Post) {
       try {
         return (
-            <Container>
-                <Card style={{margin: 'auto', width: '60rem'}} className="text-center">
-                    <Card.Header as="h3"> {post.title}</Card.Header>
-                    <Card.Body>
-                        <Row>
-                            <Col>
-                                <Card.Text><strong>Author: </strong> {post.author}</Card.Text>
-                                <Card.Text hidden>{post._id}</Card.Text>
-                                <input type="text" id="post_id" value={post._id} hidden readOnly></input>
-                            </Col>
-                            <Col>
-                                <Card.Text><strong>Date Posted: </strong>{post.date_posted}</Card.Text>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col xs={14} md={10}><Card.Text className="posts">{post.content}</Card.Text></Col>
-                            <Col xs={1} md={2}>{post.author === localStorage.getItem('username') ? <Button key='delete' variant="outline-primary" onClick={this.delete}>Delete</Button> : '' }</Col>
-                        </Row>
-                    </Card.Body>
-                </Card>
-            </Container>
+          <Card style={{margin: 'auto', width: '100%'}} className="text-center">
+              <Card.Header as="h3" style={{background: '#FFDBEC'}}> {post.title}</Card.Header>
+              <Card.Body style={{background: '#FDE7F1'}}>
+                  <Row>
+                      <Col>
+                          <Card.Text><strong>Author: </strong> {post.author}</Card.Text>
+                          <Card.Text hidden>{post._id}</Card.Text>
+                          <input type="text" id="post_id" value={post._id} hidden readOnly></input>
+                      </Col>
+                      <Col>
+                          <Card.Text><strong>Date Posted: </strong>{post.date_posted}</Card.Text>
+                      </Col>
+                  </Row>
+                  <Row>
+                      <Col xs={11} md={11}><Card.Text className="posts">{post.content}</Card.Text></Col>
+                      <Col xs={1} md={1}> <Button key='delete' variant="outline-primary" onClick={this.delete} id="delete">Delete</Button></Col>
+                  </Row>
+              </Card.Body>
+          </Card>
         )
       }
       catch {
@@ -92,23 +115,78 @@ class Profile extends Component {
       }
   }
 
+  renderInfo(user: User) {
+    try {
+      return (
+        <div>{
+        <Card  style={{width: '100%'}} id="info">
+          <Card.Header className="header" as="h3" style={{background: '#F9DBFF'}}>Your Info</Card.Header>
+          <Card.Body style={{background: '#FCEEFF'}}>
+            <Row>
+              <Col xs={5}><Card.Text><strong>Username:</strong> {user.username}</Card.Text></Col>
+              <Col><Card.Text><strong>Email:</strong> {user.email}</Card.Text></Col>
+            </Row>
+            <Row>
+              <Col xs={5}><Card.Text><strong>Name:</strong> {user.firstname} {user.lastname}</Card.Text></Col>
+              <Col><Card.Text><strong>Phone:</strong> {user.phone}</Card.Text></Col>
+            </Row>
+            <Row>
+              <Col xs={5}><Card.Text><strong>Roles:</strong> {user.roles}</Card.Text></Col>
+              <Col><Card.Text><strong>UserID:</strong> {user._id}</Card.Text></Col>
+            </Row>
+          </Card.Body>
+        </Card>}
+          
+        </div>
+          
+      )
+    }
+    catch {
+        return (
+            <div>
+                {this.state.err}
+            </div>
+        )
+    }
+  }
+
   render() {
     return (
-      <div className="">
-        <header className="header">Profile</header>
-        <Card  style={{width: '50%', margin: 'auto'}}>
-          <Card.Body>
-            <Card.Text>Username: {localStorage.getItem('username')}</Card.Text>
-          </Card.Body>
-        </Card>
-        <div>
-          {this.state.posted_content === true ? this.state.data.map((post) => (
-            <div>
-              {this.renderData(post)}
+      <div className="app">
+        <Container className="container"> 
+          <h1 className="header">Profile</h1>
+          {localStorage.getItem("token") ? 
+          <Row>
+            <Col xs={5}>
+              <p className="header"></p>
+            </Col>
+            <Col xs={7}>
+            <div >
+                <h3 className="header">Your Posts</h3>
+              </div>
+            </Col>
+            <Col xs={5}>
+              <div>
+              {this.state.info.map((user) => (
+                <div style={{margin: '1%'}}>
+                  {this.renderInfo(user)}
+                </div>
+              ))}
             </div>
-          )) : <Alert className="message">{this.state.message}</Alert> }
-        </div>
+            </Col>
+            <Col xs={7}>
+              <div >
+                {this.state.posted_content === true ? this.state.data.map((post) => (
+                  <div style={{margin: '1%'}}>
+                    {this.renderData(post)}
+                  </div>
+                )) : ( localStorage.getItem("token") && <Alert className="message">{this.state.message}</Alert>)}
+              </div>
+            </Col>
+          </Row> : window.location.href = '/Home'}
+        </Container>
       </div>
+      
     );
   }
 }

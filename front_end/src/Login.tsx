@@ -32,35 +32,37 @@ class Login extends Component {
   }
   render() {
     return (
-      <Container style={{padding: '1%'}}>
-        <Card style={{ width: '70%', margin: 'auto' }}>
-          <Card.Header as='h3' className="header">Login</Card.Header>
-          <Card.Body style={{padding: '3%'}}>
-            <form onSubmit={this.login}>
-              <Row>
-                <Col>
-                  <FloatingLabel label="Username" className="mb-3">
-                    <Form.Control type="text" id="username" placeholder="username" required />
-                  </FloatingLabel>
-                </Col>
-                <Col>
-                  <FloatingLabel label="Password" className="mb-3">
-                    <Form.Control type="password" id="password" placeholder="Password" required />
-                  </FloatingLabel>
-                </Col>
-              </Row>
-              <Button type="submit" variant="outline-primary" className='button'>Login</Button>
-              
-            </form>
-            {this.state.err ? 
-              <Alert variant="danger"> {this.state.err} </Alert> :
-              this.state.logged_in &&  <Alert>
-              {this.state.logged_in}
-              </Alert> }
-          </Card.Body>
-        </Card>
-      </Container>
-        
+      <div className="app">
+        <Container style={{padding: '1%'}}>
+          <Card style={{ width: '70%', margin: 'auto' }}>
+            <Card.Header as='h3' className="header">Login</Card.Header>
+            <Card.Body style={{padding: '3%'}}>
+              <form onSubmit={this.login}>
+                <Row>
+                  <Col>
+                    <FloatingLabel label="Username" className="mb-3">
+                      <Form.Control type="text" id="username" placeholder="username" required />
+                    </FloatingLabel>
+                  </Col>
+                  <Col>
+                    <FloatingLabel label="Password" className="mb-3">
+                      <Form.Control type="password" id="password" placeholder="Password" required />
+                    </FloatingLabel>
+                  </Col>
+                </Row>
+                <Button type="submit" variant="outline-primary" className='button'>Login</Button>
+                
+              </form>
+              {this.state.err ? 
+                <Alert variant="danger" className="message"> {this.state.err} </Alert> :
+                this.state.logged_in &&  <Alert className="message">
+                {this.state.logged_in}
+                </Alert> }
+            </Card.Body>
+          </Card>
+        </Container>
+      </div> 
+      
       
     );
   }

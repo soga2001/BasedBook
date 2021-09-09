@@ -12,6 +12,7 @@ class Post():
     title: str = field(default_factory=str)
     content: str = field(default_factory=str)
     date_posted: datetime = field(default_factory=datetime)
+    likes: int = field(default_factory=int)
 
     @classmethod
     def deserialize(cls, post):
@@ -19,4 +20,5 @@ class Post():
                     author=post["author"],
                     title=post["title"],
                     content=post["content"],
-                    date_posted=post["date_posted"]) 
+                    date_posted=post["date_posted"],
+                    likes = post["likes"]) 
