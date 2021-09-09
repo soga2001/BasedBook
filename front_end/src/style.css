@@ -102,17 +102,18 @@ form {
 
 
 #delete {
-  padding: 10%;
-  font-size: 80%;
+  float: right !important;
 }
 
 #heart {
   background-color: transparent;
   border-style: hidden;
   color: red;
-  width: 90%;
-  margin: auto;
-  margin-top: 10%;
+  padding: 2%;
+}
+
+.card-footer {
+  background-color: #C6F5FF;
 }
 
 /* Profile */

@@ -3,6 +3,7 @@ import axios from "axios";
 import './style.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import {Button, Card, Row, Col, Container} from 'react-bootstrap';
+import Alert from 'react-bootstrap/Alert'
 import {FaHeart} from "react-icons/fa";
 import {FiHeart} from "react-icons/fi";
 
@@ -50,6 +51,7 @@ class Home extends Component {
   }
 
   liked = async() => {
+    console.log((document.getElementById("post_id") as HTMLInputElement).value)
       await axios.patch("http://127.0.0.1:5000/like", {
         _id: (document.getElementById("post_id") as HTMLInputElement).value,
         likes: (document.getElementById("likes") as HTMLInputElement).value
@@ -63,6 +65,9 @@ class Home extends Component {
             console.log(res.data)
         }
       })
+      .catch((error) => {
+        this.setState({message: <Alert variant="danger" style={{fontSize: "15px", marginTop: '10%'}}>You are not logged in.</Alert>})
+      })
     } 
 
 
@@ -71,7 +76,7 @@ class Home extends Component {
   renderData(post: Post) {
       return (
         <Container>
-          <Card border="light" style={{margin: 'auto', width: '70%'}} className="text-center">
+          <Card border="light" className="text-center" id="card-header">
             <Card.Header style={{background: '#C6F5FF'}} as="h3"> {post.title}</Card.Header>
             <Card.Body style={{background: '#E3FAFF'}}>
               <Row>
@@ -85,16 +90,23 @@ class Home extends Component {
                 </Col>
               </Row>
               <Row>
-                <Col xs={13} md={10}><Card.Text className="posts">{post.content}</Card.Text></Col>
-                <Col xs={2} md={2}>
-                  <Row>
-                    <Col xs={14} md={10}>{post.author === localStorage.getItem('username') ? <Button key='delete' variant="outline-primary" id="delete" onClick={this.delete}>Delete</Button> : '' }</Col>
-                    <Col xs={14} md={10}>{localStorage.getItem("token") && <Button id="heart" onClick={this.liked} onChange={this.liked}><FiHeart /> {post.likes}</Button>}</Col>
-                    <input type="text" id="likes" hidden readOnly value={post.likes}></input>
-                  </Row>
-                </Col>
+                <Col><Card.Text className="posts">{post.content}</Card.Text></Col>
               </Row>
             </Card.Body>
+            <Card.Footer id="card-footer">
+                  <Row>
+                    <Col xs={2} md={2}>
+                      {<Button id="heart" onClick={this.liked}><FiHeart/> {post.likes !== 0 && post.likes}</Button>}
+                        <input type="text" id="likes" hidden readOnly value={post.likes}></input>
+                    </Col>
+                    <Col xs={1} md={1} id="delete">
+                      {post.author === localStorage.getItem('username') ? 
+                        <Button key='delete' variant="outline-primary" onClick={this.delete}>Delete</Button> 
+                      : '' }
+                    </Col>
+                  </Row>
+
+            </Card.Footer>
           </Card>
         </Container>
         
