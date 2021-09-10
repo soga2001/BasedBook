@@ -17,7 +17,7 @@ interface Post {
 }
 
 class Home extends Component {
-  state: { err: string; data: Post[], username: string, message: string } = { err: "", data: [], username: '', message: '' };
+  state: { err: string; data: Post[], username: string, message: string} = { err: "", data: [], username: '', message: ''};
 
   constructor(props: any) {
     super(props);
@@ -34,43 +34,47 @@ class Home extends Component {
     this.setData();
   };
 
-  delete = (e: any) => {
-    const post_id = {post_id: (document.getElementById("post_id") as HTMLInputElement).value
+  delete = (postId: String) => {
+    return (e: any) => {
+        axios.delete(`http://127.0.0.1:5000/post/${postId}`, {
+            headers:{
+            'Authorization': 'Bearer' + localStorage.getItem('token')}
+        })
+        .then((res)=> {
+            if(res.data.success) {
+                this.setState({message: res.data.success})
+                setTimeout(() => window.location.href = '/Home', 800)
+            }
+        })
     }
-    console.log(post_id.post_id)
-    axios.delete(`http://127.0.0.1:5000/post/${post_id.post_id}`, {
-      headers:{
-        'Authorization': 'Bearer' + localStorage.getItem('token')}
-    })
-    .then((res)=> {
-      if(res.data.success) {
-        this.setState({message: res.data.success})
-        setTimeout(() => window.location.href = '/Home', 800)
-      }
-    })
   }
 
-  liked = async() => {
-    console.log((document.getElementById("post_id") as HTMLInputElement).value)
-      await axios.patch("http://127.0.0.1:5000/like", {
-        _id: (document.getElementById("post_id") as HTMLInputElement).value,
-        likes: (document.getElementById("likes") as HTMLInputElement).value
+  like = (post: Post) => {
+    return (e: any) => {
+      axios.patch(`http://127.0.0.1:5000/like`, {
+        post_id: post._id,
+        likes: post.likes
       }, {
         headers:{
           'Authorization': 'Bearer' + localStorage.getItem('token')}
       } )
       .then((res) => {
         if(res.data) {
-            (document.getElementById("likes") as InnerHTML).innerHTML = res.data
-            console.log(res.data)
+          post.likes++;
+          this.setState({data: this.state.data.map(p => {
+            if(p._id === post._id){
+              return post;
+            }
+            return p;
+          })})
         }
       })
       .catch((error) => {
+        console.log(error)
         this.setState({message: <Alert variant="danger" style={{fontSize: "15px", marginTop: '10%'}}>You are not logged in.</Alert>})
       })
-    } 
-
-
+    }
+  }
 
 
   renderData(post: Post) {
@@ -81,9 +85,8 @@ class Home extends Component {
             <Card.Body style={{background: '#E3FAFF'}}>
               <Row>
                 <Col>
-                    <Card.Text><strong>Author: </strong> {post.author}</Card.Text>
-                    <Card.Text hidden>{post._id}</Card.Text>
-                    <input type="text" id="post_id" value={post._id} hidden readOnly></input>
+                    <Card.Text><strong key={post.author}>Author: </strong> {post.author}</Card.Text>
+                    <input type="text" id="post_id" key={post._id} value={post._id} hidden readOnly></input>
                 </Col>
                 <Col>
                     <Card.Text><strong>Date Posted: </strong>{post.date_posted}</Card.Text>
@@ -96,12 +99,13 @@ class Home extends Component {
             <Card.Footer id="card-footer">
                   <Row>
                     <Col xs={2} md={2}>
-                      {<Button id="heart" onClick={this.liked}><FiHeart/> {post.likes !== 0 && post.likes}</Button>}
-                        <input type="text" id="likes" hidden readOnly value={post.likes}></input>
+                      {<Button id="heart" onClick={this.like(post)}><FiHeart/> </Button>}
+                      <p id="likes">{post.likes}</p>
+                      {this.state.message}
                     </Col>
                     <Col xs={1} md={1} id="delete">
                       {post.author === localStorage.getItem('username') ? 
-                        <Button key='delete' variant="outline-primary" onClick={this.delete}>Delete</Button> 
+                        <Button key='delete' variant="outline-primary" onClick={this.delete(post._id)}>Delete</Button> 
                       : '' }
                     </Col>
                   </Row>
@@ -119,6 +123,9 @@ class Home extends Component {
         <h1 className="header">Home Page</h1>
           {this.state.data.map((post) => (
             <div style={{margin: '1%'}}>
+              {/* <Post post={post}>
+
+              </Post> */}
               {this.renderData(post)}
             </div>
           ))}

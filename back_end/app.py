@@ -133,7 +133,8 @@ def register():
             "email": email,
             "username": username,
             "password": hashed_password,
-            "roles": "N/A"
+            "roles": "N/A",
+            "liked": []
         })
         user = User.deserialize(mongo.db.users.find_one({"email": email})).to_dict()
         return jsonify({"success": "You have been registered"})
@@ -159,17 +160,38 @@ def post():
     post = Post.deserialize(mongo.db.post.find_one({"author": author}))
     return jsonify({"success": 'Posted'})
 
+# 613bb5058412d8ba7b2a3c95
+# 613bb5058412d8ba7b2a3c95
 
 @app.route("/like", methods=["PATCH"])
 @auth_required
 def likes():
-    _id = request.json["_id"]
+    # print(current_user().liked) 
+    post_id = request.json["post_id"]
     likes = int(request.json["likes"])
+    _id = ObjectId(current_user()._id)
+    user = User.deserialize(mongo.db.users.find_one({"_id": _id}))
+    for a in user.liked:
+        if post_id == a:
+            user.liked.remove(post_id)
+            print(user.liked)
+            likes = likes - 1
+            User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
+            Post.deserialize(mongo.db.post.find_one_and_update({"_id": ObjectId(post_id) }, {"$set": {"likes": likes }}))
+            updated_likes = Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(post_id)}))
+            return jsonify(updated_likes.likes)
+    user.liked.append(post_id)
+    User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
     likes = likes + 1
-    Post.deserialize(mongo.db.post.find_one_and_update({"_id": ObjectId(_id) }, {"$set": {"likes": likes }}))
-    updated_likes = Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(_id)}))
+    Post.deserialize(mongo.db.post.find_one_and_update({"_id": ObjectId(post_id) }, {"$set": {"likes": likes }}))
+    updated_likes = Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(post_id)}))
     return jsonify(updated_likes.likes)
-    
+
+
+@app.route("/liked", methods=["GET"])
+@auth_required
+def liked():
+    return jsonify(current_user().liked)
 
 
 @app.route("/post", methods=['GET'])
@@ -191,10 +213,8 @@ def get_user_posts():
 
 
 @app.route("/post/<post_id>", methods=['DELETE'])
-@cross_origin(origin="*")
 @auth_required
 def delete_post(post_id):
-
     mongo.db.post.find_one_and_delete({"_id": ObjectId(post_id)})
     return jsonify({'success': 'Your post has been deleted. Refreshing the page...'})
 

@@ -32,7 +32,7 @@ class Register extends Component {
         
     render() {
         return (
-            <Container style={{padding: '1%'}}>
+            <Container style={{padding: '1%'}}> 
               <Card style={{ width: '70%', margin: 'auto'}} >
                 <Card.Header as='h3' className="header">Register</Card.Header>
                 <Card.Body>

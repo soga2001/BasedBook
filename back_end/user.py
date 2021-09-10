@@ -16,6 +16,7 @@ class User:
     username: str = field(default_factory=str)
     password: str = field(default_factory=str)
     roles: str = field(default_factory=str)
+    liked: list = field(default_factory=list)
 
     @property
     def identity(self):
@@ -25,6 +26,13 @@ class User:
     def rolenames(self):
         try:
             return self.roles.split(",")
+        except:
+            return []
+
+    @property
+    def liked_content(self):
+        try:
+            return self.liked.split(",")
         except:
             return []
 
@@ -47,7 +55,8 @@ class User:
                     username=user["username"],
                     password=user["password"],
                     email=user["email"],
-                    roles=user["roles"])
+                    roles=user["roles"],
+                    liked=user["liked"])
 
     #removes the password so that when data is printed, it doesn't display the password
     def to_dict(self):
