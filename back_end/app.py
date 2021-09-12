@@ -133,7 +133,7 @@ def register():
             "email": email,
             "username": username,
             "password": hashed_password,
-            "roles": "N/A",
+            "roles": "member",
             "liked": []
         })
         user = User.deserialize(mongo.db.users.find_one({"email": email})).to_dict()
@@ -171,27 +171,45 @@ def likes():
     likes = int(request.json["likes"])
     _id = ObjectId(current_user()._id)
     user = User.deserialize(mongo.db.users.find_one({"_id": _id}))
+    print("before for loop", user.to_dict())
     for a in user.liked:
-        if post_id == a:
+        print(a, user.liked)
+        if a == post_id:
+            print("inside ", user.liked)
             user.liked.remove(post_id)
-            print(user.liked)
+            print("before - likes", likes)
             likes = likes - 1
+            print("after", likes)
             User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
-            Post.deserialize(mongo.db.post.find_one_and_update({"_id": ObjectId(post_id) }, {"$set": {"likes": likes }}))
+            (mongo.db.post.find_one_and_update({"_id": ObjectId(post_id) }, {"$set": {"likes": likes }}))
             updated_likes = Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(post_id)}))
-            return jsonify(updated_likes.likes)
+            print(updated_likes.likes)
+            if(updated_likes.likes == 0 ):
+                return jsonify({"likes": 0})
+            return jsonify({"likes": likes})
+    print("skipped past if statement")
     user.liked.append(post_id)
     User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
     likes = likes + 1
-    Post.deserialize(mongo.db.post.find_one_and_update({"_id": ObjectId(post_id) }, {"$set": {"likes": likes }}))
+    (mongo.db.post.find_one_and_update({"_id": ObjectId(post_id)}, {"$set": {"likes": likes }}))
     updated_likes = Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(post_id)}))
-    return jsonify(updated_likes.likes)
+    print("likes ",updated_likes.likes)
+    return jsonify({"likes": likes})
 
 
 @app.route("/liked", methods=["GET"])
 @auth_required
 def liked():
-    return jsonify(current_user().liked)
+    user = User.deserialize(mongo.db.users.find_one({"_id": ObjectId(current_user()._id)}))
+    item = []
+    for items in user.liked:
+        post = (mongo.db.post.find_one({"_id": ObjectId(items)}))
+        if(post):
+            item.append([Post.deserialize(mongo.db.post.find_one({"_id" : ObjectId(items)}))])
+        else:
+            user.liked.remove(items)
+    User.deserialize(mongo.db.users.find_one_and_update({"_id": ObjectId(current_user()._id)}, {"$set": {"liked": user.liked}}))
+    return jsonify(item)
 
 
 @app.route("/post", methods=['GET'])

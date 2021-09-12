@@ -59,8 +59,9 @@ class Home extends Component {
           'Authorization': 'Bearer' + localStorage.getItem('token')}
       } )
       .then((res) => {
-        if(res.data) {
-          post.likes++;
+        if(res.data.likes) {
+          post.likes = res.data.likes;
+          console.log(post.likes)
           this.setState({data: this.state.data.map(p => {
             if(p._id === post._id){
               return post;
