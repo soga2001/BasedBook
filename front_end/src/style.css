@@ -24,17 +24,23 @@ body {
 
 #item {
   color: white;
-  text-align: center;
+  text-decoration: none;
   /* width: 80px; */
 }
 
+#item.active {
+  color: red;
+  width: 100px;
+}
+
 #item:hover {
-  background-color: #6A6767;
+  color: skyblue;
 }
 
 #brand {
   color: white;
 }
+
 
 
 

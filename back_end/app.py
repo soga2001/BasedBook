@@ -171,15 +171,11 @@ def likes():
     likes = int(request.json["likes"])
     _id = ObjectId(current_user()._id)
     user = User.deserialize(mongo.db.users.find_one({"_id": _id}))
-    print("before for loop", user.to_dict())
     for a in user.liked:
         print(a, user.liked)
         if a == post_id:
-            print("inside ", user.liked)
             user.liked.remove(post_id)
-            print("before - likes", likes)
             likes = likes - 1
-            print("after", likes)
             User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
             (mongo.db.post.find_one_and_update({"_id": ObjectId(post_id) }, {"$set": {"likes": likes }}))
             updated_likes = Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(post_id)}))
@@ -187,7 +183,6 @@ def likes():
             if(updated_likes.likes == 0 ):
                 return jsonify({"likes": 0})
             return jsonify({"likes": likes})
-    print("skipped past if statement")
     user.liked.append(post_id)
     User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
     likes = likes + 1
