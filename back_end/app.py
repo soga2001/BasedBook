@@ -160,13 +160,10 @@ def post():
     post = Post.deserialize(mongo.db.post.find_one({"author": author}))
     return jsonify({"success": 'Posted'})
 
-# 613bb5058412d8ba7b2a3c95
-# 613bb5058412d8ba7b2a3c95
 
 @app.route("/like", methods=["PATCH"])
 @auth_required
 def likes():
-    # print(current_user().liked) 
     post_id = request.json["post_id"]
     likes = int(request.json["likes"])
     _id = ObjectId(current_user()._id)
@@ -179,17 +176,13 @@ def likes():
             User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
             (mongo.db.post.find_one_and_update({"_id": ObjectId(post_id) }, {"$set": {"likes": likes }}))
             updated_likes = Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(post_id)}))
-            print(updated_likes.likes)
-            if(updated_likes.likes == 0 ):
-                return jsonify({"likes": 0})
-            return jsonify({"likes": likes})
+            return jsonify({"disliked": "disliked"})
     user.liked.append(post_id)
     User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
     likes = likes + 1
     (mongo.db.post.find_one_and_update({"_id": ObjectId(post_id)}, {"$set": {"likes": likes }}))
     updated_likes = Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(post_id)}))
-    print("likes ",updated_likes.likes)
-    return jsonify({"likes": likes})
+    return jsonify({"liked":"liked"})
 
 
 @app.route("/liked", methods=["GET"])

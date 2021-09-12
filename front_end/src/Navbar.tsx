@@ -60,7 +60,6 @@ class NavBar extends Component {
                 {!localStorage.getItem('token') && <NavLink to='/Login' id="item" activeClassName="active">Login {<LogIn/>}</NavLink>}
                 {!localStorage.getItem('token') && <NavLink to='/Register' id="item" activeClassName="active">Register</NavLink>}
                 {localStorage.getItem("token") && 
-                  
                     <NavDropdown title={localStorage.getItem("username")}  id="item" menuVariant="dark">
                           <NavDropdown.Item>
                             <NavLink to="/Profile" id="item" activeClassName="active"><Row>

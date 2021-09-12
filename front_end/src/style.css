@@ -25,6 +25,7 @@ body {
 #item {
   color: white;
   text-decoration: none;
+  width: 100px;
   /* width: 80px; */
 }
 
