@@ -3,8 +3,7 @@ import axios from "axios";
 import './style.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import {Button, Card, Row, Col, Container} from 'react-bootstrap';
-import Alert from 'react-bootstrap/Alert'
-import {FaHeart} from "react-icons/fa";
+// import {FaHeart} from "react-icons/fa";
 import {FiHeart} from "react-icons/fi";
 
 interface Post {
@@ -76,7 +75,7 @@ class Home extends Component {
       })
       .catch((error) => {
         console.log(error)
-        this.setState({message: <Alert variant="danger" style={{fontSize: "15px", marginTop: '10%'}}>You are not logged in.</Alert>})
+        alert("You are not logged in.")
       })
     }
   }
@@ -90,8 +89,8 @@ class Home extends Component {
             <Card.Body style={{background: '#E3FAFF'}}>
               <Row>
                 <Col>
-                    <Card.Text><strong key={post.author}>Author: </strong> {post.author}</Card.Text>
-                    <input type="text" id="post_id" key={post._id} value={post._id} hidden readOnly></input>
+                    <Card.Text><strong>Author: </strong> {post.author}</Card.Text>
+                    <input type="text" id="post_id" value={post._id} hidden readOnly></input>
                 </Col>
                 <Col>
                     <Card.Text><strong>Date Posted: </strong>{post.date_posted}</Card.Text>
@@ -110,7 +109,7 @@ class Home extends Component {
                     </Col>
                     <Col xs={1} md={1} id="delete">
                       {post.author === localStorage.getItem('username') ? 
-                        <Button key='delete' variant="outline-primary" onClick={this.delete(post._id)}>Delete</Button> 
+                        <Button variant="outline-primary" onClick={this.delete(post._id)}>Delete</Button> 
                       : '' }
                     </Col>
                   </Row>
@@ -127,7 +126,7 @@ class Home extends Component {
       <div className="app">
         <h1 className="header">Home Page</h1>
           {this.state.data.map((post) => (
-            <div style={{margin: '1%'}}>
+            <div style={{margin: '1%'}} key={post._id}>
               {/* <Post post={post}>
 
               </Post> */}

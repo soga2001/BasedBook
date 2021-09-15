@@ -4,11 +4,6 @@ body {
 
 /* NavBar */
 
-/* #dropdown {
-  color: white;
-} */
-
-
 #dropdown{
   color: white;
 }
@@ -17,10 +12,6 @@ body {
   color: white;
   /* background-color: black; */
 }
-
-/* #dropdown {
-  background-color: skyblue;
-} */
 
 #item {
   color: white;
@@ -41,9 +32,6 @@ body {
 #brand {
   color: white;
 }
-
-
-
 
 /* Logo */
 
@@ -126,4 +114,6 @@ form {
 /* Profile */
 #info {
   font-size: 15px;
+  width: 65%;
+  margin: auto;
 }

@@ -189,15 +189,18 @@ def likes():
 @auth_required
 def liked():
     user = User.deserialize(mongo.db.users.find_one({"_id": ObjectId(current_user()._id)}))
-    item = []
+    item = user.liked
+    item.reverse()
     for items in user.liked:
         post = (mongo.db.post.find_one({"_id": ObjectId(items)}))
-        if(post):
-            item.append([Post.deserialize(mongo.db.post.find_one({"_id" : ObjectId(items)}))])
-        else:
+        if(not post):
             user.liked.remove(items)
     User.deserialize(mongo.db.users.find_one_and_update({"_id": ObjectId(current_user()._id)}, {"$set": {"liked": user.liked}}))
-    return jsonify(item)
+    # user = User.deserialize(mongo.db.users.find_one({"_id": ObjectId(current_user()._id)}))
+    item = [Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(x)})) for x in item]
+    if(item):
+        return jsonify(item)
+    return jsonify({"message": "You have liked no posts."})
 
 
 @app.route("/post", methods=['GET'])

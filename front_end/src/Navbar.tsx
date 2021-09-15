@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { BrowserRouter as Router, Route, NavLink, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, NavLink } from 'react-router-dom';
 import {
   Navbar, 
   Container, 
@@ -30,11 +30,21 @@ window.onload = function() {
   Check_token()
 };
 
-class NavBar extends Component {
+function navy() {
+  Check_token()
+  .then(() => {
+    console.log("True")
+  })
+  .catch(() => {
+    console.log("False")
+  })
+}
 
+class NavBar extends Component {
   render() {
     return (
       <Router>
+        {navy()}
         <Navbar collapseOnSelect expand="sm" bg="dark" id="navbar">
           <Container className="container">
             <Navbar.Brand id="brand" href="/Home"><img id="logo"

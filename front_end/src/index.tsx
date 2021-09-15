@@ -3,14 +3,6 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import NavBar from './Navbar';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter as Router, Route, Switch} from "react-router-dom";
-import Home from './Home';
-import Register from './Register';
-import Login from './Login';
-import Post from "./Post";
-import Profile from './Profile';
-// import Footer from './Footer';
-import Setting from './Setting';
 
 
 ReactDOM.render(

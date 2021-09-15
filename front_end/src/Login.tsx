@@ -21,8 +21,6 @@ class Login extends Component {
       }
       else if(res.data) {
         this.setState({err: ''})
-        this.setState({login: true})
-        localStorage.setItem("logged_in", 'true')
         this.setState({logged_in: "You have been logged in. Redirecting to home page...."})
         localStorage.setItem("token", res.data.access_token)
         localStorage.setItem("username", res.data.username)
