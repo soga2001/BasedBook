@@ -46,7 +46,7 @@ function Home() {
 
   const like = (postID: any, postLikes: any) => {
     return (e: any) => {
-      axios.patch("http://127.0.0.1:5000/like", {
+      axios.patch(`http://127.0.0.1:5000/like`, {
         post_id: postID,
         likes: postLikes
       }, {
@@ -55,10 +55,6 @@ function Home() {
       } )
       .then((res) => {
         setData(res.data)
-      })
-      .catch((error) => {
-        console.log(error)
-        alert("You are not logged in.")
       })
     }
   }
@@ -90,7 +86,7 @@ function Home() {
             <Card.Footer id="card-footer">
               <Row>
                 <Col md={1} xs={2}>
-                  {<Button id="heart" onClick={() => like(post._id, post.likes)}><FiHeart/> {post.likes}</Button>}
+                  {<Button id="heart" onClick={like(post._id, post.likes)}><FiHeart/> {post.likes}</Button>}
                 </Col>
                 <Col md={1} xs={2}>
                   {post.author === localStorage.getItem('username') ? 
