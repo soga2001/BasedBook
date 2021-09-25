@@ -34,7 +34,6 @@ interface Liked {
   date_posted: string;
   likes: number;
 }
-  
 
 class Profile extends Component {
   state: { 
@@ -48,6 +47,8 @@ class Profile extends Component {
     super(props);
     this.setData();
   }
+  
+
 
   setData() {
     axios.get("http://127.0.0.1:5000/user_post", {headers: {
@@ -159,14 +160,12 @@ class Profile extends Component {
             </Card.Body>
             <Card.Footer id="card-footer">
               <Row>
-                <Col xs={2} md={2}>
-                  {<Button id="heart" onClick={this.like(post)}><FiHeart/> </Button>}
-                  <p id="likes">{post.likes}</p>
-                  {this.state.message}
+                <Col md={2} xs={2}>
+                  {<Button id="heart" onClick={this.like(post)}><FiHeart/> {post.likes} </Button>}
                 </Col>
-                <Col xs={1} md={1} id="delete">
+                <Col md={2} xs={2}>
                   {post.author === localStorage.getItem('username') ? 
-                    <Button variant="outline-primary" onClick={this.delete(post._id)}>Delete</Button> 
+                    <Button id="button" variant="outline-primary" onClick={this.delete(post._id)}>Delete</Button> 
                   : '' }
                 </Col>
               </Row>
@@ -240,8 +239,7 @@ class Profile extends Component {
               <Card.Footer id="card-footer">
                   <Row>
                     <Col xs={2} md={2}>
-                      {<Button id="heart" onClick={this.like(post)}><FiHeart/> </Button>}
-                      <p id="likes">{post.likes}</p>
+                      {<Button id="heart" onClick={this.like(post)}><FiHeart/> {post.likes}</Button>}
                     </Col>
                   </Row>
             </Card.Footer>

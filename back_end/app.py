@@ -30,7 +30,6 @@ def get_users():
     return jsonify([User.deserialize(x).to_dict() for x in mongo.db.users.find()])
 
 
-
 @app.route("/user", methods=['GET'])
 @auth_required
 def get_user():
@@ -47,7 +46,6 @@ def get_user():
 def refresh():
     old_token = guard.read_token_from_header()
     new_token = guard.refresh_jwt_token(old_token)
-    print("old", old_token, "new", new_token)
     return jsonify(new_token)
 
 #update_user_by_id doesn't work when a user is trying to update is password as of right now
@@ -77,7 +75,7 @@ def delete_user():
         user_password = guard._verify_password(password, current_user().password)
         if user_password:
             remove_user = User.deserialize(mongo.db.users.find_one_and_delete({"_id": ObjectId(_id)}))
-            remove_post = mongo.db.post.delete_many({"author": username})
+            mongo.db.post.delete_many({"author": username})
             return jsonify(remove_user.to_dict())
         return jsonify("Invalid Username or Password")
     except:
@@ -91,10 +89,8 @@ def login():
         username = request.json["username"]
         username = username.lower()
         password = request.json["password"]
-        
         user = guard.authenticate(username, password)
         token = guard.encode_jwt_token(user)
-        # print(username, password)
         return jsonify({"access_token": token, "username": username})
     except:
         return jsonify({"error": "Invalid username or password."})
@@ -136,7 +132,47 @@ def register():
             "roles": "member",
             "liked": []
         })
-        user = User.deserialize(mongo.db.users.find_one({"email": email})).to_dict()
+        User.deserialize(mongo.db.users.find_one({"email": email})).to_dict()
+        return jsonify({"success": "You have been registered"})
+    except:
+        return jsonify("Please don't leave anything empty.")
+
+
+@app.route("/register/admin", methods=['POST'])
+def register_admin():
+    try:
+        firstname = request.json["firstname"]
+        lastname = request.json["lastname"]
+        phone = request.json["phone"]
+        email = request.json["email"]
+        email = email.lower()
+        username = request.json["username"]
+        username = username.lower()
+        password = request.json["password"]
+        hashed_password = guard.hash_password(password)
+        #check if the email and username is already in the database
+        found_email = mongo.db.users.find_one({"email": email})
+        found_username = mongo.db.users.find_one({"username": username})
+        #if found_email and found_username aren't empty and the database returned something
+        #don't add the user into the database otherwise, add the user
+        if found_email and found_username:
+            return jsonify({"error": "The email and username you entered is already taken."})
+        if found_email:
+            return jsonify({"error":"The email you entered is already taken."})
+        if found_username:
+            return jsonify({"error": "The username you entered is already taken."})
+
+        mongo.db.users.insert_one({
+            "firstname": firstname,
+            "lastname": lastname,
+            "phone": phone,
+            "email": email,
+            "username": username,
+            "password": hashed_password,
+            "roles": "admin",
+            "liked": []
+        })
+        User.deserialize(mongo.db.users.find_one({"email": email})).to_dict()
         return jsonify({"success": "You have been registered"})
     except:
         return jsonify("Please don't leave anything empty.")
@@ -157,7 +193,8 @@ def post():
         "date_posted": date_posted,
         "likes": '0'
     })
-    post = Post.deserialize(mongo.db.post.find_one({"author": author}))
+    
+    Post.deserialize(mongo.db.post.find_one({"author": author}))
     return jsonify({"success": 'Posted'})
 
 
@@ -169,20 +206,17 @@ def likes():
     _id = ObjectId(current_user()._id)
     user = User.deserialize(mongo.db.users.find_one({"_id": _id}))
     for a in user.liked:
-        print(a, user.liked)
         if a == post_id:
             user.liked.remove(post_id)
             likes = likes - 1
             User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
             (mongo.db.post.find_one_and_update({"_id": ObjectId(post_id) }, {"$set": {"likes": likes }}))
-            updated_likes = Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(post_id)}))
-            return jsonify({"disliked": "disliked"})
+            return jsonify([Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING)])
     user.liked.append(post_id)
     User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
     likes = likes + 1
     (mongo.db.post.find_one_and_update({"_id": ObjectId(post_id)}, {"$set": {"likes": likes }}))
-    updated_likes = Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(post_id)}))
-    return jsonify({"liked":"liked"})
+    return jsonify([Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING)])
 
 
 @app.route("/liked", methods=["GET"])
@@ -225,7 +259,7 @@ def get_user_posts():
 @auth_required
 def delete_post(post_id):
     mongo.db.post.find_one_and_delete({"_id": ObjectId(post_id)})
-    return jsonify({'success': 'Your post has been deleted. Refreshing the page...'})
+    return jsonify([Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING)])
 
 
 @app.route("/protected", methods=['POST'])
@@ -234,6 +268,9 @@ def protected():
     return jsonify({"success": True})
     
 
+@app.route("/checking", methods=['GET'])
+def checking():
+    return jsonify({"checked": "Checked"})
 
 #Run the example
 if __name__ == "__main__":

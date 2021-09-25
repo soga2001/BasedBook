@@ -1,10 +1,11 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import './style.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import {Button, Card, Row, Col, Container} from 'react-bootstrap';
 // import {FaHeart} from "react-icons/fa";
 import {FiHeart} from "react-icons/fi";
+
 
 interface Post {
   _id: string;
@@ -15,63 +16,45 @@ interface Post {
   likes: number;
 }
 
-class Home extends Component {
-  state: { err: string; data: Post[], username: string, message: string} = { err: "", data: [], username: '', message: ''};
+function Home() {
+  const [posts, setData] = useState<any[]>([])
 
-  constructor(props: any) {
-    super(props);
-    this.setData();
-  }
+  const post = async () => {
+    try {
+      const fetchPost = await fetch("http://127.0.0.1:5000/post");
+      const jsonData = await fetchPost.json();
+      setData(jsonData);
+      console.log(jsonData)
+    }
+    catch {
 
-  setData() {
-    axios.get("http://127.0.0.1:5000/post").then((res) => {
-      this.setState({ data: res.data });
-    });
-  }
-
-  home = (e: any) => {
-    this.setData();
-  };
-
-  delete = (postId: String) => {
-    return (e: any) => {
-        axios.delete(`http://127.0.0.1:5000/post/${postId}`, {
-            headers:{
-            'Authorization': 'Bearer' + localStorage.getItem('token')}
-        })
-        .then((res)=> {
-            if(res.data.success) {
-                this.setState({message: res.data.success})
-                setTimeout(() => window.location.href = '/Home', 800)
-            }
-        })
     }
   }
 
-  like = (post: Post) => {
+  const remove = (postId: String) => {
+    return (e: any) => (
+      axios.delete(`http://127.0.0.1:5000/post/${postId}`, {
+        headers:{
+          'Authorization': 'Bearer' + localStorage.getItem('token')}
+      }).then((res)=> {
+        if(res.data) {
+           setData(res.data)
+        }
+    }) 
+    )
+  }
+
+  const like = (postID: any, postLikes: any) => {
     return (e: any) => {
-      axios.patch(`http://127.0.0.1:5000/like`, {
-        post_id: post._id,
-        likes: post.likes
+      axios.patch("http://127.0.0.1:5000/like", {
+        post_id: postID,
+        likes: postLikes
       }, {
         headers:{
           'Authorization': 'Bearer' + localStorage.getItem('token')}
       } )
       .then((res) => {
-        if(res.data) {
-          if(res.data.liked === "liked") {
-            post.likes++;
-          }
-          else if(res.data.disliked === "disliked") {
-            post.likes--;
-          }
-          this.setState({data: this.state.data.map(p => {
-            if(p._id === post._id){
-              return post;
-            }
-            return p;
-          })})
-        }
+        setData(res.data)
       })
       .catch((error) => {
         console.log(error)
@@ -80,10 +63,14 @@ class Home extends Component {
     }
   }
 
+  useEffect(() => {
+    post();
+  }, []);
 
-  renderData(post: Post) {
-      return (
-        <Container>
+  return (
+    <div>
+        {posts.map(post => (
+          <Container key={post._id}>
           <Card border="light" className="text-center" id="card-header">
             <Card.Header style={{background: '#C6F5FF'}} as="h3"> {post.title}</Card.Header>
             <Card.Body style={{background: '#E3FAFF'}}>
@@ -101,41 +88,22 @@ class Home extends Component {
               </Row>
             </Card.Body>
             <Card.Footer id="card-footer">
-                  <Row>
-                    <Col xs={2} md={2}>
-                      {<Button id="heart" onClick={this.like(post)}><FiHeart/> </Button>}
-                      <p id="likes">{post.likes}</p>
-                      {this.state.message}
-                    </Col>
-                    <Col xs={1} md={1} id="delete">
-                      {post.author === localStorage.getItem('username') ? 
-                        <Button variant="outline-primary" onClick={this.delete(post._id)}>Delete</Button> 
-                      : '' }
-                    </Col>
-                  </Row>
-
+              <Row>
+                <Col md={1} xs={2}>
+                  {<Button id="heart" onClick={() => like(post._id, post.likes)}><FiHeart/> {post.likes}</Button>}
+                </Col>
+                <Col md={1} xs={2}>
+                  {post.author === localStorage.getItem('username') ? 
+                    <Button id="button" variant="outline-primary" onClick={remove(post._id)}>Delete</Button> 
+                  : '' }
+                </Col>  
+              </Row>
             </Card.Footer>
           </Card>
         </Container>
-        
-      )
-  }
-
-  render() {
-    return (
-      <div className="app">
-        <h1 className="header">Home Page</h1>
-          {this.state.data.map((post) => (
-            <div style={{margin: '1%'}} key={post._id}>
-              {/* <Post post={post}>
-
-              </Post> */}
-              {this.renderData(post)}
-            </div>
-          ))}
-      </div>
-    );
-  }
+        ))}
+    </div>
+  )
 }
 
 

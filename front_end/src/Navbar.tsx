@@ -26,25 +26,17 @@ function logout() {
   localStorage.removeItem('username');
   window.location.href ='/Home';
 }
-window.onload = function() {
-  Check_token()
-};
 
-function navy() {
-  Check_token()
-  .then(() => {
-    console.log("True")
-  })
-  .catch(() => {
-    console.log("False")
-  })
-}
+window.onload = async () => (
+  await Check_token()
+)
+
+
 
 class NavBar extends Component {
   render() {
     return (
       <Router>
-        {navy()}
         <Navbar collapseOnSelect expand="sm" bg="dark" id="navbar">
           <Container className="container">
             <Navbar.Brand id="brand" href="/Home"><img id="logo"
@@ -57,13 +49,15 @@ class NavBar extends Component {
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav variant="pills" className="me-auto">
-                  <NavLink to='/Home' id="item" activeClassName="active"><Row>
-                      <Col xs={3}> {<BsHouseDoor/>}</Col>
+                  <NavLink to='/Home' id="item" activeClassName="active">
+                    <Row>
+                      <Col xs={3}><BsHouseDoor/></Col>
                       <Col xs={3}>Home</Col>
-                    </Row></NavLink>
+                    </Row>
+                  </NavLink>
                     {localStorage.getItem('token') && <NavLink to='/Post' id="item" activeClassName="active"><Row>
-                        <Col xs={3}> <FiEdit/ >  </Col>
-                        <Col xs={3}> Post </Col>
+                        <Col xs={3}><FiEdit/></Col>
+                        <Col xs={3}>Post</Col>
                       </Row></NavLink>}
               </Nav>
               <Nav variant="pills">
@@ -71,20 +65,24 @@ class NavBar extends Component {
                 {!localStorage.getItem('token') && <NavLink to='/Register' id="item" activeClassName="active">Register</NavLink>}
                 {localStorage.getItem("token") && 
                     <NavDropdown title={localStorage.getItem("username")}  id="item" menuVariant="dark">
-                          <NavDropdown.Item>
-                            <NavLink to="/Profile" id="item" activeClassName="active"><Row>
+                      <NavDropdown.Item>
+                        <NavLink to="/Profile" id="drop-item" activeClassName="active">
+                            <Row>
                               <Col>Profile</Col> 
                               <Col>{<BsFillPersonLinesFill />}</Col>
-                            </Row></NavLink>
-                          </NavDropdown.Item>
-                          <NavDropdown.Item>
-                            <NavLink to="/Setting" id="item" activeClassName="active"><Row>
-                              <Col>Setting</Col> 
-                              <Col>{<BsFillGearFill />}</Col>
-                            </Row></NavLink>
-                            </NavDropdown.Item>
+                            </Row>
+                          </NavLink>
+                      </NavDropdown.Item>
+                      <NavDropdown.Item >
+                        <NavLink to="/Setting" id="drop-item" activeClassName="active">
+                          <Row>
+                            <Col>Setting</Col> 
+                            <Col>{<BsFillGearFill />}</Col>
+                          </Row>
+                        </NavLink>
+                      </NavDropdown.Item>
                           <NavDropdown.Divider/>
-                          <NavDropdown.Item id="dropdown" onClick={logout}>
+                          <NavDropdown.Item onClick={logout}>
                             <Row>
                               <Col>LogOut</Col> 
                               <Col>{<LogOut />}</Col>
@@ -105,7 +103,6 @@ class NavBar extends Component {
           <Route exact path="/Profile"><Profile/></Route>
           <Route exact path="/Setting"><Setting/></Route>
       </Router>
-      
     )
   }
 }
