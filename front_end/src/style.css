@@ -134,25 +134,20 @@ form {
 /* Profile */
 #info {
   font-size: 15px;
-  width: 65%;
+  width: 60%;
   margin: auto;
 }
 
+#card {
+  margin: 1%;
+  width: 100%;
+}
+
+#message {
+  margin-top: 1% !important; 
+  margin: auto;
+  width: 60%;
+  text-align: center;
+}
 
 /* Loader */
-
-.svgLoader {
-  animation: spin 0.5s linear infinite;
-  margin: auto;
-}
-.divLoader {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}

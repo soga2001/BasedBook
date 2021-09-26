@@ -6,29 +6,13 @@ import {Button, Card, Row, Col, Container} from 'react-bootstrap';
 // import {FaHeart} from "react-icons/fa";
 import {FiHeart} from "react-icons/fi";
 
-
-interface Post {
-  _id: string;
-  author: string;
-  title: string;
-  content: string;
-  date_posted: string;
-  likes: number;
-}
-
 function Home() {
   const [posts, setData] = useState<any[]>([])
 
   const post = async () => {
-    try {
-      const fetchPost = await fetch("http://127.0.0.1:5000/post");
-      const jsonData = await fetchPost.json();
-      setData(jsonData);
-      console.log(jsonData)
-    }
-    catch {
-
-    }
+    const fetchPost = await fetch("http://127.0.0.1:5000/post");
+    const jsonData = await fetchPost.json();
+    setData(jsonData);
   }
 
   const remove = (postId: String) => {
@@ -38,7 +22,7 @@ function Home() {
           'Authorization': 'Bearer' + localStorage.getItem('token')}
       }).then((res)=> {
         if(res.data) {
-           setData(res.data)
+           post()
         }
     }) 
     )
@@ -54,7 +38,7 @@ function Home() {
           'Authorization': 'Bearer' + localStorage.getItem('token')}
       } )
       .then((res) => {
-        setData(res.data)
+        post();
       })
     }
   }
@@ -64,10 +48,10 @@ function Home() {
   }, []);
 
   return (
-    <div>
+    <Container>
+      <h1 className="header">Home Page</h1>
         {posts.map(post => (
-          <Container key={post._id}>
-          <Card border="light" className="text-center" id="card-header">
+          <Card key={post._id} border="light" className="text-center" id="card">
             <Card.Header style={{background: '#C6F5FF'}} as="h3"> {post.title}</Card.Header>
             <Card.Body style={{background: '#E3FAFF'}}>
               <Row>
@@ -96,11 +80,9 @@ function Home() {
               </Row>
             </Card.Footer>
           </Card>
-        </Container>
         ))}
-    </div>
+    </Container>
   )
 }
-
 
 export default Home;

@@ -211,12 +211,12 @@ def likes():
             likes = likes - 1
             User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
             (mongo.db.post.find_one_and_update({"_id": ObjectId(post_id) }, {"$set": {"likes": likes }}))
-            return jsonify([Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING)])
+            return jsonify("Disliked")
     user.liked.append(post_id)
     User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
     likes = likes + 1
     (mongo.db.post.find_one_and_update({"_id": ObjectId(post_id)}, {"$set": {"likes": likes }}))
-    return jsonify([Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING)])
+    return jsonify("Liked")
 
 
 @app.route("/liked", methods=["GET"])
