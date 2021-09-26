@@ -1,0 +1,153 @@
+body {
+  background-color: green;
+}
+
+/* NavBar */
+
+#dropdown{
+  color: white;
+}
+
+#navbar {
+  color: white;
+  /* background-color: black; */
+}
+
+#item {
+  color: white;
+  text-decoration: none;
+  width: 100px;
+  text-align: center;
+  padding: 5px;
+  /* width: 80px; */
+}
+
+#item.active {
+  border-bottom: 6px solid red;
+  background-color:hsla(290,60%,70%,0.3);
+  color: red;
+}
+
+#item:hover {
+  color: skyblue;
+  border-bottom: 6px solid white;
+  background-color:hsla(120,0%,70%,0.3);
+}
+
+#drop-item {
+  color: white;
+  text-decoration: none;
+  width: 100px;
+  text-align: center;
+}
+
+/* #drop-item:hover {
+  color: skyblue;
+} */
+
+#drop-item.active {
+  color: red;
+}
+
+#brand {
+  color: white;
+}
+
+/* Logo */
+
+#logo:hover {
+  background-color: transparent !important;
+  filter: invert(20%) sepia(50%) saturate(3207%) hue-rotate(360deg) brightness(80%) contrast(200%);
+}
+
+
+/* Form */
+
+label {
+  width: 500px;
+}​
+
+
+.post_content {
+  display: inline-block;
+  width: 0px;
+  margin: 1%;
+}
+
+.button {
+  margin: 0 44.5%;
+}
+
+#button {
+  font-size: 13px;
+}
+
+form {
+  padding: 2%;
+}
+
+
+/* Message */
+
+.message {
+  text-align: center;
+  width: 50%;
+  margin: auto;
+}
+
+/* Header */
+
+.header {
+  text-align: center;
+}
+
+
+/* Home Page */
+
+.posts {
+  text-align: justify;
+  text-indent: 50px;
+  word-wrap: break-word;
+  hyphens: auto;
+  white-space: pre-wrap;
+}
+
+.date, .author {
+  display: inline-block;
+  width: 50%;
+  margin: auto;
+  font-size: 15px;
+}
+
+#heart {
+  background-color: transparent;
+  border-style: hidden;
+  color: red;
+  padding: 2%;
+  font-size: 15px;
+}
+
+.card-footer {
+  background-color: #C6F5FF;
+}
+
+/* Profile */
+#info {
+  font-size: 15px;
+  width: 60%;
+  margin: auto;
+}
+
+#card {
+  margin: 1%;
+  width: 100%;
+}
+
+#message {
+  margin-top: 1% !important; 
+  margin: auto;
+  width: 60%;
+  text-align: center;
+}
+
+/* Loader */
