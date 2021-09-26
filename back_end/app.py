@@ -16,7 +16,6 @@ app.config["JWT_REFRESH_LIFESPAN"] = {"days": 30}
 
 # connecting to mongo running on the computer
 app.config["MONGO_URI"] = "mongodb://localhost:27017/test_database"
-# using local reference
 mongo = PyMongo(app)
 
 #import User and Post dataclass from user.py and post.py files
@@ -37,7 +36,6 @@ def get_user():
         id = current_user()._id
         user = [User.deserialize(mongo.db.users.find_one({"_id": ObjectId(id)})).to_dict()]
         return jsonify(user)
-        # return jsonify({"error": "There is no user with that user_id in the database"})
     except:
         return jsonify({"error": "There is no user with that user_id in the database"})
 
@@ -230,7 +228,6 @@ def liked():
         if(not post):
             user.liked.remove(items)
     User.deserialize(mongo.db.users.find_one_and_update({"_id": ObjectId(current_user()._id)}, {"$set": {"liked": user.liked}}))
-    # user = User.deserialize(mongo.db.users.find_one({"_id": ObjectId(current_user()._id)}))
     item = [Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(x)})) for x in item]
     if(item):
         return jsonify(item)

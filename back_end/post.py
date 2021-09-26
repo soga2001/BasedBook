@@ -13,6 +13,7 @@ class Post():
     content: str = field(default_factory=str)
     date_posted: datetime = field(default_factory=datetime)
     likes: int = field(default_factory=int)
+    # image: str = field(default_factory=str)
 
     @classmethod
     def deserialize(cls, post):
