@@ -193,7 +193,7 @@ def post():
         "title": title,
         "content": content,
         "date_posted": date_posted,
-        "likes": '0'
+        "likes": 0
     })
     Post.deserialize(mongo.db.post.find_one({"author": author}))
     return jsonify({"success": 'Posted'})
@@ -219,9 +219,18 @@ def likes():
     (mongo.db.post.find_one_and_update({"_id": ObjectId(post_id)}, {"$set": {"likes": likes }}))
     return jsonify("Liked")
 
-
-def user_liked(user, postID):
-    return
+@app.route("/user_liked/<postID>", methods=["POST"])
+@auth_required
+def user_liked(postID):
+    id = current_user()._id
+    user = User.deserialize(mongo.db.users.find_one({"_id": ObjectId(id)}))
+    print(postID)
+    print(user.liked)
+    # liked = filter(lambda x: x == postID, user.liked)
+    for post in user.liked:
+        if post == postID:
+            return True
+    return jsonify(False)
 
 # Returns all the liked posts
 @app.route("/liked", methods=["GET"])

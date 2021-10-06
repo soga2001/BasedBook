@@ -7,7 +7,7 @@ import {Button, Card, Row, Col, Container} from 'react-bootstrap';
 import {FiHeart} from "react-icons/fi";
 import ReactLoading from 'react-loading';
 import FadeIn from 'react-fade-in';
-import { FaHeart } from "react-icons/fa";
+import { FaHeart, FaWindows } from "react-icons/fa";
 import Alert from 'react-bootstrap/Alert'
 
 function Home() {
@@ -23,14 +23,11 @@ function Home() {
 
   const remove = (postId: any) => {
     const items = posts.filter(item => item._id !== postId);
-    return (e: any) => (
-      axios.delete(`http://127.0.0.1:5000/post/${postId}`, {
-        headers:{
-          'Authorization': 'Bearer' + localStorage.getItem('token')}
-      }).then((res)=> {
-        setData(items);
-      }) 
-    )
+    setData(items);
+    axios.delete(`http://127.0.0.1:5000/post/${postId}`, {
+      headers:{
+        'Authorization': 'Bearer' + localStorage.getItem('token')}
+    })
   }
 
   useEffect(() => {
@@ -43,7 +40,7 @@ function Home() {
       <FadeIn>
         {loading === true ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : posts.map(post => (
           <Post key={post._id} _id={post._id} title={post.title} author={post.author} date_posted={post.date_posted} 
-          content={post.content} likes={post.likes} onDelete={remove}/>
+          content={post.content} likes={post.likes} onDelete={() => remove(post._id)}/>
         ))}
       </FadeIn>
     </Container>
@@ -84,6 +81,25 @@ function Post(props: any) {
     }
   }
 
+  const userLiked = (postID: any) => {
+    return (e: any) => (
+      axios.post(`http://127.0.0.1:5000/user_liked/${postID}`, {}, {
+      headers:{
+        'Authorization': 'Bearer' + localStorage.getItem('token')}
+    }).then((res) => {
+      if(res.data === true)
+      {
+        setLiked(true);
+        console.log(liked)
+      }
+      else {
+        setLiked(false);
+      }
+    })
+    )
+    
+  }
+
   return (
     <Card key={props._id} border="light" className="text-center" id="card">
       <Card.Header style={{background: '#C6F5FF'}} as="h3"> {props.title}</Card.Header>
@@ -109,7 +125,7 @@ function Post(props: any) {
             {error && <Alert variant="danger" className="message">{message}</Alert>}
           <Col md={1} xs={2}>
             {props.author === localStorage.getItem('username') ? 
-              <Button id="button" variant="outline-primary" onClick={() => props.onDelete}>Delete</Button> 
+              <Button id="button" variant="outline-primary" onClick={() => props.onDelete(props._id)}>Delete</Button> 
             : '' }
           </Col>
           {deleted && <Alert className="message">{message}</Alert>}

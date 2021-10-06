@@ -51,6 +51,7 @@ function Profile() {
       else {
         setEmpty(false);
         setPosted(res.data);
+        console.log(res.data)
         // setPostLoading(true);
       }
   })
