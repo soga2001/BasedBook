@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 import {useState} from 'react';
-=======
->>>>>>> 51fa00b21980e02b481855eac2b79ddeb1e67608
 import axios from 'axios';
 
 async function Check_token() {
