@@ -5,15 +5,16 @@ from flask_pymongo import ASCENDING, DESCENDING, PyMongo
 from datetime import datetime
 from bson import ObjectId
 from flask_praetorian import Praetorian, auth_required, current_user
+import time
 
 #create the app
-app = Flask(__name__, static_folder='../front-end/build', static_url_path='')
+app = Flask(__name__)
 guard = Praetorian()
 CORS(app)
 
 app.config["SECRET_KEY"] = "supo5458"
-app.config["JWT_ACCESS_LIFESPAN"] = {"hours": 4}
-app.config["JWT_REFRESH_LIFESPAN"] = {"days": 30}
+app.config["JWT_ACCESS_LIFESPAN"] = {"hours": 5}
+app.config["JWT_REFRESH_LIFESPAN"] = {"days": 15}
 
 # connecting to mongo running on the computer
 app.config["MONGO_URI"] = "mongodb://localhost:27017/test_database"
@@ -23,7 +24,9 @@ mongo = PyMongo(app)
 from user import User
 from post import Post
 
+
 guard.init_app(app, User)
+
 
 @app.route("/users", methods=['GET'])
 def get_users():
@@ -40,12 +43,14 @@ def get_user():
     except:
         return jsonify({"error": "There is no user with that user_id in the database"})
 
+
 @app.route("/refresh-token", methods=['POST'])
 @cross_origin(origin="*")
 def refresh():
     old_token = guard.read_token_from_header()
     new_token = guard.refresh_jwt_token(old_token)
     return jsonify(new_token)
+
 
 #update_user_by_id doesn't work when a user is trying to update is password as of right now
 @app.route("/user", methods=['PUT'])
@@ -108,7 +113,6 @@ def register():
         username = username.lower()
         password = request.json["password"]
         hashed_password = guard.hash_password(password)
-        # roles = request.json["roles"]
         #check if the email and username is already in the database
         found_email = mongo.db.users.find_one({"email": email})
         found_username = mongo.db.users.find_one({"username": username})
@@ -177,8 +181,6 @@ def register_admin():
         return jsonify("Please don't leave anything empty.")
 
 
-
-
 @app.route("/post", methods=['POST'])
 @auth_required
 def post():
@@ -218,6 +220,10 @@ def likes():
     return jsonify("Liked")
 
 
+def user_liked(user, postID):
+    return
+
+# Returns all the liked posts
 @app.route("/liked", methods=["GET"])
 @auth_required
 def liked():
@@ -238,7 +244,7 @@ def liked():
 @app.route("/post", methods=['GET'])
 def get_all_post():
     posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING)]
-    return jsonify(posts)
+    return jsonify({"posts": posts})
 
 
 @app.route("/user_post", methods=['GET'])
@@ -252,27 +258,18 @@ def get_user_posts():
     return jsonify({"message": "You have made no posts."})
 
 
-
 @app.route("/post/<post_id>", methods=['DELETE'])
 @auth_required
 def delete_post(post_id):
     mongo.db.post.find_one_and_delete({"_id": ObjectId(post_id)})
-    return jsonify([Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING)])
+    return jsonify({"success": True})
 
 
 @app.route("/protected", methods=['POST'])
 @auth_required
 def protected():
-    return jsonify({"success": True})
+    return jsonify(True)
     
-
-@app.route("/checking", methods=['GET'])
-def checking():
-    return jsonify({"checked": "Checked"})
-
-@app.route('/')
-def serve() :
-    return send_from_directory(app.static_folder, 'index.html')
 
 #Run the example
 if __name__ == "__main__":

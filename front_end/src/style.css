@@ -131,6 +131,10 @@ form {
   background-color: #C6F5FF;
 }
 
+/* .message {
+  margin: 1%;
+} */
+
 /* Profile */
 #info {
   font-size: 15px;
@@ -151,3 +155,7 @@ form {
 }
 
 /* Loader */
+
+.loading {
+  margin: auto;
+}

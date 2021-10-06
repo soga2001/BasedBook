@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useState, useEffect} from 'react';
 import { BrowserRouter as Router, Route, NavLink } from 'react-router-dom';
 import {
   Navbar, 
@@ -30,8 +30,6 @@ function logout() {
 window.onload = async () => (
   await Check_token()
 )
-
-
 
 class NavBar extends Component {
   render() {

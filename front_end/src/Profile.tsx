@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { Component, useState, useEffect } from "react";
 import axios from "axios";
 import './style.css'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -6,32 +6,38 @@ import {Button, Card, Row, Col, Container} from 'react-bootstrap';
 import Alert from 'react-bootstrap/Alert';
 import {FaHeart} from "react-icons/fa"
 import {FiHeart} from "react-icons/fi";
+import ReactLoading from 'react-loading';
+import FadeIn from 'react-fade-in';
 
 
 function Profile() {
 
   // User Info //
   const [info, setInfo] = useState<any[]>([]);
+  // const [infoLoading, setInfoLoading] = useState(false);
 
   // User Posted posts //
   const [posts, setPosted] = useState<any[]>([]);
   const [postMessage, setMessage] = useState('');
   const [empty, setEmpty] = useState(false);
+  // const [postLoading, setPostLoading] = useState(false);
 
   // User Liked posts //
   const [likedPost, setLiked] = useState<any[]>([]);
   const [likedMessage, setLikedMessage] = useState('');
   const [likedEmpty, setLikedEmpty] = useState(false);
+  // const [likedLoading, setLikedLoading] = useState(false);
 
   
 
   const information = async () => {
-    const fetchInfo = await axios.get("http://127.0.0.1:5000/user",{
+    const fetchInfo = await fetch("http://127.0.0.1:5000/user",{
       headers:{
         'Authorization': 'Bearer' + localStorage.getItem('token')}
-    }).then((res) => {
-      setInfo(res.data)
     })
+    const data = await fetchInfo.json();
+    setInfo(data);
+    // await data && setInfoLoading(true);
   };
 
   const userPosted = async () => {
@@ -45,11 +51,14 @@ function Profile() {
       else {
         setEmpty(false);
         setPosted(res.data);
+        // setPostLoading(true);
       }
   })
   }
 
   const remove = (postId: String) => {
+    const items = posts.filter(item => item._id !== postId);
+    setPosted(items);
     return (e: any) => (
       axios.delete(`http://127.0.0.1:5000/post/${postId}`, {
         headers:{
@@ -58,7 +67,7 @@ function Profile() {
         if(res.data.message) {
           setMessage(res.data.message)
           setEmpty(true)
-          setPosted([])
+          // setPosted([])
         }
         else {
           setEmpty(false)
@@ -100,6 +109,7 @@ function Profile() {
         // this.setState({liked_content: true})
         setLikedEmpty(false)
         setLiked(res.data)
+        // setLikedLoading(true);
       }
     })
   }
@@ -114,7 +124,7 @@ function Profile() {
   return (
     <Container>
       <h1 className="header">Profile</h1>
-      {info.map(info => (
+      {/* infoLoading === false ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : */ info.map(info => (
         <Card id="info" key={info.username}>
           <Card.Header className="header" as="h3" style={{background: '#F9DBFF'}}>Your Info</Card.Header>
           <Card.Body style={{background: '#FCEEFF'}}>
@@ -136,7 +146,7 @@ function Profile() {
       <Row>
         <Col md={6}>
           <h1 className="header">Your Posts</h1>
-          {(empty === false && posts.map(post => (
+          {/* postLoading === false ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : */ (empty === false && posts.map(post => (
               <Card key={post._id} border="light" className="text-center" id="card">
                 <Card.Header style={{background: '#C6F5FF'}} as="h3"> {post.title}</Card.Header>
                 <Card.Body style={{background: '#E3FAFF'}}>
@@ -170,7 +180,7 @@ function Profile() {
           </Col>
           <Col>
           <h1 className="header">Liked Post</h1>
-          {(likedEmpty === false && likedPost.map(post => (
+          {/* likedLoading === false ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : */ (likedEmpty === false && likedPost.map(post => (
             <Card style={{margin: 'auto', width: '100%'}} className="text-center">
             <Card.Header as="h3" style={{background: '#FFDBEC'}}> {post.title}</Card.Header>
             <Card.Body style={{background: '#FDE7F1'}}>
