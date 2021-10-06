@@ -1,7 +1,10 @@
 {
   "name": "front_end",
   "version": "0.1.0",
+<<<<<<< HEAD
   "proxy": "https://guarded-citadel-70687.herokuapp.com/",
+=======
+>>>>>>> 51fa00b21980e02b481855eac2b79ddeb1e67608
   "private": true,
   "dependencies": {
     "@popperjs/core": "^2.9.3",
@@ -13,7 +16,10 @@
     "@types/react": "^17.0.14",
     "@types/react-bootstrap": "^0.32.26",
     "@types/react-dom": "^17.0.9",
+<<<<<<< HEAD
     "@types/react-redux": "^7.1.18",
+=======
+>>>>>>> 51fa00b21980e02b481855eac2b79ddeb1e67608
     "@types/react-router-dom": "^5.1.8",
     "@types/react-router-hash-link": "^2.4.2",
     "@types/reactstrap": "^8.7.2",
@@ -25,11 +31,17 @@
     "react-async": "^10.0.1",
     "react-bootstrap": "^2.0.0-beta.6",
     "react-dom": "^17.0.2",
+<<<<<<< HEAD
     "react-fade-in": "^2.0.1",
     "react-feather": "^2.0.9",
     "react-flash-message": "^1.0.7",
     "react-icons": "^4.2.0",
     "react-loading": "^2.0.3",
+=======
+    "react-feather": "^2.0.9",
+    "react-flash-message": "^1.0.7",
+    "react-icons": "^4.2.0",
+>>>>>>> 51fa00b21980e02b481855eac2b79ddeb1e67608
     "react-native": "^0.65.1",
     "react-native-flash-message": "^0.1.23",
     "react-redux": "^7.2.4",

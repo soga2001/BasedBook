@@ -131,10 +131,13 @@ form {
   background-color: #C6F5FF;
 }
 
+<<<<<<< HEAD
 /* .message {
   margin: 1%;
 } */
 
+=======
+>>>>>>> 51fa00b21980e02b481855eac2b79ddeb1e67608
 /* Profile */
 #info {
   font-size: 15px;
@@ -155,7 +158,10 @@ form {
 }
 
 /* Loader */
+<<<<<<< HEAD
 
 .loading {
   margin: auto;
 }
+=======
+>>>>>>> 51fa00b21980e02b481855eac2b79ddeb1e67608

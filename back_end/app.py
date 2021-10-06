@@ -43,14 +43,12 @@ def get_user():
     except:
         return jsonify({"error": "There is no user with that user_id in the database"})
 
-
 @app.route("/refresh-token", methods=['POST'])
 @cross_origin(origin="*")
 def refresh():
     old_token = guard.read_token_from_header()
     new_token = guard.refresh_jwt_token(old_token)
     return jsonify(new_token)
-
 
 #update_user_by_id doesn't work when a user is trying to update is password as of right now
 @app.route("/user", methods=['PUT'])

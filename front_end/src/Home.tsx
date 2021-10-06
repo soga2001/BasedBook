@@ -80,6 +80,8 @@ function Post(props: any) {
     }
   }
 
+
+
   const userLiked = (postID: any) => {
     return (e: any) => (
       axios.post(`http://127.0.0.1:5000/user_liked/${postID}`, {}, {
@@ -96,7 +98,6 @@ function Post(props: any) {
       }
     })
     )
-    
   }
 
   return (
