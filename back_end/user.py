@@ -16,7 +16,9 @@ class User:
     username: str = field(default_factory=str)
     password: str = field(default_factory=str)
     roles: str = field(default_factory=str)
+    # liked: set = field(default_factory=set)
     liked: list = field(default_factory=list)
+
 
     @property
     def identity(self):
@@ -29,12 +31,6 @@ class User:
         except:
             return []
 
-    @property
-    def liked_content(self):
-        try:
-            return self.liked.split(",")
-        except:
-            return []
 
     @classmethod
     def lookup(cls, username):

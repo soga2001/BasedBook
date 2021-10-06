@@ -47,7 +47,6 @@ function Home() {
   )
 }
 
-//Item.jsx
 function Post(props: any) {
   const [likes, setLikes] = useState(props.likes);
   const [message, setMessage] = useState('');
