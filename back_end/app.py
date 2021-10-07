@@ -133,12 +133,13 @@ def register():
             "roles": "member",
             "liked": []
         })
-        User.deserialize(mongo.db.users.find_one({"email": email})).to_dict()
+        # User.deserialize(mongo.db.users.find_one({"email": email})).to_dict()
         return jsonify({"success": "You have been registered"})
     except:
         return jsonify("Please don't leave anything empty.")
 
 
+# Currently has no usage
 @app.route("/register/admin", methods=['POST'])
 def register_admin():
     try:
@@ -196,39 +197,52 @@ def post():
     Post.deserialize(mongo.db.post.find_one({"author": author}))
     return jsonify({"success": 'Posted'})
 
-
-@app.route("/like", methods=["PATCH"])
+@app.route("/dislike", methods=["POST"])
 @auth_required
-def likes():
+def dislike():
     post_id = request.json["post_id"]
-    likes = int(request.json["likes"])
-    _id = ObjectId(current_user()._id)
-    user = User.deserialize(mongo.db.users.find_one({"_id": _id}))
-    for a in user.liked:
-        if a == post_id:
-            user.liked.remove(post_id)
-            likes = likes - 1
-            User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
-            (mongo.db.post.find_one_and_update({"_id": ObjectId(post_id) }, {"$set": {"likes": likes }}))
-            return jsonify("Disliked")
-    user.liked.append(post_id)
-    User.deserialize(mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}}))
-    likes = likes + 1
-    (mongo.db.post.find_one_and_update({"_id": ObjectId(post_id)}, {"$set": {"likes": likes }}))
+    mongo.db.likes.find_one_and_delete({
+        "postId": post_id,
+        "userId": current_user()._id
+    })
+
+@app.route("/like", methods=["POST"])
+@auth_required
+def like():
+    post_id = request.json["post_id"]
+    # likes = int(request.json["likes"])
+    mongo.db.likes.insert_one({
+        "postId": post_id,
+        "userId": current_user()._id
+    })
     return jsonify("Liked")
+    # user = User.deserialize(mongo.db.users.find_one({"_id": _id}))
+    # user.liked = set(user.liked)
+    # if post_id in user.liked:
+    #     user.liked.remove(post_id)
+    #     likes = likes - 1
+    #     user.liked = list(user.liked)
+    #     mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}})
+    #     Post.deserialize(mongo.db.post.find_one_and_update({"_id": ObjectId(post_id)}, {"$set": {"likes": likes}}))
+    #     return jsonify("Disliked")
+    # user.liked.add(post_id)
+    # likes = likes + 1
+    # user.liked = list(user.liked)
+    # mongo.db.post.find_one_and_update({"_id": ObjectId(post_id)}, {"$set": {"likes": likes}})
+    # mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}})
+    # return jsonify("Liked")
 
 @app.route("/user_liked/<postID>", methods=["GET"])
 @auth_required
 def user_liked(postID):
     id = current_user()._id
     user = User.deserialize(mongo.db.users.find_one({"_id": ObjectId(id)}))
-    print(postID)
-    print(user.liked)
-    liked = filter(lambda x: x == postID, user.liked)
-    for post in user.liked:
-        if post == postID:
-            return jsonify(True)
-    return jsonify(False)
+    # print(postID)
+    # print(user.liked)
+    # for post in user.liked:
+    #     if post == postID:
+    #         return jsonify(True)
+    return jsonify("UsedPost")
 
 # Returns all the liked posts
 @app.route("/liked", methods=["GET"])

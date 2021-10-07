@@ -21,87 +21,68 @@ function Home() {
     setLoading(false);
   }
 
-  const remove = (postId: any) => {
-    const items = posts.filter(item => item._id !== postId);
-    setData(items);
-    axios.delete(`http://127.0.0.1:5000/post/${postId}`, {
-      headers:{
-        'Authorization': 'Bearer' + localStorage.getItem('token')}
-    })
+  window.onload = async () => {
+    await post();
   }
-
-  useEffect(() => {
-    post();
-  }, []);
 
   return (
     <Container>
       <h1 className="header">Home Page</h1>
       <FadeIn>
         {loading === true ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : posts.map(post => (
-          <Post key={post._id} _id={post._id} title={post.title} author={post.author} date_posted={post.date_posted} 
-          content={post.content} likes={post.likes} onDelete={() => remove(post._id)}/>
+          <Postview key={post._id} _id={post._id} title={post.title} author={post.author} date_posted={post.date_posted} 
+          content={post.content} likes={post.likes}/>
         ))}
       </FadeIn>
     </Container>
   )
 }
 
-function Post(props: any) {
+function Postview(props: any) {
   const [likes, setLikes] = useState(props.likes);
   const [message, setMessage] = useState('');
   const [error, setError] = useState(false);
   const [deleted, setDeleted] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   const like = () => {
     return (e: any) => {
-      axios.patch(`http://127.0.0.1:5000/like`, {
+      axios.post(`http://127.0.0.1:5000/like`, {
         post_id: props._id,
-        likes: likes
       }, {
         headers:{
           'Authorization': 'Bearer' + localStorage.getItem('token')}
       } )
-      .then((res) => {
-        if(res.data === "Liked") {
-          setLiked(true);
-          setLikes(likes + 1);
-        }
-        else if(res.data = "disliked") {
-          setLiked(false);
-          setLikes(likes - 1);
-        }
-      })
-      .catch((error) => {
-        setError(true);
-        setMessage("You are not logged in.")
-      })
     }
   }
 
-
-
-  const userLiked = (postID: any) => {
-    return (e: any) => (
-      axios.post(`http://127.0.0.1:5000/user_liked/${postID}`, {}, {
+  const remove = () => {
+    setDeleted(true);
+    axios.delete(`http://127.0.0.1:5000/post/${props._id}`, {
       headers:{
         'Authorization': 'Bearer' + localStorage.getItem('token')}
-    }).then((res) => {
-      if(res.data === true)
-      {
-        setLiked(true);
-        console.log(liked)
-      }
-      else {
-        setLiked(false);
-      }
     })
-    )
   }
 
+  // const userLiked = () => {
+  //   return (e: any) => (
+  //     axios.post(`http://127.0.0.1:5000/user_liked/${props._id}`, {}, {
+  //     headers:{
+  //       'Authorization': 'Bearer' + localStorage.getItem('token')}
+  //   }).then((res) => {
+  //     console.log(res.data)
+  //   })
+  //   )
+  // }
+
+  // useEffect(() => {
+  //   userLiked()
+  // })
+
   return (
-    <Card key={props._id} border="light" className="text-center" id="card">
+    <div>
+      {deleted ? '' : <Card key={props._id} border="light" className="text-center" id="card" style={{visibility: deleted ? "hidden" : "visible"}}>
       <Card.Header style={{background: '#C6F5FF'}} as="h3"> {props.title}</Card.Header>
       <Card.Body style={{background: '#E3FAFF'}}>
         <Row>
@@ -125,13 +106,14 @@ function Post(props: any) {
             {error && <Alert variant="danger" className="message">{message}</Alert>}
           <Col md={1} xs={2}>
             {props.author === localStorage.getItem('username') ? 
-              <Button id="button" variant="outline-primary" onClick={() => props.onDelete(props._id)}>Delete</Button> 
+              <Button id="button" variant="outline-primary" onClick={() => remove()}>Delete</Button> 
             : '' }
           </Col>
-          {deleted && <Alert className="message">{message}</Alert>}
         </Row>
       </Card.Footer>
-    </Card>
+    </Card>}
+    </div>
+    
   )
 }
 

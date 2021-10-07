@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field, asdict, fields
+from dataclasses import dataclass, field, asdict
 from app import mongo
 from bson import ObjectId
 
@@ -19,7 +19,6 @@ class User:
     # liked: set = field(default_factory=set)
     liked: list = field(default_factory=list)
 
-
     @property
     def identity(self):
         return self._id
@@ -30,7 +29,6 @@ class User:
             return self.roles.split(",")
         except:
             return []
-
 
     @classmethod
     def lookup(cls, username):
