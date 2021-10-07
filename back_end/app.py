@@ -23,6 +23,7 @@ mongo = PyMongo(app)
 #import User and Post dataclass from user.py and post.py files
 from user import User
 from post import Post
+from likes import UserPostLikes
 
 
 guard.init_app(app, User)
@@ -205,6 +206,7 @@ def dislike():
         "postId": post_id,
         "userId": current_user()._id
     })
+    return jsonify("Disliked")
 
 @app.route("/like", methods=["POST"])
 @auth_required
@@ -216,33 +218,29 @@ def like():
         "userId": current_user()._id
     })
     return jsonify("Liked")
-    # user = User.deserialize(mongo.db.users.find_one({"_id": _id}))
-    # user.liked = set(user.liked)
-    # if post_id in user.liked:
-    #     user.liked.remove(post_id)
-    #     likes = likes - 1
-    #     user.liked = list(user.liked)
-    #     mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}})
-    #     Post.deserialize(mongo.db.post.find_one_and_update({"_id": ObjectId(post_id)}, {"$set": {"likes": likes}}))
-    #     return jsonify("Disliked")
-    # user.liked.add(post_id)
-    # likes = likes + 1
-    # user.liked = list(user.liked)
-    # mongo.db.post.find_one_and_update({"_id": ObjectId(post_id)}, {"$set": {"likes": likes}})
-    # mongo.db.users.find_one_and_update({"_id": _id}, {"$set": {"liked": user.liked}})
-    # return jsonify("Liked")
 
 @app.route("/user_liked/<postID>", methods=["GET"])
 @auth_required
 def user_liked(postID):
-    id = current_user()._id
-    user = User.deserialize(mongo.db.users.find_one({"_id": ObjectId(id)}))
-    # print(postID)
-    # print(user.liked)
-    # for post in user.liked:
-    #     if post == postID:
-    #         return jsonify(True)
-    return jsonify("UsedPost")
+    likes = mongo.db.likes.aggregate([{"$match": {"postId": postID}},{"$group" : {"_id": "$postId", "total": {"$sum": 1}}}])
+    postLikes: int
+    for doc in likes:
+        postLikes = doc["total"]
+    if(UserPostLikes.deserialize(mongo.db.likes.find_one({"userId": current_user()._id, "postId": postID}))):
+        return jsonify({"success": True, "likes": postLikes})
+    return jsonify({"success": False, "likes": postLikes})
+
+@app.route("/liked", methods=["POST"])
+def likes():
+    postID = request.json["postId"]
+    userID = request.json["userId"]
+    likes = mongo.db.likes.aggregate([{"$match": {"postId": postID}},{"$group" : {"_id": "$postId", "total": {"$sum": 1}}}])
+    postLikes: int
+    for doc in likes:
+        postLikes = doc["total"]
+    if(mongo.db.likes.find_one({"userId": userID, "postId": postID})):
+        return jsonify({"success": True, "likes": postLikes})
+    return jsonify({"likes": postLikes})
 
 # Returns all the liked posts
 @app.route("/liked", methods=["GET"])

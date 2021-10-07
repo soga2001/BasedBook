@@ -7,7 +7,7 @@ import {Button, Card, Row, Col, Container} from 'react-bootstrap';
 import {FiHeart} from "react-icons/fi";
 import ReactLoading from 'react-loading';
 import FadeIn from 'react-fade-in';
-import { FaHeart, FaWindows } from "react-icons/fa";
+import { FaHeart, FaRegHeart} from "react-icons/fa";
 import Alert from 'react-bootstrap/Alert'
 
 function Home() {
@@ -21,10 +21,6 @@ function Home() {
     setLoading(false);
   }
 
-  // window.onload = async () => {
-  //   await post();
-  // }
-
   useEffect(() => {
     post();
   }, [])
@@ -35,7 +31,7 @@ function Home() {
       <FadeIn>
         {loading === true ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : posts.map(post => (
           <Postview key={post._id} _id={post._id} title={post.title} author={post.author} date_posted={post.date_posted} 
-          content={post.content} likes={post.likes}/>
+          content={post.content}/>
         ))}
       </FadeIn>
     </Container>
@@ -43,23 +39,12 @@ function Home() {
 }
 
 function Postview(props: any) {
-  const [likes, setLikes] = useState(props.likes);
+  const [likes, setLikes] = useState(0);
   const [message, setMessage] = useState('');
   const [error, setError] = useState(false);
   const [deleted, setDeleted] = useState(false);
   const [liked, setLiked] = useState(false);
-  const [visible, setVisible] = useState(true);
-
-  const like = () => {
-    return (e: any) => {
-      axios.post(`http://127.0.0.1:5000/like`, {
-        post_id: props._id,
-      }, {
-        headers:{
-          'Authorization': 'Bearer' + localStorage.getItem('token')}
-      } )
-    }
-  }
+  const [token, setToken] = useState(localStorage.getItem("token"))
 
   const remove = () => {
     setDeleted(true);
@@ -69,20 +54,52 @@ function Postview(props: any) {
     })
   }
 
-  // const userLiked = () => {
-  //   return (e: any) => (
-  //     axios.post(`http://127.0.0.1:5000/user_liked/${props._id}`, {}, {
-  //     headers:{
-  //       'Authorization': 'Bearer' + localStorage.getItem('token')}
-  //   }).then((res) => {
-  //     console.log(res.data)
-  //   })
-  //   )
-  // }
+  const like = () => {
+    return (e: any) => {
+      if(liked && token) {
+        setLiked(false)
+        setLikes(likes - 1)
+        axios.post(`http://127.0.0.1:5000/dislike`, {
+        post_id: props._id}, {
+        headers:{
+          'Authorization': 'Bearer' + localStorage.getItem('token')}
+      })
+      }
+      else if (token) {
+        setLiked(true)
+        setLikes(likes + 1)
+        axios.post(`http://127.0.0.1:5000/like`, {
+        post_id: props._id}, {
+        headers:{
+          'Authorization': 'Bearer' + localStorage.getItem('token')}
+        })
+      }
+      else {
+        setError(true)
+        setMessage("You are not logged in.")
+      }
+    }
+  }
 
-  // useEffect(() => {
-  //   userLiked()
-  // })
+  const userLiked = () => {
+    axios.post(`http://127.0.01:5000/liked`, {
+      postId: props._id,
+      userId: localStorage.getItem("username")
+    })
+      .then((res) => {
+        if(res.data.success === true) {
+          setLiked(true)
+        }
+        else {
+          setLiked(false)
+        }
+        setLikes(res.data.likes)
+      })
+  }
+
+  useEffect(() => {
+    userLiked();
+  },[])
 
   return (
     <div>
@@ -105,7 +122,7 @@ function Postview(props: any) {
       <Card.Footer id="card-footer">
         <Row>
           <Col md={1} xs={2}>
-            {<Button id="heart" onClick={like()}><FiHeart/> {likes}</Button>} {' '}
+            {<Button id="heart" onClick={like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}{' '}
           </Col>
             {error && <Alert variant="danger" className="message">{message}</Alert>}
           <Col md={1} xs={2}>
