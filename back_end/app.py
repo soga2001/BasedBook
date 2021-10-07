@@ -212,23 +212,11 @@ def dislike():
 @auth_required
 def like():
     post_id = request.json["post_id"]
-    # likes = int(request.json["likes"])
     mongo.db.likes.insert_one({
         "postId": post_id,
         "userId": current_user()._id
     })
     return jsonify("Liked")
-
-@app.route("/user_liked/<postID>", methods=["GET"])
-@auth_required
-def user_liked(postID):
-    likes = mongo.db.likes.aggregate([{"$match": {"postId": postID}},{"$group" : {"_id": "$postId", "total": {"$sum": 1}}}])
-    postLikes: int
-    for doc in likes:
-        postLikes = doc["total"]
-    if(UserPostLikes.deserialize(mongo.db.likes.find_one({"userId": current_user()._id, "postId": postID}))):
-        return jsonify({"success": True, "likes": postLikes})
-    return jsonify({"success": False, "likes": postLikes})
 
 @app.route("/liked", methods=["POST"])
 def likes():
@@ -240,7 +228,7 @@ def likes():
         postLikes = doc["total"]
     if(mongo.db.likes.find_one({"userId": userID, "postId": postID})):
         return jsonify({"success": True, "likes": postLikes})
-    return jsonify({"likes": postLikes})
+    return jsonify({"success": True, "likes": postLikes})
 
 # Returns all the liked posts
 @app.route("/liked", methods=["GET"])
