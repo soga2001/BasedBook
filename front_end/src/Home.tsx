@@ -21,9 +21,13 @@ function Home() {
     setLoading(false);
   }
 
-  window.onload = async () => {
-    await post();
-  }
+  // window.onload = async () => {
+  //   await post();
+  // }
+
+  useEffect(() => {
+    post();
+  }, [])
 
   return (
     <Container>
