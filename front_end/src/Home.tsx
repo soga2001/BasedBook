@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Component } from "react";
+import React, { useState, useEffect} from "react";
 import axios from "axios";
 import './style.css'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -7,7 +7,7 @@ import {Button, Card, Row, Col, Container} from 'react-bootstrap';
 import {FiHeart} from "react-icons/fi";
 import ReactLoading from 'react-loading';
 import FadeIn from 'react-fade-in';
-import { FaHeart, FaRegHeart} from "react-icons/fa";
+import { FaHeart} from "react-icons/fa";
 import Alert from 'react-bootstrap/Alert'
 
 function Home() {
@@ -43,8 +43,8 @@ function Postview(props: any) {
   const [message, setMessage] = useState('');
   const [error, setError] = useState(false);
   const [deleted, setDeleted] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [token, setToken] = useState(localStorage.getItem("token"))
+  const [liked, setLiked] = useState<Boolean>();
+  const [token] = useState(localStorage.getItem("token"))
 
   const remove = () => {
     setDeleted(true);
@@ -55,42 +55,44 @@ function Postview(props: any) {
   }
 
   const like = () => {
-    return (e: any) => {
-      if(liked && token) {
-        setLiked(false)
-        setLikes(likes - 1)
-        axios.post(`http://127.0.0.1:5000/dislike`, {
-        post_id: props._id}, {
-        headers:{
-          'Authorization': 'Bearer' + localStorage.getItem('token')}
+    if(liked && token) {
+      console.log(liked, "token")
+      setLiked(false)
+      setLikes(likes - 1)
+      axios.post(`http://127.0.0.1:5000/dislike`, {
+      post_id: props._id}, {
+      headers:{
+        'Authorization': 'Bearer' + localStorage.getItem('token')}
+    })
+    }
+    else if (!liked && token) {
+      console.log("token")
+      setLiked(true)
+      setLikes(likes + 1)
+      axios.post(`http://127.0.0.1:5000/like`, {
+      post_id: props._id}, {
+      headers:{
+        'Authorization': 'Bearer' + localStorage.getItem('token')}
       })
-      }
-      else if (token) {
-        setLiked(true)
-        setLikes(likes + 1)
-        axios.post(`http://127.0.0.1:5000/like`, {
-        post_id: props._id}, {
-        headers:{
-          'Authorization': 'Bearer' + localStorage.getItem('token')}
-        })
-      }
-      else {
-        setError(true)
-        setMessage("You are not logged in.")
-      }
+    }
+    else {
+      setError(true)
+      setMessage("You are not logged in.")
     }
   }
 
   const userLiked = () => {
-    axios.post(`http://127.0.01:5000/liked`, {
+    axios.post("http://127.0.01:5000/liked", {
       postId: props._id,
       userId: localStorage.getItem("username")
     })
       .then((res) => {
-        if(res.data.success === true) {
+        if(res.data.liked) {
+          console.log("true")
           setLiked(true)
         }
         else {
+          console.log('false')
           setLiked(false)
         }
         setLikes(res.data.likes)
@@ -122,7 +124,7 @@ function Postview(props: any) {
       <Card.Footer id="card-footer">
         <Row>
           <Col md={1} xs={2}>
-            {<Button id="heart" onClick={like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}{' '}
+            {<Button id="heart" onClick={() => like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}{' '}
           </Col>
             {error && <Alert variant="danger" className="message">{message}</Alert>}
           <Col md={1} xs={2}>
