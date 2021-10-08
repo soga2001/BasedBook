@@ -222,7 +222,7 @@ def like():
 @app.route("/liked/<postId>", methods=["GET"])
 def likes(postId):
     likes = mongo.db.likes.aggregate([{"$match": {"postId": postId}},{"$group" : {"_id": "$postId", "total": {"$sum": 1}}}])
-    postLikes: int
+    postLikes = 0
     for doc in likes:
         postLikes = doc["total"]
     token = guard.read_token_from_header()
@@ -231,7 +231,8 @@ def likes(postId):
         if(mongo.db.likes.find_one({"userId": userId["id"], "postId": postId})):
             return jsonify({"liked": True, "likes": postLikes})
     except:
-        return jsonify({"error": False, "likes": postLikes})
+        print("")
+    return jsonify({"error": False, "likes": postLikes})
 
 # Returns all the liked posts
 @app.route("/liked", methods=["GET"])
@@ -271,7 +272,8 @@ def get_user_posts():
 @app.route("/post/<post_id>", methods=['DELETE'])
 @auth_required
 def delete_post(post_id):
-    mongo.db.post.find_one_and_delete({"_id": ObjectId(post_id)})
+    mongo.db.post.remove({"_id": ObjectId(post_id)})
+    mongo.db.likes.remove({"postId": post_id})
     return jsonify({"success": True})
 
 
