@@ -82,10 +82,10 @@ function Postview(props: any) {
   }
 
   const userLiked = () => {
-    axios.post("http://127.0.01:5000/liked", {
-      postId: props._id,
-      userId: localStorage.getItem("username")
-    })
+    axios.get(`http://127.0.01:5000/liked/${props._id}`, {
+      headers:{
+        'Authorization': 'Bearer' + localStorage.getItem('token')}
+      })
       .then((res) => {
         if(res.data.liked) {
           console.log("true")

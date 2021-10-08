@@ -6,6 +6,7 @@ from datetime import datetime
 from bson import ObjectId
 from flask_praetorian import Praetorian, auth_required, current_user
 import time
+import jwt
 
 #create the app
 app = Flask(__name__)
@@ -218,17 +219,19 @@ def like():
     })
     return jsonify("Liked")
 
-@app.route("/liked", methods=["POST"])
-def likes():
-    postId = request.json["postId"]
-    userId = request.json["userId"]
+@app.route("/liked/<postId>", methods=["GET"])
+def likes(postId):
     likes = mongo.db.likes.aggregate([{"$match": {"postId": postId}},{"$group" : {"_id": "$postId", "total": {"$sum": 1}}}])
     postLikes: int
     for doc in likes:
         postLikes = doc["total"]
-    if(userId and mongo.db.likes.find({"userId": userId, "postId": postId})):
-        return jsonify({"liked": True, "likes": postLikes})
-    return jsonify({"error": False, "likes": postLikes})
+    token = guard.read_token_from_header()
+    try:
+        userId = guard.extract_jwt_token(token=token)
+        if(mongo.db.likes.find_one({"userId": userId["id"], "postId": postId})):
+            return jsonify({"liked": True, "likes": postLikes})
+    except:
+        return jsonify({"error": False, "likes": postLikes})
 
 # Returns all the liked posts
 @app.route("/liked", methods=["GET"])
