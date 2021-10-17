@@ -14,6 +14,10 @@ async function Check_token() {
     } 
     catch {
         if(!localStorage.getItem("token")) {
+            if(window.location.href === 'http://localhost:3000/Post' || window.location.href === "http://localhost:3000/Profile")
+            {
+                window.location.href = '/Home'
+            }
             return false;
         }
         await axios.post("http://127.0.0.1:5000/refresh-token", {}, {
@@ -28,16 +32,14 @@ async function Check_token() {
         .catch((error) =>{
             localStorage.removeItem("token")
             localStorage.removeItem("username")
-            if(window.location.href === '/Post' || window.location.href === '/Profile')
+            if(window.location.href === 'http://localhost:3000/Post' || window.location.href === "http://localhost:3000/Profile")
             {
                 window.location.href = '/Home'
-            }
-            else {
-                window.location.reload();
             }
             return false;
         })
     }
+    return false;
 }
 
 

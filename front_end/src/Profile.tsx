@@ -10,7 +10,6 @@ import ReactLoading from 'react-loading';
 import FadeIn from 'react-fade-in';
 
 
-
 function Information(props: any) {
   return  (
     <Card id="info">
@@ -39,6 +38,7 @@ function UserPosted(props: any) {
   const [liked, setLiked] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState(false);
+  const [token] = useState(localStorage.getItem("token"))
 
   const remove = () => {
     setDeleted(true);
@@ -49,7 +49,8 @@ function UserPosted(props: any) {
   }
 
   const like = () => {
-    if(liked) {
+    if(liked && token) {
+      console.log(liked, "token")
       setLiked(false)
       setLikes(likes - 1)
       axios.post(`http://127.0.0.1:5000/dislike`, {
@@ -58,7 +59,8 @@ function UserPosted(props: any) {
         'Authorization': 'Bearer' + localStorage.getItem('token')}
     })
     }
-    else {
+    else if (!liked && token) {
+      console.log("token")
       setLiked(true)
       setLikes(likes + 1)
       axios.post(`http://127.0.0.1:5000/like`, {
@@ -67,7 +69,33 @@ function UserPosted(props: any) {
         'Authorization': 'Bearer' + localStorage.getItem('token')}
       })
     }
+    else {
+      setError(true)
+      setMessage("You are not logged in.")
+    }
   }
+
+  const userLiked = () => {
+    axios.get(`http://127.0.01:5000/liked/${props._id}`, {
+      headers:{
+        'Authorization': 'Bearer' + localStorage.getItem('token')}
+      })
+      .then((res) => {
+        if(res.data.liked) {
+          console.log("true")
+          setLiked(true)
+        }
+        else {
+          console.log('false')
+          setLiked(false)
+        }
+        setLikes(res.data.likes)
+      })
+  }
+
+  useEffect(() => {
+    userLiked();
+  },[])
 
   return (
     <Card border="light" className="text-center" id="card" style={{visibility: deleted ? "hidden" : "visible"}}>
@@ -102,6 +130,10 @@ function UserPosted(props: any) {
   )
 }
 
+function UserLiked() {
+
+}
+
 function Profile() {
 
   // User Info //
@@ -114,13 +146,6 @@ function Profile() {
   const [empty, setEmpty] = useState(false);
   // const [postLoading, setPostLoading] = useState(false);
 
-  // User Liked posts //
-  const [likedPost, setLiked] = useState<any[]>([]);
-  const [likedMessage, setLikedMessage] = useState('');
-  const [likedEmpty, setLikedEmpty] = useState(false);
-  // const [likedLoading, setLikedLoading] = useState(false);
-
-
   const information = async () => {
     const fetchInfo = await fetch("http://127.0.0.1:5000/user",{
       headers:{
@@ -132,7 +157,7 @@ function Profile() {
   };
 
   const userPosted = async () => {
-    const fetchPost = await axios.get("http://127.0.0.1:5000/user_post", {headers: {
+    await axios.get("http://127.0.0.1:5000/user_post", {headers: {
       'Authorization': 'Bearer' + localStorage.getItem('token')
       }}).then((res) => {
       if(res.data.message) {
@@ -148,30 +173,9 @@ function Profile() {
   })
   }
 
-  const liked = async () => {
-    const post = axios.get("http://127.0.0.1:5000/liked", {
-      headers: {
-        'Authorization': 'Bearer' + localStorage.getItem('token')
-    }}).then((res) => {
-      if(res.data.message) {
-        setLikedMessage("You have liked no posts.")
-        setLikedEmpty(true)
-        setLiked([]);
-      }
-      else {
-        // this.setState({liked: res.data});
-        // this.setState({liked_content: true})
-        setLikedEmpty(false)
-        setLiked(res.data)
-        // setLikedLoading(true);
-      }
-    })
-  }
-
   useEffect(() => {
     information();
     userPosted();
-    liked();
   }, [])
 
   return (
@@ -180,46 +184,12 @@ function Profile() {
       {info.map(info => (
         <Information key={info._id} firstname={info.firstname} lastname={info.lastname} username={info.username} email={info.email} _id={info._id} phone={info.phone} roles={info.roles} />
       ))}
-      <Row>
-        <Col md={6}>
-          <h1 className="header">Your Posts</h1>
-          {/* postLoading === false ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : */ (empty === false && posts.map(post => (
-              <FadeIn>
-                <UserPosted key={post._id} author={post.author} _id={post._id} title={post.title} date_posted={post.date_posted} content={post.content}/>
-              </FadeIn> 
-            ))) || <Alert id="message">{postMessage}</Alert>}
-          </Col>
-          <Col>
-          <h1 className="header">Liked Post</h1>
-          {/* likedLoading === false ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : */ (likedEmpty === false && likedPost.map(post => (
-            <Card style={{margin: 'auto', width: '100%'}} className="text-center">
-            <Card.Header as="h3" style={{background: '#FFDBEC'}}> {post.title}</Card.Header>
-            <Card.Body style={{background: '#FDE7F1'}}>
-                <Row>
-                    <Col>
-                        <Card.Text><strong>Author: </strong> {post.author}</Card.Text>
-                        <Card.Text hidden>{post._id}</Card.Text>
-                        <input type="text" id="post_id" value={post._id} hidden readOnly></input>
-                    </Col>
-                    <Col>
-                        <Card.Text><strong>Date Posted: </strong>{post.date_posted}</Card.Text>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col><Card.Text className="posts">{post.content}</Card.Text></Col>
-                </Row>
-            </Card.Body>
-            <Card.Footer id="card-footer">
-                <Row>
-                  <Col xs={2} md={2}>
-                    {/* {<Button id="heart" onClick={like(post._id, post.likes)}><FaHeart/> {post.likes}</Button>} */}
-                  </Col>
-                </Row>
-          </Card.Footer>
-        </Card>
-          ))) || <Alert id="message">{likedMessage}</Alert>}
-          </Col>
-        </Row>
+      <h1 className="header">Your Posts</h1>
+      {/* postLoading === false ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : */ (empty === false && posts.map(post => (
+          <FadeIn>
+            <UserPosted key={post._id} author={post.author} _id={post._id} title={post.title} date_posted={post.date_posted} content={post.content}/>
+          </FadeIn> 
+        ))) || <Alert id="message">{postMessage}</Alert>}
     </Container>
   )
 }

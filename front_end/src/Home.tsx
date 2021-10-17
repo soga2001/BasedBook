@@ -8,32 +8,44 @@ import {FiHeart} from "react-icons/fi";
 import ReactLoading from 'react-loading';
 import FadeIn from 'react-fade-in';
 import { FaHeart} from "react-icons/fa";
-import Alert from 'react-bootstrap/Alert'
+import Alert from 'react-bootstrap/Alert';
 
 function Home() {
   const [posts, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [totalPosts, setTotalPosts] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [message, setMessage] = useState('');
 
   const post = async () => {
-    const fetchPost = await fetch("http://127.0.0.1:5000/post");
+    const fetchPost = await fetch(`http://127.0.0.1:5000/post/${page}`);
     const jsonData = await fetchPost.json();
-    setData(jsonData.posts);
+    await jsonData && setData([...posts, ...jsonData.posts]);
+    await jsonData && setTotalPosts(Number(jsonData.total))
+    if(jsonData.total !== page) {
+      setPage(page + 1);
+      return;
+    }
+    setMessage("There are no more posts.")
     setLoading(false);
   }
 
+
   useEffect(() => {
     post();
-  }, [])
+  }, [page])
 
   return (
     <Container>
       <h1 className="header">Home Page</h1>
       <FadeIn>
-        {loading === true ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : posts.map(post => (
+      {posts.map(post => (
           <Postview key={post._id} _id={post._id} title={post.title} author={post.author} date_posted={post.date_posted} 
           content={post.content}/>
-        ))}
-      </FadeIn>
+      ))}
+    </FadeIn>
+    {loading ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : <Alert id="message">{message}</Alert>}
     </Container>
   )
 }
@@ -45,6 +57,7 @@ function Postview(props: any) {
   const [deleted, setDeleted] = useState(false);
   const [liked, setLiked] = useState<Boolean>();
   const [token] = useState(localStorage.getItem("token"))
+  const [loading, setLoading] = useState(true);
 
   const remove = () => {
     setDeleted(true);
@@ -56,7 +69,6 @@ function Postview(props: any) {
 
   const like = () => {
     if(liked && token) {
-      console.log(liked, "token")
       setLiked(false)
       setLikes(likes - 1)
       axios.post(`http://127.0.0.1:5000/dislike`, {
@@ -66,7 +78,6 @@ function Postview(props: any) {
     })
     }
     else if (!liked && token) {
-      console.log("token")
       setLiked(true)
       setLikes(likes + 1)
       axios.post(`http://127.0.0.1:5000/like`, {
@@ -88,13 +99,12 @@ function Postview(props: any) {
       })
       .then((res) => {
         if(res.data.liked) {
-          console.log("true")
           setLiked(true)
         }
         else {
-          console.log('false')
           setLiked(false)
         }
+        setLoading(false)
         setLikes(res.data.likes)
       })
   }
@@ -105,36 +115,39 @@ function Postview(props: any) {
 
   return (
     <div>
-      {deleted ? '' : <Card key={props._id} border="light" className="text-center" id="card" style={{visibility: deleted ? "hidden" : "visible"}}>
-      <Card.Header style={{background: '#C6F5FF'}} as="h3"> {props.title}</Card.Header>
-      <Card.Body style={{background: '#E3FAFF'}}>
-        <Row>
-          <Col>
-              <Card.Text><strong>Author: </strong> {props.author}</Card.Text>
-              <input type="text" id="post_id" value={props._id} hidden readOnly></input>
-          </Col>
-          <Col>
-              <Card.Text><strong>Date Posted: </strong>{props.date_posted}</Card.Text>
-          </Col>
-        </Row>
-        <Row>
-          <Col><Card.Text className="posts">{props.content}</Card.Text></Col>
-        </Row>
-      </Card.Body>
-      <Card.Footer id="card-footer">
-        <Row>
-          <Col md={1} xs={2}>
-            {<Button id="heart" onClick={() => like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}{' '}
-          </Col>
-            {error && <Alert variant="danger" className="message">{message}</Alert>}
-          <Col md={1} xs={2}>
-            {props.author === localStorage.getItem('username') ? 
-              <Button id="button" variant="outline-primary" onClick={() => remove()}>Delete</Button> 
-            : '' }
-          </Col>
-        </Row>
-      </Card.Footer>
-    </Card>}
+      <div>
+        {loading ? <ReactLoading type={'bubbles'} color={'red'} height={667} width={375} /> :
+        deleted ? '' : <Card key={props._id} border="light" className="text-center" id="card" style={{visibility: deleted ? "hidden" : "visible"}}>
+        <Card.Header style={{background: '#C6F5FF'}} as="h3"> {props.title}</Card.Header>
+        <Card.Body style={{background: '#E3FAFF'}}>
+          <Row>
+            <Col>
+                <Card.Text><strong>Author: </strong> {props.author}</Card.Text>
+                <input type="text" id="post_id" value={props._id} hidden readOnly></input>
+            </Col>
+            <Col>
+                <Card.Text><strong>Date Posted: </strong>{props.date_posted}</Card.Text>
+            </Col>
+          </Row>
+          <Row>
+            <Col><Card.Text className="posts">{props.content}</Card.Text></Col>
+          </Row>
+        </Card.Body>
+        <Card.Footer id="card-footer">
+          <Row>
+            <Col md={1} xs={2}>
+              {<Button id="heart" onClick={() => like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}{' '}
+            </Col>
+              {error && <Alert variant="danger" className="message">{message}</Alert>}
+            <Col md={1} xs={2}>
+              {props.author === localStorage.getItem('username') ? 
+                <Button id="button" variant="outline-primary" onClick={() => remove()}>Delete</Button> 
+              : '' }
+            </Col>
+          </Row>
+        </Card.Footer>
+      </Card>
+      }</div>
     </div>
     
   )

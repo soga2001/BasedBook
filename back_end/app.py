@@ -29,6 +29,8 @@ from likes import UserPostLikes
 
 guard.init_app(app, User)
 
+#limiting the total posts
+limit = 1
 
 @app.route("/users", methods=['GET'])
 def get_users():
@@ -132,8 +134,7 @@ def register():
             "email": email,
             "username": username,
             "password": hashed_password,
-            "roles": "member",
-            "liked": []
+            "roles": "member"
         })
         # User.deserialize(mongo.db.users.find_one({"email": email})).to_dict()
         return jsonify({"success": "You have been registered"})
@@ -173,8 +174,7 @@ def register_admin():
             "email": email,
             "username": username,
             "password": hashed_password,
-            "roles": "admin",
-            "liked": []
+            "roles": "admin"
         })
         User.deserialize(mongo.db.users.find_one({"email": email})).to_dict()
         return jsonify({"success": "You have been registered"})
@@ -231,31 +231,32 @@ def likes(postId):
         if(mongo.db.likes.find_one({"userId": userId["id"], "postId": postId})):
             return jsonify({"liked": True, "likes": postLikes})
     except:
-        print("")
+        return jsonify({"error": False, "likes": postLikes})
     return jsonify({"error": False, "likes": postLikes})
 
 # Returns all the liked posts
-@app.route("/liked", methods=["GET"])
+@app.route("/liked_posts", methods=["GET"])
 @auth_required
 def liked():
-    user = User.deserialize(mongo.db.users.find_one({"_id": ObjectId(current_user()._id)}))
-    item = user.liked
-    item.reverse()
-    for items in user.liked:
-        post = (mongo.db.post.find_one({"_id": ObjectId(items)}))
-        if(not post):
-            user.liked.remove(items)
-    User.deserialize(mongo.db.users.find_one_and_update({"_id": ObjectId(current_user()._id)}, {"$set": {"liked": user.liked}}))
-    item = [Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(x)})) for x in item]
-    if(item):
-        return jsonify(item)
+    userId = current_user()._id
+    posts = []
+    liked = mongo.db.likes.find({"userId": userId})
+    # for post in liked:
+    #     posts = Post.deserialize(mongo.db.post.find({"_id": ObjectId(post["postId"])}))
+    posts = [Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(x["postId"])})) for x in liked]
+    posts.reverse()
+    # posts = [mongo.db.posts.find({"_id": x["postId"]}) for x in liked]
+    # posts = [Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(x["postId"]) for x in liked}))]
+    if(posts):
+        return jsonify(posts)
     return jsonify({"message": "You have liked no posts."})
-
-
-@app.route("/post", methods=['GET'])
-def get_all_post():
-    posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING)]
-    return jsonify({"posts": posts})
+    
+@app.route("/post/<page>", methods=['GET'])
+def get_all_post(page):
+    page = int(page)
+    posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING).limit(limit).skip(page)]
+    time.sleep(1)
+    return jsonify({"posts": posts, "total": mongo.db.post.count()})
 
 
 @app.route("/user_post", methods=['GET'])

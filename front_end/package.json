@@ -17,9 +17,10 @@
     "@types/react-router-dom": "^5.1.8",
     "@types/react-router-hash-link": "^2.4.2",
     "@types/reactstrap": "^8.7.2",
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "bootstrap": "^5.1.0",
     "feather-icons": "^4.28.0",
+    "prop-types": "^15.7.2",
     "react": "^17.0.2",
     "react-animated-heart": "0.0.7-alpha.1",
     "react-async": "^10.0.1",
@@ -70,6 +71,7 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-typescript": "^7.15.0",
+    "@types/prop-types": "^15.7.4",
     "xxxxx": "^1.0.3"
   }
 }

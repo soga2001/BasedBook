@@ -20,6 +20,8 @@ import Post from "./Post";
 import Profile from './Profile';
 // import Footer from './Footer';
 import Setting from './Setting';
+import { FaHeart} from "react-icons/fa";
+import Liked from './Liked';
 
 function logout() {
   localStorage.removeItem('token');
@@ -27,14 +29,21 @@ function logout() {
   window.location.href ='/Home';
 }
 
-window.onload = async () => (
-  await Check_token()
-)
 
-class NavBar extends Component {
-  render() {
-    return (
-      <Router>
+function NavBar() {
+  const [token, setToken] = useState<boolean>()
+
+  const checkToken = async() => {
+    const validToken = await Check_token()
+    setToken(validToken)
+  }
+
+  useEffect(() => {
+    checkToken()
+  }, [token])
+
+  return (
+    <Router>
         <Navbar collapseOnSelect expand="sm" bg="dark" id="navbar">
           <Container className="container">
             <Navbar.Brand id="brand" href="/Home"><img id="logo"
@@ -79,13 +88,21 @@ class NavBar extends Component {
                           </Row>
                         </NavLink>
                       </NavDropdown.Item>
-                          <NavDropdown.Divider/>
-                          <NavDropdown.Item onClick={logout}>
-                            <Row>
-                              <Col>LogOut</Col> 
-                              <Col>{<LogOut />}</Col>
-                            </Row>
-                            </NavDropdown.Item>
+                      <NavDropdown.Item>
+                        <NavLink to="/Liked" id="drop-item" activeClassName="active">
+                          <Row>
+                            <Col>Liked</Col>
+                            <Col><FaHeart /></Col>
+                          </Row>
+                        </NavLink>
+                      </NavDropdown.Item>
+                      <NavDropdown.Divider/>
+                      <NavDropdown.Item onClick={logout}>
+                        <Row>
+                          <Col>LogOut</Col> 
+                          <Col>{<LogOut />}</Col>
+                        </Row>
+                        </NavDropdown.Item>
                     </NavDropdown>
                   }
               </Nav>
@@ -99,9 +116,10 @@ class NavBar extends Component {
           <Route exact path="/Login"><Login/></Route>
           <Route exact path="/Register"><Register/></Route>
           <Route exact path="/Profile"><Profile/></Route>
+          <Route exact path="/Liked"><Liked/></Route>
           <Route exact path="/Setting"><Setting/></Route>
       </Router>
-    )
-  }
+  )
 }
+
 export default NavBar;
