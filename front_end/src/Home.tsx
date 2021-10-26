@@ -35,21 +35,13 @@ function PageView(props: any) {
   const [error, setError] = useState(false);
   const [message, setMessage] = useState(''); 
 
-  // const [limit, setLimit] = useState(props.limit);
-  // const [offset, setOffset] = useState(props.offset)
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
-  const [count, setCount] = useState(1);
 
-  // used this website for the handleScroll + useEffect code
-  // https://upmostly.com/tutorials/build-an-infinite-scroll-component-in-react-using-react-hooks
   function handleScroll() {
-    if(window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return;
-        const changePage = async () => {
-        console.log('handleScroll')
-        await setPage(page + 1);
+    if((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 1000) {
+      setPage(page + 1);
     }
-    changePage();
   }
 
   useEffect(() => {
@@ -59,10 +51,9 @@ function PageView(props: any) {
   
   const post = async () => {
     if(hasMore) {
+      setLoading(true);
       const fetchPost = await fetch(`http://127.0.0.1:5000/post?limit=${limit}&page=${page}`);
       const jsonData = await fetchPost.json();
-      console.log(count, jsonData.posts);
-      setCount(count + 1);
       await jsonData.posts && setData([...posts, ...jsonData.posts]);
       if(!jsonData.hasMore) {
         setHasMore(jsonData.hasMore)
@@ -83,7 +74,7 @@ function PageView(props: any) {
         <Postview key={post._id} _id={post._id} title={post.title} author={post.author} date_posted={post.date_posted} 
         content={post.content}/>
       ))}
-      {!hasMore ? <Alert id="message">{message}</Alert> : <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/>}
+      {!loading ? <Alert id="message">{message}</Alert> : <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/>}
     </div>
   )
 }
