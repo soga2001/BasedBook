@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect, useRef} from "react";
 import axios from "axios";
 import './style.css'
 import 'bootstrap/dist/css/bootstrap.css';
@@ -10,43 +10,73 @@ import FadeIn from 'react-fade-in';
 import { FaHeart} from "react-icons/fa";
 import Alert from 'react-bootstrap/Alert';
 
+
+
 function Home() {
-  const [posts, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [totalPosts, setTotalPosts] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [message, setMessage] = useState('');
+  const [limit, setLimit] = useState(10);
+  const [offset, setOffset] = useState(10);
 
-  const post = async () => {
-    const fetchPost = await fetch(`http://127.0.0.1:5000/post/${page}`);
-    const jsonData = await fetchPost.json();
-    await jsonData && setData([...posts, ...jsonData.posts]);
-    await jsonData && setTotalPosts(Number(jsonData.total))
-    if(jsonData.total !== page) {
-      setPage(page + 1);
-      return;
-    }
-    setMessage("There are no more posts.")
-    setLoading(false);
-  }
-
+  // function loadMore(){
+  //   if (window.innerHeight + document.documentElement.scrollTop === document.scrollingElement.scrollHeight) {
+  //       // Do load more content here!
+  //   }
+  // }
 
   useEffect(() => {
-    post();
-  }, [page])
+
+  }, [offset])
 
   return (
     <Container>
+      <h1 className="header">Home Page</h1> {/* For some reason this doesn't appear on the screen but if I remove this, the next home page header doesn't appear on the screen */}
       <h1 className="header">Home Page</h1>
       <FadeIn>
-      {posts.map(post => (
-          <Postview key={post._id} _id={post._id} title={post.title} author={post.author} date_posted={post.date_posted} 
-          content={post.content}/>
-      ))}
-    </FadeIn>
-    {loading ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : <Alert id="message">{message}</Alert>}
+        <PageView limit={limit} offset={page}/>
+      </FadeIn>
     </Container>
+  )
+}
+
+
+
+function PageView(props: any) {
+  const [posts, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState(false);
+  const [message, setMessage] = useState(''); 
+
+  const [limit, setLimit] = useState(props.limit);
+  const [offset, setOffset] = useState(props.offset)
+  
+  const post = async () => {
+    // setLoading(true);
+    if(hasMore) {
+      const fetchPost = await fetch(`http://127.0.0.1:5000/post?limit=${limit}&offset=${offset}`);
+      const jsonData = await fetchPost.json();
+      await jsonData.posts && setData(jsonData.posts) && setHasMore(jsonData.hasMore);
+    }
+    if(!hasMore) {
+      setMessage("There are no more posts.")
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    post();
+  }, [])
+
+  return (
+    <div>
+      {posts.map(post => (
+        <Postview key={post._id} _id={post._id} title={post.title} author={post.author} date_posted={post.date_posted} 
+        content={post.content}/>
+      ))}
+      {!loading ? <Alert id="message">{message}</Alert> : <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/>}
+    </div>
+      
+    
   )
 }
 
@@ -116,8 +146,8 @@ function Postview(props: any) {
   return (
     <div>
       <div>
-        {loading ? <ReactLoading type={'bubbles'} color={'red'} height={667} width={375} /> :
-        deleted ? '' : <Card key={props._id} border="light" className="text-center" id="card" style={{visibility: deleted ? "hidden" : "visible"}}>
+        {
+        deleted ? '' : <Card key={props._id} border="light" className="text-center" id="card">
         <Card.Header style={{background: '#C6F5FF'}} as="h3"> {props.title}</Card.Header>
         <Card.Body style={{background: '#E3FAFF'}}>
           <Row>

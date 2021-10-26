@@ -44,7 +44,7 @@ function NavBar() {
 
   return (
     <Router>
-        <Navbar collapseOnSelect expand="sm" bg="dark" id="navbar">
+        <Navbar collapseOnSelect expand="sm" bg="dark" id="navbar" fixed="top">
           <Container className="container">
             <Navbar.Brand id="brand" href="/Home"><img id="logo"
                 alt="Logo"

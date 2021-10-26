@@ -251,12 +251,16 @@ def liked():
         return jsonify(posts)
     return jsonify({"message": "You have liked no posts."})
     
-@app.route("/post/<page>", methods=['GET'])
-def get_all_post(page):
-    page = int(page)
-    posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING).limit(limit).skip(page)]
-    time.sleep(1)
-    return jsonify({"posts": posts, "total": mongo.db.post.count()})
+@app.route("/post", methods=['GET'])
+def get_all_post():
+    # page = int(page)
+    offset = int(request.args['offset'])
+    limit = int(request.args['limit'])
+    posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING).limit(limit).skip(offset)]
+    if(posts and len(posts) == 10):
+        print("has more")
+        return jsonify({"posts": posts, "hasMore": True})
+    return jsonify({"posts": posts, "hasMore": False})
 
 
 @app.route("/user_post", methods=['GET'])
