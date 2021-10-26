@@ -13,26 +13,14 @@ import Alert from 'react-bootstrap/Alert';
 
 
 function Home() {
-  const [page, setPage] = useState(0);
-  const [limit, setLimit] = useState(10);
-  const [offset, setOffset] = useState(10);
-
-  // function loadMore(){
-  //   if (window.innerHeight + document.documentElement.scrollTop === document.scrollingElement.scrollHeight) {
-  //       // Do load more content here!
-  //   }
-  // }
-
-  useEffect(() => {
-
-  }, [offset])
+  
 
   return (
     <Container>
       <h1 className="header">Home Page</h1> {/* For some reason this doesn't appear on the screen but if I remove this, the next home page header doesn't appear on the screen */}
       <h1 className="header">Home Page</h1>
       <FadeIn>
-        <PageView limit={limit} offset={page}/>
+        <PageView />
       </FadeIn>
     </Container>
   )
@@ -47,25 +35,47 @@ function PageView(props: any) {
   const [error, setError] = useState(false);
   const [message, setMessage] = useState(''); 
 
-  const [limit, setLimit] = useState(props.limit);
-  const [offset, setOffset] = useState(props.offset)
+  // const [limit, setLimit] = useState(props.limit);
+  // const [offset, setOffset] = useState(props.offset)
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [count, setCount] = useState(1);
+
+  // used this website for the handleScroll + useEffect code
+  // https://upmostly.com/tutorials/build-an-infinite-scroll-component-in-react-using-react-hooks
+  function handleScroll() {
+    if(window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) return;
+        const changePage = async () => {
+        console.log('handleScroll')
+        await setPage(page + 1);
+    }
+    changePage();
+  }
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [])
   
   const post = async () => {
-    // setLoading(true);
     if(hasMore) {
-      const fetchPost = await fetch(`http://127.0.0.1:5000/post?limit=${limit}&offset=${offset}`);
+      const fetchPost = await fetch(`http://127.0.0.1:5000/post?limit=${limit}&page=${page}`);
       const jsonData = await fetchPost.json();
-      await jsonData.posts && setData(jsonData.posts) && setHasMore(jsonData.hasMore);
-    }
-    if(!hasMore) {
-      setMessage("There are no more posts.")
+      console.log(count, jsonData.posts);
+      setCount(count + 1);
+      await jsonData.posts && setData([...posts, ...jsonData.posts]);
+      if(!jsonData.hasMore) {
+        setHasMore(jsonData.hasMore)
+        setMessage("There are no more posts.")
+      }
+      // setData([...Array.from([...posts, ...jsonData.posts])])
     }
     setLoading(false);
   }
 
   useEffect(() => {
     post();
-  }, [])
+  }, [page])
 
   return (
     <div>
@@ -73,10 +83,8 @@ function PageView(props: any) {
         <Postview key={post._id} _id={post._id} title={post.title} author={post.author} date_posted={post.date_posted} 
         content={post.content}/>
       ))}
-      {!loading ? <Alert id="message">{message}</Alert> : <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/>}
+      {!hasMore ? <Alert id="message">{message}</Alert> : <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/>}
     </div>
-      
-    
   )
 }
 

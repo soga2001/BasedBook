@@ -253,12 +253,11 @@ def liked():
     
 @app.route("/post", methods=['GET'])
 def get_all_post():
-    # page = int(page)
-    offset = int(request.args['offset'])
+    page = int(request.args['page'])
     limit = int(request.args['limit'])
+    offset = page * 10
     posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING).limit(limit).skip(offset)]
     if(posts and len(posts) == 10):
-        print("has more")
         return jsonify({"posts": posts, "hasMore": True})
     return jsonify({"posts": posts, "hasMore": False})
 
