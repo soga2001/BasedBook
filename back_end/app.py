@@ -257,9 +257,10 @@ def get_all_post():
     limit = int(request.args['limit'])
     offset = page * 10
     posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING).limit(limit).skip(offset)]
-    if(posts and len(posts) == 10):
-        return jsonify({"posts": posts, "hasMore": True})
-    return jsonify({"posts": posts, "hasMore": False})
+    time.sleep(2)
+    if(posts):
+        return jsonify({"posts": posts})
+    return jsonify({"hasMore": False})
 
 
 @app.route("/user_post", methods=['GET'])

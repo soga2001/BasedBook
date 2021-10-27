@@ -13,8 +13,6 @@ import Alert from 'react-bootstrap/Alert';
 
 
 function Home() {
-  
-
   return (
     <Container>
       <h1 className="header">Home Page</h1> {/* For some reason this doesn't appear on the screen but if I remove this, the next home page header doesn't appear on the screen */}
@@ -28,38 +26,37 @@ function Home() {
 
 
 
-function PageView(props: any) {
+function PageView() {
   const [posts, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [error, setError] = useState(false);
   const [message, setMessage] = useState(''); 
 
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState(10);
 
   function handleScroll() {
-    if((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 1000) {
+    if(window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 250) {
+      window.removeEventListener('scroll', handleScroll);
       setPage(page + 1);
     }
   }
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [])
   
   const post = async () => {
     if(hasMore) {
       setLoading(true);
       const fetchPost = await fetch(`http://127.0.0.1:5000/post?limit=${limit}&page=${page}`);
       const jsonData = await fetchPost.json();
-      await jsonData.posts && setData([...posts, ...jsonData.posts]);
-      if(!jsonData.hasMore) {
-        setHasMore(jsonData.hasMore)
-        setMessage("There are no more posts.")
+      await jsonData.posts && setData((prev) => {
+        return [...new Set([...prev, ...jsonData.posts])]
+      });
+      // Supposedly the setData() above makes sure there are no duplicate posts in the array, didn't actually work.
+      window.addEventListener('scroll', handleScroll)
+      if(jsonData.hasMore === false) {
+        setHasMore(jsonData.hasMore);
+        setMessage("There are no more posts.");
+        window.removeEventListener('scroll', handleScroll)
       }
-      // setData([...Array.from([...posts, ...jsonData.posts])])
     }
     setLoading(false);
   }
@@ -74,6 +71,7 @@ function PageView(props: any) {
         <Postview key={post._id} _id={post._id} title={post.title} author={post.author} date_posted={post.date_posted} 
         content={post.content}/>
       ))}
+      <div></div>
       {!loading ? <Alert id="message">{message}</Alert> : <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/>}
     </div>
   )
