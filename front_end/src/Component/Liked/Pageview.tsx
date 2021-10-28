@@ -32,7 +32,7 @@ function Pageview() {
             await jsonData.posts && setPost((prev) =>
             [...new Set([...prev, ...jsonData.posts])]);
             window.addEventListener('scroll', handleScroll);
-            if(jsonData.message) {
+            if(jsonData.posts < 10 || jsonData.message) {
                 window.removeEventListener('scroll', handleScroll);
                 setMessage("You have reached the end.");
                 setHasMore(false);
@@ -48,7 +48,7 @@ function Pageview() {
     return (
         <div>
             {likedPost.map(post => (
-                <Postview title={post.title} author={post.author} _id={post._id} content={post.content} date_posted={post.data_posted} />
+                <Postview key={post._id} title={post.title} author={post.author} _id={post._id} content={post.content} date_posted={post.data_posted} />
             ))}
             {!loading ? <Alert id="message">{message}</Alert> : <ReactLoading type={'bars'} color={"darkblue"} height={100} width={100} className="loading"/>}
         </div>

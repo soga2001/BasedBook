@@ -45,7 +45,6 @@ function Postview(props: any) {
           })
           .then((res) => {
             if(res.data.liked) {
-              console.log("true")
               setLiked(true)
             }
             else {
@@ -61,22 +60,23 @@ function Postview(props: any) {
 
     return (
         <div>
-            {deleted ? '' : <Card style={{margin: 'auto', width: '100%'}} className="text-center">
+            {deleted ? '' : 
+              <Card style={{margin: 'auto', width: '100%'}} className="text-center">
                 <Card.Header as="h3" style={{background: '#FFDBEC'}}> {props.title}</Card.Header>
                 <Card.Body style={{background: '#FDE7F1'}}>
                     <Row>
                         <Col>
-                            <Card.Text><strong>Author: </strong> {props.author}</Card.Text>
+                          <Card.Text><strong>Author: </strong> {props.author}</Card.Text>
                         </Col>
                         <Col>
-                            <Card.Text><strong>Date Posted: </strong>{props.date_posted}</Card.Text>
+                          <Card.Text><strong>Date Posted: </strong>{props.date_posted}</Card.Text>
                         </Col>
                     </Row>
                     <Row>
-                        <Col><Card.Text className="posts">{props.content}</Card.Text></Col>
+                      <Col><Card.Text className="posts">{props.content}</Card.Text></Col>
                     </Row>
                 </Card.Body>
-                <Card.Footer id="card-footer">
+                <Card.Footer>
                 <span >{<Button id="heart" onClick={() => like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}</span>
                 <span>{props.author === localStorage.getItem('username') ? 
                     <Button id="button" onClick={() => remove()}>Delete</Button> 
