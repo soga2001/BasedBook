@@ -1,4 +1,4 @@
-import React, {Component, useState, useEffect} from 'react';
+import {useState, useEffect} from 'react';
 import { BrowserRouter as Router, Route, NavLink } from 'react-router-dom';
 import {
   Navbar, 
@@ -10,18 +10,20 @@ import {
 } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Check_token} from './Token';
+// Icons
 import { LogIn, LogOut } from 'react-feather';
 import { BsHouseDoor, BsFillGearFill, BsFillPersonLinesFill } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
+import { FaHeart} from "react-icons/fa";
+// Pages
 import Home from './Home';
 import Register from './Register';
 import Login from './Login';
 import Post from "./Post";
 import Profile from './Profile';
-// import Footer from './Footer';
 import Setting from './Setting';
-import { FaHeart} from "react-icons/fa";
 import Liked from './Liked';
+
 
 function logout() {
   localStorage.removeItem('token');
@@ -29,23 +31,20 @@ function logout() {
   window.location.href ='/Home';
 }
 
-
 function NavBar() {
-  const [token, setToken] = useState<boolean>()
 
   const checkToken = async() => {
-    const validToken = await Check_token()
-    setToken(validToken)
+    await Check_token()
   }
 
   useEffect(() => {
     checkToken()
-  }, [token])
+  }, [])
 
   return (
     <Router>
-        <Navbar collapseOnSelect expand="sm" bg="dark" id="navbar" fixed="top">
-          <Container className="container">
+        {<Navbar collapseOnSelect expand="sm" bg="dark" id="navbar" fixed="top">
+          <Container>
             <Navbar.Brand id="brand" href="/Home"><img id="logo"
                 alt="Logo"
                 src="/logo.png"
@@ -92,7 +91,7 @@ function NavBar() {
                         <NavLink to="/Liked" id="drop-item" activeClassName="active">
                           <Row>
                             <Col>Liked</Col>
-                            <Col><FaHeart /></Col>
+                            <Col><FaHeart id="heart"/></Col>
                           </Row>
                         </NavLink>
                       </NavDropdown.Item>
@@ -109,7 +108,7 @@ function NavBar() {
             </Navbar.Collapse>
             
           </Container>
-        </Navbar>
+        </Navbar>}
           <Route exact path="/"><Home/></Route>
           <Route exact path="/Home"><Home/> </Route>
           <Route exact path="/Post"><Post/></Route>

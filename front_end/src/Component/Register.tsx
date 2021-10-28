@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import './style.css';
+import '../style.css';
 import {Button, Card, Row, Col, Container, FloatingLabel, Form} from 'react-bootstrap';
 import Alert from 'react-bootstrap/Alert';
 

@@ -2,11 +2,6 @@ html {
   scroll-behavior: smooth;
  }
 
-
-body {
-  background-color: green;
-}
-
 /* NavBar */
 
 #dropdown{
@@ -85,6 +80,14 @@ label {
 
 #button {
   font-size: 13px;
+  color: black;
+  border-color: darkblue;
+  background-color: transparent;
+}
+
+#button:hover {
+  background-color: darkblue;
+  color: white;
 }
 
 form {
@@ -106,6 +109,11 @@ form {
   text-align: center;
 }
 
+/* Container */
+
+.body {
+  margin-top: 60px;
+}
 
 /* Home Page */
 
@@ -132,13 +140,20 @@ form {
   font-size: 15px;
 }
 
-.card-footer {
-  background-color: #C6F5FF;
+#card-header {
+  background-color: #A8FAFF;
 }
 
-/* .message {
-  margin: 1%;
-} */
+#card-body {
+  background-color: #CCFBFE;
+}
+
+#card-footer {
+  background-color: #DFFDFF;
+  padding: 0;
+}
+
+
 
 /* Profile */
 #info {
@@ -157,6 +172,7 @@ form {
   margin: auto;
   width: 60%;
   text-align: center;
+  margin-bottom: 20px;
 }
 
 /* Loader */

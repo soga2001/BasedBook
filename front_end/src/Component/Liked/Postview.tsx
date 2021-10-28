@@ -1,55 +1,10 @@
-import React, { Component, useState, useEffect } from "react";
-import axios from "axios";
-import './style.css'
-import 'bootstrap/dist/css/bootstrap.css';
-import {Button, Card, Row, Col, Container} from 'react-bootstrap';
-import Alert from 'react-bootstrap/Alert';
-import {FaHeart} from "react-icons/fa"
+import {useState, useEffect} from 'react';
+import axios from 'axios';
+import { FaHeart} from "react-icons/fa";
 import {FiHeart} from "react-icons/fi";
-import ReactLoading from 'react-loading';
-import FadeIn from 'react-fade-in';
+import {Button, Card, Row, Col} from 'react-bootstrap';
 
-function Liked() {
-
-    // User Liked posts //
-    const [likedPost, setLiked] = useState<any[]>([]);
-    const [likedMessage, setLikedMessage] = useState('');
-    const [likedEmpty, setLikedEmpty] = useState(false);
-    // const [likedLoading, setLikedLoading] = useState(false);
-
-    const liked = async () => {
-        axios.get("http://127.0.0.1:5000/liked_posts", {
-        headers: {
-            'Authorization': 'Bearer' + localStorage.getItem('token')
-        }}).then((res) => {
-        if(res.data.message) {
-            setLikedMessage("You have liked no posts.")
-            setLikedEmpty(true)
-            setLiked([]);
-        }
-        else {
-            setLikedEmpty(false)
-            setLiked(res.data)
-            // setLikedLoading(true);
-        }
-        })
-    }
-
-    useEffect(() => {
-        liked();
-    }, [])
-
-    return (
-        <Container>
-            <h1 className="header">Liked Post</h1>
-            {/* likedLoading === false ? <ReactLoading type={'bubbles'} color={"black"} height={100} width={100} className="loading"/> : */ (likedEmpty === false && likedPost.map(post => (
-                <LikedPost title={post.title} author={post.author} _id={post._id} content={post.content} date_posted={post.data_posted} />
-            ))) || <Alert id="message">{likedMessage}</Alert>}
-        </Container>
-    )
-}
-  
-function LikedPost(props: any) {
+function Postview(props: any) {
     const [likes, setLikes] = useState(0);
     const [deleted, setDeleted] = useState(false);
     const [liked, setLiked] = useState(true);
@@ -105,7 +60,8 @@ function LikedPost(props: any) {
       }, [])
 
     return (
-        <Card style={{margin: 'auto', width: '100%'}} className="text-center">
+        <div>
+            {deleted ? '' : <Card style={{margin: 'auto', width: '100%'}} className="text-center">
                 <Card.Header as="h3" style={{background: '#FFDBEC'}}> {props.title}</Card.Header>
                 <Card.Body style={{background: '#FDE7F1'}}>
                     <Row>
@@ -121,14 +77,14 @@ function LikedPost(props: any) {
                     </Row>
                 </Card.Body>
                 <Card.Footer id="card-footer">
-                    <Row>
-                    <Col xs={2} md={2}>
-                        <Button id="heart" onClick={() => like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>{' '}
-                    </Col>
-                    </Row>
+                <span >{<Button id="heart" onClick={() => like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}</span>
+                <span>{props.author === localStorage.getItem('username') ? 
+                    <Button id="button" onClick={() => remove()}>Delete</Button> 
+                    : '' }</span>
             </Card.Footer>
-            </Card>
+            </Card>}
+        </div>
     )
 }
 
-export default Liked;
+export default Postview;

@@ -36,7 +36,6 @@ limit = 1
 def get_users():
     return jsonify([User.deserialize(x).to_dict() for x in mongo.db.users.find()])
 
-
 @app.route("/user", methods=['GET'])
 @auth_required
 def get_user():
@@ -67,7 +66,6 @@ def update_user_by_id():
     except:
         return jsonify("There is no user with that user_id in the database")
 
-
 @app.route('/user', methods=["DELETE"])
 @auth_required
 @cross_origin(origin="*")
@@ -87,7 +85,6 @@ def delete_user():
     except:
         return jsonify("Invalid information")
 
-
 @app.route("/login", methods=['POST'])
 @cross_origin(origin="*")
 def login():
@@ -100,7 +97,6 @@ def login():
         return jsonify({"access_token": token, "username": username})
     except:
         return jsonify({"error": "Invalid username or password."})
-
 
 @app.route("/register", methods=['POST'])
 @cross_origin(origin="*")
@@ -136,11 +132,9 @@ def register():
             "password": hashed_password,
             "roles": "member"
         })
-        # User.deserialize(mongo.db.users.find_one({"email": email})).to_dict()
         return jsonify({"success": "You have been registered"})
     except:
         return jsonify("Please don't leave anything empty.")
-
 
 # Currently has no usage
 @app.route("/register/admin", methods=['POST'])
@@ -181,7 +175,6 @@ def register_admin():
     except:
         return jsonify("Please don't leave anything empty.")
 
-
 @app.route("/post", methods=['POST'])
 @auth_required
 def post():
@@ -220,7 +213,7 @@ def like():
     return jsonify("Liked")
 
 @app.route("/liked/<postId>", methods=["GET"])
-def likes(postId):
+def liked(postId):
     likes = mongo.db.likes.aggregate([{"$match": {"postId": postId}},{"$group" : {"_id": "$postId", "total": {"$sum": 1}}}])
     postLikes = 0
     for doc in likes:
@@ -237,18 +230,17 @@ def likes(postId):
 # Returns all the liked posts
 @app.route("/liked_posts", methods=["GET"])
 @auth_required
-def liked():
+def liked_posts():
     userId = current_user()._id
     posts = []
-    liked = mongo.db.likes.find({"userId": userId})
-    # for post in liked:
-    #     posts = Post.deserialize(mongo.db.post.find({"_id": ObjectId(post["postId"])}))
+    page = int(request.args['page'])
+    limit = int(request.args['limit'])
+    offset = page * 10
+    liked = mongo.db.likes.find({"userId": userId}).limit(limit).skip(offset)
     posts = [Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(x["postId"])})) for x in liked]
     posts.reverse()
-    # posts = [mongo.db.posts.find({"_id": x["postId"]}) for x in liked]
-    # posts = [Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(x["postId"]) for x in liked}))]
     if(posts):
-        return jsonify(posts)
+        return jsonify({"posts": posts})
     return jsonify({"message": "You have liked no posts."})
     
 @app.route("/post", methods=['GET'])
@@ -257,21 +249,22 @@ def get_all_post():
     limit = int(request.args['limit'])
     offset = page * 10
     posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING).limit(limit).skip(offset)]
-    time.sleep(2)
     if(posts):
         return jsonify({"posts": posts})
     return jsonify({"hasMore": False})
-
 
 @app.route("/user_post", methods=['GET'])
 @cross_origin(origin="*")
 @auth_required
 def get_user_posts():
     author = current_user().username
-    post = [Post.deserialize(x) for x in mongo.db.post.find({"author" : author}).sort("date_posted", DESCENDING)]
+    page = int(request.args['page'])
+    limit = int(request.args['limit'])
+    offset = page * 10
+    post = [Post.deserialize(x) for x in mongo.db.post.find({"author" : author}).sort("date_posted", DESCENDING).limit(limit).skip(offset)]
     if post:
-        return jsonify(post)
-    return jsonify({"message": "You have made no posts."})
+        return jsonify({"posts": post})
+    return jsonify({"hasMore": False})
 
 
 @app.route("/post/<post_id>", methods=['DELETE'])
