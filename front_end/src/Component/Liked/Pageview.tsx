@@ -29,11 +29,12 @@ function Pageview() {
                 }
             })
             const jsonData = await fetchPost.json();
-            await jsonData.posts && setPost([...likedPost, ...jsonData.posts]);
+            await jsonData.posts && setPost((prev) =>
+            [...new Set([...prev, ...jsonData.posts])]);
             window.addEventListener('scroll', handleScroll);
             if(jsonData.message) {
                 window.removeEventListener('scroll', handleScroll);
-                setMessage("You have reached the end of your liked posts.");
+                setMessage("You have reached the end.");
                 setHasMore(false);
             }
         }

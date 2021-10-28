@@ -1,11 +1,6 @@
-import React, { Component, useState, useEffect } from "react";
-import axios from "axios";
 import '../style.css'
 import 'bootstrap/dist/css/bootstrap.css';
-import {Button, Card, Row, Col, Container} from 'react-bootstrap';
-import Alert from 'react-bootstrap/Alert';
-import {FaHeart} from "react-icons/fa"
-import {FiHeart} from "react-icons/fi";
+import {Container} from 'react-bootstrap';
 import FadeIn from 'react-fade-in';
 import Pageview from "./Profile/Information";
 import UserPosted_Pageview from "./Profile/UserPosted";

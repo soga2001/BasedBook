@@ -13,7 +13,6 @@ function UserPosted(props: any) {
     const [liked, setLiked] = useState(false);
     const [message, setMessage] = useState('');
     const [error, setError] = useState(false);
-    const [token] = useState(localStorage.getItem("token"))
   
     const remove = () => {
       setDeleted(true);
@@ -131,7 +130,7 @@ function UserPosted_Pageview() {
             window.addEventListener('scroll', handleScroll)
             if(jsonData.hasMore === false) {
                 window.removeEventListener('scroll', handleScroll)
-                setMessage("There are no more posts.");
+                setMessage("You have reached the end.");
                 setHasMore(false);
             }
         }

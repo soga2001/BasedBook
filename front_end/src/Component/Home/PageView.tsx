@@ -29,9 +29,9 @@ function Pageview() {
         );
         // Supposedly the setData() above makes sure there are no duplicate posts in the array, didn't actually work.
         window.addEventListener('scroll', handleScroll)
-        if(jsonData.hasMore === false) {
+        if((jsonData.posts < 10) || (jsonData.hasMore === false)) {
           window.removeEventListener('scroll', handleScroll)
-          setMessage("There are no more posts.");
+          setMessage("There have reached the end.");
           setHasMore(false);
         }
       }

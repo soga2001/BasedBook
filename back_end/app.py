@@ -187,7 +187,6 @@ def post():
         "title": title,
         "content": content,
         "date_posted": date_posted,
-        "likes": 0
     })
     Post.deserialize(mongo.db.post.find_one({"author": author}))
     return jsonify({"success": 'Posted'})
@@ -236,9 +235,8 @@ def liked_posts():
     page = int(request.args['page'])
     limit = int(request.args['limit'])
     offset = page * 10
-    liked = mongo.db.likes.find({"userId": userId}).limit(limit).skip(offset)
+    liked = mongo.db.likes.find({"userId": userId}).sort('$natural', -1).limit(limit).skip(offset)
     posts = [Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(x["postId"])})) for x in liked]
-    posts.reverse()
     if(posts):
         return jsonify({"posts": posts})
     return jsonify({"message": "You have liked no posts."})
