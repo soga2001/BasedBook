@@ -11,7 +11,7 @@ class Login extends Component {
 
   login = (e: any) => {
     e.preventDefault();
-    axios.post("http://127.0.0.1:5000/login", {
+    axios.post("/login", {
       username: (document.getElementById("username") as HTMLInputElement).value,
       password: (document.getElementById("password") as HTMLInputElement).value
     })
@@ -30,10 +30,9 @@ class Login extends Component {
   }
   render() {
     return (
-      <div className="app">
-        <Container style={{padding: '1%'}}>
-          <Card style={{ width: '70%', margin: 'auto' }}>
-            <Card.Header as='h3' className="header">Login</Card.Header>
+        <Container className="body">
+          <Card style={{ width: '70%', margin: 'auto' }} className="user">
+            <Card.Header as='h3' className="header" style={{ color: 'black'}}>Login</Card.Header>
             <Card.Body style={{padding: '3%'}}>
               <form onSubmit={this.login}>
                 <Row>
@@ -59,7 +58,7 @@ class Login extends Component {
             </Card.Body>
           </Card>
         </Container>
-      </div> 
+
       
       
     );

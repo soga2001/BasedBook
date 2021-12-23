@@ -2,12 +2,13 @@ import {useState, useEffect} from 'react';
 import ReactLoading from 'react-loading';
 import Postview from './Postview';
 import Alert from 'react-bootstrap/Alert';
+import axios from 'axios';
 
 function Pageview() {
     const [posts, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const [message, setMessage] = useState(''); 
+    const [message] = useState('You have reached the end.'); 
   
     const [page, setPage] = useState<number>(0);
     const [limit] = useState(10);
@@ -22,25 +23,26 @@ function Pageview() {
     const post = async () => {
       if(hasMore) {
         setLoading(true);
-        const fetchPost = await fetch(`http://127.0.0.1:5000/post?limit=${limit}&page=${page}`);
-        const jsonData = await fetchPost.json();
-        await jsonData.posts && setData((prev) =>
-          [...new Set([...prev, ...jsonData.posts])]
+        const getPostsRes = await axios.get(`/post?limit=${limit}&page=${page}`)
+        const postsInPage = getPostsRes.data.posts;
+        await postsInPage && setData((prev) =>
+          [...new Set([...prev, ...postsInPage])]
         );
-        // Supposedly the setData() above makes sure there are no duplicate posts in the array, didn't actually work.
-        window.addEventListener('scroll', handleScroll)
-        if((jsonData.posts < 10) || (jsonData.hasMore === false)) {
-          window.removeEventListener('scroll', handleScroll)
-          setMessage("There have reached the end.");
+        if((postsInPage < 10) || (getPostsRes.data.hasMore === false)) {
+          window.removeEventListener('scroll', handleScroll);
+          setLoading(false);
           setHasMore(false);
+          return;
         }
+        window.addEventListener('scroll', handleScroll);
+        setLoading(false);
       }
-      setLoading(false);
     }
   
     useEffect(() => {
       post();
     }, [page])
+
   
     return (
       <div>
@@ -48,7 +50,7 @@ function Pageview() {
           <Postview key={post._id} _id={post._id} title={post.title} author={post.author} date_posted={post.date_posted} 
           content={post.content}/>
         ))}
-        {!loading ? <Alert id="message">{message}</Alert> : <ReactLoading type={'bars'} color={"darkblue"} height={100} width={100} className="loading"/>}
+        {loading ? <ReactLoading type={'bars'} color={"darkblue"} height={100} width={100} className="loading"/> : <Alert id="message">{message}</Alert>}
       </div>
     )
   }

@@ -2,6 +2,10 @@ html {
   scroll-behavior: smooth;
  }
 
+ body {
+   background-color: #a395aa;
+ }
+
 /* NavBar */
 
 #dropdown{
@@ -41,9 +45,6 @@ html {
   text-align: center;
 }
 
-/* #drop-item:hover {
-  color: skyblue;
-} */
 
 #drop-item.active {
   color: red;
@@ -107,12 +108,18 @@ form {
 
 .header {
   text-align: center;
+  color: black;
 }
 
 /* Container */
 
 .body {
   margin-top: 60px;
+}
+
+/* Login and Register */
+.user {
+  background-color: #BBB8B8;
 }
 
 /* Home Page */

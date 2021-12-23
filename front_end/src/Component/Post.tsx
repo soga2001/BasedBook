@@ -10,7 +10,7 @@ class Post extends Component {
 
     post = (e: any) => {
         e.preventDefault(); // so that the page doesn't refresh everytime ths submit button if pressed.
-        axios.post("http://127.0.0.1:5000/post", {
+        axios.post("/post", {
             title: (document.getElementById('title') as HTMLInputElement).value,
             content: (document.getElementById('content') as HTMLInputElement).value
         }, {

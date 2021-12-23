@@ -2,11 +2,12 @@ import {useState, useEffect} from 'react';
 import ReactLoading from 'react-loading';
 import Alert from 'react-bootstrap/Alert';
 import Postview from './Postview';
+import axios from 'axios';
 
 function Pageview() {
 
     const [likedPost, setPost] = useState<any[]>([]);
-    const [message, setMessage] = useState('');
+    const [message] = useState('You have reached the end.');
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(true);
 
@@ -23,22 +24,24 @@ function Pageview() {
     const post = async () => {
         if(hasMore) {
             setLoading(true);
-            const fetchPost = await fetch(`http://127.0.0.1:5000/liked_posts?limit=${limit}&page=${page}`, {
+            const getPostsRes = await axios.get(`/liked_posts?limit=${limit}&page=${page}`, {
                 headers: {
                     'Authorization': 'Bearer' + localStorage.getItem('token')
                 }
             })
-            const jsonData = await fetchPost.json();
-            await jsonData.posts && setPost((prev) =>
-            [...new Set([...prev, ...jsonData.posts])]);
-            window.addEventListener('scroll', handleScroll);
-            if(jsonData.posts < 10 || jsonData.message) {
+            const postsInPage = getPostsRes.data.posts;
+            await postsInPage && setPost((prev) =>
+          [...new Set([...prev, ...postsInPage])]
+            );
+            if(postsInPage < 10 || getPostsRes.data.message) {
                 window.removeEventListener('scroll', handleScroll);
-                setMessage("You have reached the end.");
                 setHasMore(false);
+                setLoading(false);
+                return;
             }
+            window.addEventListener('scroll', handleScroll);
+            setLoading(false);
         }
-        setLoading(false);
     }
 
     useEffect(() => {
@@ -48,11 +51,10 @@ function Pageview() {
     return (
         <div>
             {likedPost.map(post => (
-                <Postview key={post._id} title={post.title} author={post.author} _id={post._id} content={post.content} date_posted={post.data_posted} />
+                <Postview key={post._id} title={post.title} author={post.author} _id={post._id} content={post.content} date_posted={post.date_posted} />
             ))}
             {!loading ? <Alert id="message">{message}</Alert> : <ReactLoading type={'bars'} color={"darkblue"} height={100} width={100} className="loading"/>}
-        </div>
-            
+        </div>    
     )
 }
 

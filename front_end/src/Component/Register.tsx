@@ -9,7 +9,7 @@ class Register extends Component {
 
   register = (e: any) => {
     e.preventDefault();
-    axios.post("http://127.0.0.1:5000/register", {
+    axios.post("/register", {
       firstname: (document.getElementById("firstname") as HTMLInputElement).value,
       lastname: (document.getElementById("lastname") as HTMLInputElement).value,
       phone: (document.getElementById("phone") as HTMLInputElement).value,
@@ -32,9 +32,9 @@ class Register extends Component {
         
     render() {
         return (
-            <Container style={{padding: '1%'}}> 
+            <Container className="body"> 
               <Card style={{ width: '70%', margin: 'auto'}} >
-                <Card.Header as='h3' className="header">Register</Card.Header>
+                <Card.Header as='h3' className="header" style={{ color: 'black'}}>Register</Card.Header>
                 <Card.Body>
                   <form onSubmit={this.register}>
                     <Row>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import ReactLoading from 'react-loading';
 import {Card, Row, Col} from 'react-bootstrap';
+import axios from "axios";
 
 function Postview(props: any) {
     return  (
@@ -30,11 +31,11 @@ function Pageview() {
     const [infoLoading, setInfoLoading] = useState(true);
 
     const information = async () => {
-        const fetchInfo = await fetch("http://127.0.0.1:5000/user",{
+        const fetchInfo = await axios.get("/user",{
         headers:{
             'Authorization': 'Bearer' + localStorage.getItem('token')}
         })
-        const data = await fetchInfo.json();
+        const data = await fetchInfo.data;
         setInfo(data);
         await data && setInfoLoading(false);
     };

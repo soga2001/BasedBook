@@ -9,7 +9,7 @@ import time
 import jwt
 
 #create the app
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../front_end/build", static_url_path='')
 guard = Praetorian()
 CORS(app)
 
@@ -252,7 +252,6 @@ def get_all_post():
     return jsonify({"hasMore": False})
 
 @app.route("/user_post", methods=['GET'])
-@cross_origin(origin="*")
 @auth_required
 def get_user_posts():
     author = current_user().username

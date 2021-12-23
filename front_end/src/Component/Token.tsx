@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-async function Check_token() {
+function Check_token() {
     try {
-        await axios.post("http://127.0.0.1:5000/protected", {}, {
+        axios.post("/protected", {}, {
             headers: {
                 'Authorization': 'Bearer' + localStorage.getItem('token')
             }
@@ -13,13 +13,9 @@ async function Check_token() {
     } 
     catch {
         if(!localStorage.getItem("token")) {
-            if(window.location.href === 'http://localhost:3000/Post' || window.location.href === "http://localhost:3000/Profile")
-            {
-                window.location.href = '/Home'
-            }
             return false;
         }
-        await axios.post("http://127.0.0.1:5000/refresh-token", {}, {
+        axios.post("/refresh-token", {}, {
             headers: {
                 'Authorization': 'Bearer' + localStorage.getItem('token')
             }
@@ -31,15 +27,10 @@ async function Check_token() {
         .catch((error) =>{
             localStorage.removeItem("token")
             localStorage.removeItem("username")
-            if(window.location.href === 'http://localhost:3000/Post' || window.location.href === "http://localhost:3000/Profile")
-            {
-                window.location.href = '/Home'
-            }
             return false;
         })
     }
     return false;
 }
-
 
 export {Check_token};

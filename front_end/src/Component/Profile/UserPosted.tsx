@@ -16,7 +16,7 @@ function UserPosted(props: any) {
   
     const remove = () => {
       setDeleted(true);
-      axios.delete(`http://127.0.0.1:5000/post/${props._id}`, {
+      axios.delete(`/post/${props._id}`, {
         headers:{
           'Authorization': 'Bearer' + localStorage.getItem('token')}
       })
@@ -27,7 +27,7 @@ function UserPosted(props: any) {
         console.log(liked, "token")
         setLiked(false)
         setLikes(likes - 1)
-        axios.post(`http://127.0.0.1:5000/dislike`, {
+        axios.post(`/dislike`, {
         post_id: props._id}, {
         headers:{
           'Authorization': 'Bearer' + localStorage.getItem('token')}
@@ -37,7 +37,7 @@ function UserPosted(props: any) {
         console.log("token")
         setLiked(true)
         setLikes(likes + 1)
-        axios.post(`http://127.0.0.1:5000/like`, {
+        axios.post(`/like`, {
         post_id: props._id}, {
         headers:{
           'Authorization': 'Bearer' + localStorage.getItem('token')}
@@ -50,7 +50,7 @@ function UserPosted(props: any) {
     }
   
     const userLiked = () => {
-      axios.get(`http://127.0.01:5000/liked/${props._id}`, {
+      axios.get(`/liked/${props._id}`, {
         headers:{
           'Authorization': 'Bearer' + localStorage.getItem('token')}
         })
@@ -101,7 +101,7 @@ function UserPosted(props: any) {
 function UserPosted_Pageview() {
     // User Posted posts //
     const [posts, setPosts] = useState<any[]>([]);
-    const [message, setMessage] = useState('');
+    const [message] = useState('You have reached the end.');
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     // const [postLoading, setPostLoading] = useState(false);
@@ -119,18 +119,18 @@ function UserPosted_Pageview() {
     const userPosted = async () => {
         if(hasMore) {
             setLoading(true);
-            const fetchPost = await fetch(`http://127.0.0.1:5000/user_post?&limit=${limit}&page=${page}`, {
+            const getPostsRes = await axios.get(`/user_post?&limit=${limit}&page=${page}`, {
                 headers:{
                     'Authorization': 'Bearer' + localStorage.getItem('token')}
             });
-            const jsonData = await fetchPost.json();
-            await jsonData.posts && setPosts((prev) =>
-                [...new Set([...prev, ...jsonData.posts])]
+            const postsInPage = getPostsRes.data.posts;
+            postsInPage && setPosts((prev) =>
+              [...new Set([...prev, ...postsInPage])]
             );
+            
             window.addEventListener('scroll', handleScroll)
-            if(jsonData.hasMore === false) {
+            if(postsInPage < 10 || getPostsRes.data.hasMore === false) {
                 window.removeEventListener('scroll', handleScroll)
-                setMessage("You have reached the end.");
                 setHasMore(false);
             }
         }
