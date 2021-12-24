@@ -8,18 +8,23 @@ from flask_praetorian import Praetorian, auth_required, current_user
 import time
 import jwt
 
-#create the app
-app = Flask(__name__, static_folder="../front_end/build", static_url_path='')
-guard = Praetorian()
-CORS(app)
+import os
 
-app.config["SECRET_KEY"] = "supo5458"
-app.config["JWT_ACCESS_LIFESPAN"] = {"hours": 5}
-app.config["JWT_REFRESH_LIFESPAN"] = {"days": 15}
+#create the app
+app = Flask(__name__)
+
+
 
 # connecting to mongo running on the computer
-app.config["MONGO_URI"] = "mongodb://localhost:27017/test_database"
+if app.config["ENV"] == "production":
+    app.config.from_object("config.ProductionConfig")
+else:
+    app.config.from_object("config.DevelopmentConfig")
+
+CORS(app)
+guard = Praetorian()
 mongo = PyMongo(app)
+
 
 #import User and Post dataclass from user.py and post.py files
 from user import User
