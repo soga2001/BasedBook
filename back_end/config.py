@@ -3,7 +3,8 @@ import os
 class Config:
     DEBUG = False
     TESTING = False
-    SECRET_KEY = os.getenv('SOCIAL_MEDIA_SECRET_KEY')
+    # SECRET_KEY = os.getenv('SOCIAL_MEDIA_SECRET_KEY')
+    SECRET_KEY = "testing"
     JWT_ACCESS_LIFESPAN = {"hours": 5}
     JWT_REFRESH_LIFESPAN = {"days": 15}
     
