@@ -1,18 +1,12 @@
-from flask.helpers import send_from_directory
 from flask_cors import CORS, cross_origin
 from flask import Flask, jsonify, request
-from flask_pymongo import ASCENDING, DESCENDING, PyMongo
+from flask_pymongo import DESCENDING, PyMongo
 from datetime import datetime
 from bson import ObjectId
 from flask_praetorian import Praetorian, auth_required, current_user
-import time
-import jwt
-
-import os
 
 #create the app
 app = Flask(__name__)
-
 
 
 # connecting to mongo running on the computer
@@ -34,8 +28,6 @@ from likes import UserPostLikes
 
 guard.init_app(app, User)
 
-#limiting the total posts
-limit = 1
 
 @app.route("/users", methods=['GET'])
 def get_users():
@@ -58,7 +50,7 @@ def refresh():
     new_token = guard.refresh_jwt_token(old_token)
     return jsonify(new_token)
 
-#update_user_by_id doesn't work when a user is trying to update is password as of right now
+#update_user_by_id doesn't work when a user is trying to update is password as of right now``
 @app.route("/user", methods=['PUT'])
 @auth_required
 @cross_origin(origin="*")
@@ -285,4 +277,4 @@ def protected():
 
 #Run the example
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
