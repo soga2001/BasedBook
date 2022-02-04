@@ -34,3 +34,31 @@
         npm i (install all the dependencies)
         npm start (run the front end)
     After a few seconds, a window on your default web browser should open with the front end.
+
+---
+
+## Images
+
+### Home Page
+![Screenshot](images/home-loggedOut.jpg)
+
+## Login Page
+![Screenshot](images/login.jpg)
+
+## Register Page
+![Screenshot](images/register.jpg)
+
+## Logged In Menu
+![Screenshot](images/loggedIn-menu.jpg)
+
+### Home Page when logged in
+![Screenshot](images/home-loggedin.jpg)
+
+## Post page
+![Screenshot](images/post.jpg)
+
+## User Profile
+![Screenshot](images/profile.jpg)
+
+## User Liked
+![Screenshot](images/liked.jpg)
