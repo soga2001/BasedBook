@@ -14,23 +14,23 @@
 
 1. After everything has been installed from **Requirements**, clone this git repository.
 2. Now open the terminal into the Social_Media folder and
-
+    ```bash
         cd back_end (move to the back_end folder)
         pip install virtualenv (install virtualenv for virtual enviornment)
         virtualenv venv (Create a virtual environment)
         source venv/Scripts/activate (on windows) **or** source venv/bin/activate (on mac) (Activate the virtual enviornment)
-        pip install -r requirements.txt (install all the requirements to run the backend part of this project)
+        pip install -r requirements.txt (install all the requirements to run the backend part of this project)```
 3. To run the backend, do
-
+        ```bash
         export FLASK_DEBUG=1
         export FLASK_ENV=development
         export FLASK_APP=app.py
-        flask run
+        flask run```
     This should run the backend
 4. Now to move onto the front end
-
+        ```bash
         cd .. (move one folder back)
         cd front_end (move to the front end folder)
         npm i (install all the dependencies)
-        npm start (run the front end)
+        npm start (run the front end)```
     After a few seconds, a window on your default web browser should open with the front end.
