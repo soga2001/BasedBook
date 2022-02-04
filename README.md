@@ -15,10 +15,7 @@
 1. After everything has been installed from **Requirements**, clone this git repository.
 2. Now open the terminal into the Social_Media folder and
 
-        cd back_end 
-        
-        (move to the back_end folder)
-        
+        cd back_end (move to the back_end folder)
         pip install virtualenv (install virtualenv for virtual enviornment)
         virtualenv venv (Create a virtual environment)
         source venv/Scripts/activate (on windows) **or** source venv/bin/activate (on mac) (Activate the virtual enviornment)
