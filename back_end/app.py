@@ -5,7 +5,6 @@ from datetime import datetime
 from bson import ObjectId
 from flask_praetorian import Praetorian, auth_required, current_user
 # import time
-# import jwt
 
 import os
 
