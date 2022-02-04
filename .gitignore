@@ -1,2 +1,6 @@
 shell/*
 **/__pycache__/*
+
+venv/
+
+.vscode/
