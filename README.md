@@ -25,9 +25,10 @@
         export FLASK_APP=app.py <br/>
         flask run <br/>
     This should run the backend
-4. Now to move onto the front end <br/>
-        cd .. (move one folder back) <br/>
-        cd front_end (move to the front end folder) <br/>
-        npm i (install all the dependencies) <br/>
-        npm start (run the front end) <br/>
+4. Now to move onto the front end
+
+        cd .. (move one folder back)
+        cd front_end (move to the front end folder)
+        npm i (install all the dependencies)
+        npm start (run the front end)
     After a few seconds, a window on your default web browser should open with the front end.
