@@ -1,9 +1,9 @@
-import '../style.css'
+import '../../style.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import {Container} from 'react-bootstrap';
 import FadeIn from 'react-fade-in';
-import Pageview from "./Profile/Information";
-import UserPosted_Pageview from "./Profile/UserPosted";
+import Pageview from "./Information";
+import UserPosted_Pageview from "./UserPosted";
 
 function Profile() {
   return (

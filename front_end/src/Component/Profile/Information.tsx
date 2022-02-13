@@ -3,6 +3,12 @@ import ReactLoading from 'react-loading';
 import {Card, Row, Col} from 'react-bootstrap';
 import axios from "axios";
 
+function hideEmail(emailAddress: string) {
+    const strLength = emailAddress.length;
+    const [first, last] = emailAddress.split('@')
+    return first.substring(0,1) + first.substr(1, first.length - 1).replace(/\w/g, '*') + first.substr(-1, 1) + '@' + last;
+}
+
 function Postview(props: any) {
     return  (
         <Card id="info">
@@ -10,7 +16,7 @@ function Postview(props: any) {
             <Card.Body style={{background: '#FCEEFF'}}>
                 <Row>
                     <Col md={6}><Card.Text><strong>Username:</strong> {props.username}</Card.Text></Col>
-                    <Col md={6}><Card.Text><strong>Email:</strong> {props.email}</Card.Text></Col>
+                    <Col md={6}><Card.Text><strong>Email:</strong> {hideEmail(props.email)}</Card.Text></Col>
                 </Row>
                 <Row>
                     <Col md={6}><Card.Text><strong>Name:</strong> {props.firstname} {props.lastname}</Card.Text></Col>

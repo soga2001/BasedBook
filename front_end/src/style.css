@@ -3,7 +3,7 @@ html {
  }
 
  body {
-   background-color: #a395aa;
+   background-color: lightblue;
  }
 
 /* NavBar */
@@ -14,7 +14,7 @@ html {
 
 #navbar {
   color: white;
-  /* background-color: black; */
+  background-color: black !important;
 }
 
 #item {
@@ -119,7 +119,8 @@ form {
 
 /* Login and Register */
 .user {
-  background-color: #BBB8B8;
+  width: 70%;
+  margin: auto;
 }
 
 /* Home Page */

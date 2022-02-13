@@ -1,12 +1,14 @@
+from fileinput import filename
 from flask_cors import CORS, cross_origin
 from flask import Flask, jsonify, request
 from flask_pymongo import DESCENDING, PyMongo
 from datetime import datetime
 from bson import ObjectId
 from flask_praetorian import Praetorian, auth_required, current_user
-# import time
+import time
 
 import os
+import gridfs
 
 #create the app
 app = Flask(__name__)
@@ -21,6 +23,7 @@ else:
 CORS(app)
 guard = Praetorian()
 mongo = PyMongo(app)
+# fs = gridfs.GridFS(mongo.db)
 
 
 #import User and Post dataclass from user.py and post.py files
@@ -102,35 +105,29 @@ def login():
 @cross_origin(origin="*")
 def register():
     try:
-        firstname = request.json["firstname"]
-        lastname = request.json["lastname"]
-        phone = request.json["phone"]
-        email = request.json["email"]
-        email = email.lower()
+        email = request.json["email"].lower()
+        print(email.split('@')[0])
+        if(len(email.split('@')[0]) < 4):
+            return jsonify({"error": "The email is too short."})
         username = request.json["username"]
-        username = username.lower()
         password = request.json["password"]
         hashed_password = guard.hash_password(password)
         #check if the email and username is already in the database
         found_email = mongo.db.users.find_one({"email": email})
         found_username = mongo.db.users.find_one({"username": username})
-        #if found_email and found_username aren't empty and the database returned something
-        #don't add the user into the database otherwise, add the user
-        if found_email and found_username:
-            return jsonify({"error": "The email and username you entered is already taken."})
-        if found_email:
-            return jsonify({"error":"The email you entered is already taken."})
-        if found_username:
-            return jsonify({"error": "The username you entered is already taken."})
+        #if email or username is already in the database
+        if found_email or found_username:
+            return jsonify({"error": "The email or username you entered is already taken."})
 
         mongo.db.users.insert_one({
-            "firstname": firstname,
-            "lastname": lastname,
-            "phone": phone,
+            "firstname": request.json["firstname"],
+            "lastname": request.json["lastname"],
+            "phone": request.json["phone"],
             "email": email,
             "username": username,
             "password": hashed_password,
             "roles": "member"
+            # "image": file
         })
         return jsonify({"success": "You have been registered"})
     except:
@@ -149,6 +146,7 @@ def register_admin():
         username = username.lower()
         password = request.json["password"]
         hashed_password = guard.hash_password(password)
+        image = request.file["image"]
         #check if the email and username is already in the database
         found_email = mongo.db.users.find_one({"email": email})
         found_username = mongo.db.users.find_one({"username": username})
@@ -168,7 +166,8 @@ def register_admin():
             "email": email,
             "username": username,
             "password": hashed_password,
-            "roles": "admin"
+            "roles": "admin",
+            "image": username + "image"
         })
         User.deserialize(mongo.db.users.find_one({"email": email})).to_dict()
         return jsonify({"success": "You have been registered"})
