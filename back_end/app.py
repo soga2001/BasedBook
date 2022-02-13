@@ -75,13 +75,11 @@ def update_user_by_id():
 def delete_user():
     try:
         username = current_user().username
-        password = request.json["password"]
-        _id = current_user()._id
         #guard._verify_password checks the password that the user inputs to the password in the database
         #and returns True or False depending on whether the password match or not.
-        user_password = guard._verify_password(password, current_user().password)
+        user_password = guard._verify_password(request.json["password"], current_user().password)
         if user_password:
-            remove_user = User.deserialize(mongo.db.users.find_one_and_delete({"_id": ObjectId(_id)}))
+            remove_user = User.deserialize(mongo.db.users.find_one_and_delete({"_id": ObjectId(current_user()._id)}))
             mongo.db.post.delete_many({"author": username})
             return jsonify(remove_user.to_dict())
         return jsonify("Invalid Username or Password")
@@ -96,6 +94,7 @@ def login():
         username = username.lower()
         password = request.json["password"]
         user = guard.authenticate(username, password)
+        print("potato")
         token = guard.encode_jwt_token(user)
         return jsonify({"access_token": token, "username": username})
     except:
@@ -106,9 +105,6 @@ def login():
 def register():
     try:
         email = request.json["email"].lower()
-        print(email.split('@')[0])
-        if(len(email.split('@')[0]) < 4):
-            return jsonify({"error": "The email is too short."})
         username = request.json["username"]
         password = request.json["password"]
         hashed_password = guard.hash_password(password)
