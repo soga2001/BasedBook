@@ -23,7 +23,7 @@ else:
 CORS(app)
 guard = Praetorian()
 mongo = PyMongo(app)
-# fs = gridfs.GridFS(mongo.db)
+fs = gridfs.GridFS(mongo.db)
 
 
 #import User and Post dataclass from user.py and post.py files
@@ -35,6 +35,8 @@ from likes import UserPostLikes
 guard.init_app(app, User)
 
 
+# returns all the user in the database along with information
+#currently has no usage
 @app.route("/users", methods=['GET'])
 def get_users():
     return jsonify([User.deserialize(x).to_dict() for x in mongo.db.users.find()])
@@ -47,16 +49,10 @@ def get_user():
         user = [User.deserialize(mongo.db.users.find_one({"_id": ObjectId(id)})).to_dict()]
         return jsonify(user)
     except:
-        return jsonify({"error": "There is no user with that user_id in the database"})
+        return jsonify({"": "There is no user with that user_id in the database"})
 
-@app.route("/refresh-token", methods=['POST'])
-@cross_origin(origin="*")
-def refresh():
-    old_token = guard.read_token_from_header()
-    new_token = guard.refresh_jwt_token(old_token)
-    return jsonify(new_token)
-
-#update_user_by_id doesn't work when a user is trying to update is password as of right now``
+# Update user information
+# Currently no usage
 @app.route("/user", methods=['PUT'])
 @auth_required
 @cross_origin(origin="*")
@@ -69,6 +65,14 @@ def update_user_by_id():
     except:
         return jsonify("There is no user with that user_id in the database")
 
+@app.route("/upload_image", methods=["POST"])
+@auth_required
+def upload_file():
+    file = request.form.to_dict(flat=False)
+    print(file)
+    return jsonify({"success": file})
+
+# Currently has no uses but removes a user information and all the post they have liked and posted
 @app.route('/user', methods=["DELETE"])
 @auth_required
 @cross_origin(origin="*")
@@ -86,6 +90,7 @@ def delete_user():
     except:
         return jsonify("Invalid information")
 
+# Login a user
 @app.route("/login", methods=['POST'])
 @cross_origin(origin="*")
 def login():
@@ -100,6 +105,7 @@ def login():
     except:
         return jsonify({"error": "Invalid username or password."})
 
+# Register a user
 @app.route("/register", methods=['POST'])
 @cross_origin(origin="*")
 def register():
@@ -170,6 +176,7 @@ def register_admin():
     except:
         return jsonify("Please don't leave anything empty.")
 
+# Upload a post to the database
 @app.route("/post", methods=['POST'])
 @auth_required
 def post():
@@ -186,6 +193,7 @@ def post():
     Post.deserialize(mongo.db.post.find_one({"author": author}))
     return jsonify({"success": 'Posted'})
 
+# Dislike a post
 @app.route("/dislike", methods=["POST"])
 @auth_required
 def dislike():
@@ -196,6 +204,7 @@ def dislike():
     })
     return jsonify("Disliked")
 
+# Like a post
 @app.route("/like", methods=["POST"])
 @auth_required
 def like():
@@ -206,6 +215,7 @@ def like():
     })
     return jsonify("Liked")
 
+# Check if the post is liked
 @app.route("/liked/<postId>", methods=["GET"])
 def liked(postId):
     likes = mongo.db.likes.aggregate([{"$match": {"postId": postId}},{"$group" : {"_id": "$postId", "total": {"$sum": 1}}}])
@@ -221,7 +231,7 @@ def liked(postId):
         return jsonify({"error": False, "likes": postLikes})
     return jsonify({"error": False, "likes": postLikes})
 
-# Returns all the liked posts
+# Returns 10 the liked posts from the database at a time
 @app.route("/liked_posts", methods=["GET"])
 @auth_required
 def liked_posts():
@@ -236,6 +246,7 @@ def liked_posts():
         return jsonify({"posts": posts})
     return jsonify({"message": "You have liked no posts."})
     
+# Get posts from the database
 @app.route("/post", methods=['GET'])
 def get_all_post():
     page = int(request.args['page'])
@@ -246,6 +257,7 @@ def get_all_post():
         return jsonify({"posts": posts})
     return jsonify({"hasMore": False})
 
+# For Profile
 @app.route("/user_post", methods=['GET'])
 @auth_required
 def get_user_posts():
@@ -259,6 +271,7 @@ def get_user_posts():
     return jsonify({"hasMore": False})
 
 
+# Delete Post
 @app.route("/post/<post_id>", methods=['DELETE'])
 @auth_required
 def delete_post(post_id):
@@ -267,10 +280,23 @@ def delete_post(post_id):
     return jsonify({"success": True})
 
 
+# To make sure the user token is still valid
 @app.route("/protected", methods=['POST'])
 @auth_required
 def protected():
     return jsonify(True)
+
+# Refresh token if possible
+@app.route("/refresh-token", methods=['POST'])
+@cross_origin(origin="*")
+def refresh():
+    try:
+        old_token = guard.read_token_from_header()
+        new_token = guard.refresh_jwt_token(old_token)
+        return jsonify(new_token)
+    except:
+        return jsonify({"error": "Invaid Token"})
+
     
 
 #Run the example

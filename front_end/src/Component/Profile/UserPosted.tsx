@@ -139,7 +139,7 @@ function UserPosted_Pageview() {
 
     useEffect(() => {
         userPosted();
-    }, [page])
+    }, [])
 
     return (
         <div>

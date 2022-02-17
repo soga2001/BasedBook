@@ -10,6 +10,9 @@ function Check_token() {
         .then((res)=> {
             return true;
         })
+        .catch((err => {
+            return false;
+        }))
     } 
     catch {
         if(!localStorage.getItem("token")) {

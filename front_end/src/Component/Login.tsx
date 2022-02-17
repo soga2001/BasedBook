@@ -2,7 +2,7 @@ import { Component } from "react";
 import axios from "axios"
 import '../style.css'
 import ReactLoading from 'react-loading';
-import Alert from 'react-bootstrap/Alert'
+import Alert from 'react-bootstrap/Alert';
 import {Button, Card, Row, Col, Container, FloatingLabel, Form} from 'react-bootstrap';
 
 
