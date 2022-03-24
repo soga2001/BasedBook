@@ -5,9 +5,6 @@ from flask_pymongo import DESCENDING, PyMongo
 from datetime import datetime
 from bson import ObjectId
 from flask_praetorian import Praetorian, auth_required, current_user
-import time
-
-import os
 import gridfs
 
 #create the app
@@ -55,22 +52,15 @@ def get_user():
 # Currently no usage
 @app.route("/user", methods=['PUT'])
 @auth_required
-@cross_origin(origin="*")
 def update_user_by_id():
     try:
         user_id = current_user()._id
         data = request.json
         update_user = User.deserialize(mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": data}))
-        return jsonify(update_user.to_dict())
+        return jsonify({"success": True})
     except:
-        return jsonify("There is no user with that user_id in the database")
+        return jsonify({"error": True})
 
-@app.route("/upload_image", methods=["POST"])
-@auth_required
-def upload_file():
-    file = request.form.to_dict(flat=False)
-    print(file)
-    return jsonify({"success": file})
 
 # Currently has no uses but removes a user information and all the post they have liked and posted
 @app.route('/user', methods=["DELETE"])
@@ -99,7 +89,6 @@ def login():
         username = username.lower()
         password = request.json["password"]
         user = guard.authenticate(username, password)
-        print("potato")
         token = guard.encode_jwt_token(user)
         return jsonify({"access_token": token, "username": username})
     except:
@@ -183,12 +172,12 @@ def post():
     author = current_user().username
     title = request.json["title"]
     content = request.json["content"]
-    date_posted = datetime.now()
+    date = datetime.now().strftime("%d %B %Y @ %I:%M:%S %p")
     mongo.db.post.insert_one({
         "author": author,
         "title": title,
         "content": content,
-        "date_posted": date_posted,
+        "date_posted": date
     })
     Post.deserialize(mongo.db.post.find_one({"author": author}))
     return jsonify({"success": 'Posted'})
@@ -220,9 +209,11 @@ def like():
 def liked(postId):
     likes = mongo.db.likes.aggregate([{"$match": {"postId": postId}},{"$group" : {"_id": "$postId", "total": {"$sum": 1}}}])
     postLikes = 0
+    
     for doc in likes:
         postLikes = doc["total"]
     token = guard.read_token_from_header()
+    
     try:
         userId = guard.extract_jwt_token(token=token)
         if(mongo.db.likes.find_one({"userId": userId["id"], "postId": postId})):
@@ -245,6 +236,7 @@ def liked_posts():
     if(posts):
         return jsonify({"posts": posts})
     return jsonify({"message": "You have liked no posts."})
+
     
 # Get posts from the database
 @app.route("/post", methods=['GET'])

@@ -11,7 +11,7 @@ class Post():
     _id: str = field(default_factory=str)
     title: str = field(default_factory=str)
     content: str = field(default_factory=str)
-    date_posted: datetime = field(default_factory=datetime)
+    date_posted: str = field(default_factory=str)
     # image: str = field(default_factory=str)
 
     @classmethod
