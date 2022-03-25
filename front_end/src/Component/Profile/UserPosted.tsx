@@ -5,6 +5,7 @@ import {FaHeart} from "react-icons/fa"
 import {FiHeart} from "react-icons/fi";
 import Alert from 'react-bootstrap/Alert';
 import ReactLoading from 'react-loading';
+import moment from 'moment';
 
 
 function UserPosted(props: any) {
@@ -80,7 +81,7 @@ function UserPosted(props: any) {
                     <input type="text" id="post_id" value={props._id} hidden readOnly></input>
                     </Col>
                     <Col>
-                    <Card.Text><strong>Date Posted: </strong>{props.date_posted}</Card.Text>
+                    <Card.Text><strong>Posted: </strong> {moment(props.date_posted).fromNow()}</Card.Text>
                     </Col>
                 </Row>
                 <Row>

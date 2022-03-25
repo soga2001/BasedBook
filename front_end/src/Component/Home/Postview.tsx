@@ -4,6 +4,7 @@ import { FaHeart} from "react-icons/fa";
 import Alert from 'react-bootstrap/Alert';
 import {FiHeart} from "react-icons/fi";
 import {Button, Card, Row, Col} from 'react-bootstrap';
+import moment from 'moment';
 
 function Postview(props: any) {
     const [likes, setLikes] = useState(0);
@@ -78,7 +79,7 @@ function Postview(props: any) {
                   <input type="text" id="post_id" value={props._id} hidden readOnly></input>
               </Col>
               <Col>
-                  <Card.Text><strong>Date Posted: </strong>{props.date_posted}</Card.Text>
+                  <Card.Text><strong>Posted: </strong> {moment(props.date_posted).fromNow()} </Card.Text>
               </Col>
             </Row>
             <Row>
