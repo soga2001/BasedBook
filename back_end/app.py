@@ -172,7 +172,7 @@ def post():
     author = current_user().username
     title = request.json["title"]
     content = request.json["content"]
-    date = datetime.now().strftime("%d %B %Y @ %I:%M:%S %p")
+    date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     mongo.db.post.insert_one({
         "author": author,
         "title": title,
