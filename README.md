@@ -67,5 +67,8 @@
 ## User Profile
 ![Screenshot](images/profile.jpg)
 
+## User Profile
+![Screenshot](images/setting.jpg)
+
 ## User Liked
 ![Screenshot](images/liked.jpg)
