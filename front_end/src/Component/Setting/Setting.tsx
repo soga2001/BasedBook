@@ -174,11 +174,11 @@ class Setting extends Component {
                     <form onSubmit={this.changePhone}>
                         <Row>
                             <Col><label>Phone:</label></Col>
-                            <Col><input type='password' id='phone'></input></Col>
+                            <Col><input type='password' id='phone' required></input></Col>
                         </Row>
                         <Row>
                             <Col><label>Confirm Phone:</label></Col>
-                            <Col><input type='text' id='cphone'></input></Col>
+                            <Col><input type='text' id='cphone' required></input></Col>
                         </Row>
                         {this.state.numLoad ? <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/> : <Button type="submit" variant="primary">Change</Button>}
                     </form>
@@ -190,11 +190,11 @@ class Setting extends Component {
                         <Alert variant="danger" className='text-center'> Once removed, the account cannot be retrieved. Please proceed with caution.</Alert>
                         <Row>
                             <Col><label>Password:</label></Col>
-                            <Col><input type="password" id="delPass"></input></Col>
+                            <Col><input type="password" id="delPass" required></input></Col>
                         </Row>
                         <Row>
                             <Col><label>Confirm Password:</label></Col>
-                            <Col><input type="password" id="delCPass"></input></Col>
+                            <Col><input type="password" id="delCPass" required></input></Col>
                         </Row>
                         {this.state.numLoad ? <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/> : <Button type="submit" variant="primary">Delete</Button>}
                         {this.state.delMes !== "" && <Alert >{this.state.delMes}</Alert>}
