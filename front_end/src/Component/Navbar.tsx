@@ -21,18 +21,11 @@ import Register from './Register';
 import Login from './Login';
 import Post from "./Post";
 import Profile from './Profile/Profile';
-import Setting from './Setting';
+import Setting from './Setting/Setting';
 import Liked from './Liked';
-
-
-function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('username');
-  window.location.href ='/Home';
-}
+import Logout from './Logout';
 
 function NavBar() {
-
   const checkToken = async() => {
     await Check_token()
   }
@@ -96,7 +89,7 @@ function NavBar() {
                         </NavLink>
                       </NavDropdown.Item>
                       <NavDropdown.Divider/>
-                      <NavDropdown.Item onClick={logout}>
+                      <NavDropdown.Item onClick={Logout}>
                         <Row>
                           <Col>LogOut</Col> 
                           <Col>{<LogOut />}</Col>

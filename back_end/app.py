@@ -48,24 +48,37 @@ def get_user():
     except:
         return jsonify({"": "There is no user with that user_id in the database"})
 
-# Update user information
-# Currently no usage
-@app.route("/user", methods=['PUT'])
+#change username
+@app.route("/update_username", methods=['PUT'])
 @auth_required
-def update_user_by_id():
+def update_username():
     try:
-        user_id = current_user()._id
         data = request.json
-        update_user = User.deserialize(mongo.db.users.find_one_and_update({"_id": ObjectId(user_id)}, {"$set": data}))
-        return jsonify({"success": True})
+        found = mongo.db.users.find_one({"username": data["username"]})
+        if(found is not None):
+            return jsonify({"message": "Username already taken."})
+        if(guard.authenticate(current_user().username, data["password"])):
+            mongo.db.post.update_many({"author": current_user().username},{"$set": {"author": data["username"]}})
+            mongo.db.users.find_one_and_update({"_id": ObjectId(current_user()._id)}, {"$set": {"username": data["username"]}})
+            return jsonify({"success": True})
     except:
-        return jsonify({"error": True})
+        return jsonify({"message": "Invalid password."})
 
+# change password
+@app.route("/update_password", methods=['PUT'])
+@auth_required
+def update_password():
+    try:
+        data = request.json
+        if(guard.authenticate(current_user().username, data["password"])):
+            mongo.db.users.find_one_and_update({"_id": ObjectId(current_user()._id), "email": current_user().email}, {"$set": {"password": guard.hash_password(data["newPass"])}})
+            return jsonify({"success": True})
+    except:
+        return jsonify({"message": "Please make sure your email or old password is correct."})
 
 # Currently has no uses but removes a user information and all the post they have liked and posted
-@app.route('/user', methods=["DELETE"])
+@app.route('/delete_user', methods=["DELETE"])
 @auth_required
-@cross_origin(origin="*")
 def delete_user():
     try:
         username = current_user().username
@@ -73,12 +86,13 @@ def delete_user():
         #and returns True or False depending on whether the password match or not.
         user_password = guard._verify_password(request.json["password"], current_user().password)
         if user_password:
-            remove_user = User.deserialize(mongo.db.users.find_one_and_delete({"_id": ObjectId(current_user()._id)}))
+            mongo.db.likes.delete_many({"userId": current_user()._id})
             mongo.db.post.delete_many({"author": username})
-            return jsonify(remove_user.to_dict())
-        return jsonify("Invalid Username or Password")
+            User.deserialize(mongo.db.users.find_one_and_delete({"_id": ObjectId(current_user()._id)}))
+            return jsonify({"success": True})
+        return jsonify({"message":"Invalid Username or Password"})
     except:
-        return jsonify("Invalid information")
+        return jsonify({"message": "Invalid information"})
 
 # Login a user
 @app.route("/login", methods=['POST'])

@@ -1,18 +1,17 @@
 import React, { Component } from "react";
 import axios from "axios";
-import '../style.css';
 import {Button, Row, Col, Container, FloatingLabel, Form} from 'react-bootstrap';
 import Alert from 'react-bootstrap/Alert';
 import ReactLoading from 'react-loading';
 
 class Register extends Component {
-  state = {err: "", registered: "", loading: false, email: ""};
+  state = {err: "", registered: "", loading: false};
 
-  register = (e: any) => {
+  register = async (e: any) => {
     e.preventDefault();
     this.setState({loading: true})
-    this.setState({email: (document.getElementById("email") as HTMLInputElement).value});
-    if(this.state.email.split('@')[0].length < 4) {
+    var email = (document.getElementById("email") as HTMLInputElement).value;
+    if(email.split('@')[0].length < 4) {
       this.setState({loading: false})
       this.setState({err: "Email is too short. Please try again."});
     }
@@ -21,7 +20,7 @@ class Register extends Component {
         firstname: (document.getElementById("firstname") as HTMLInputElement).value,
         lastname: (document.getElementById("lastname") as HTMLInputElement).value,
         phone: (document.getElementById("phone") as HTMLInputElement).value,
-        email: this.state.email,
+        email: email,
         username: (document.getElementById("username") as HTMLInputElement).value,
         password: (document.getElementById("password") as HTMLInputElement).value
       })
