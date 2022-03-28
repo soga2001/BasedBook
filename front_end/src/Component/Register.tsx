@@ -42,10 +42,10 @@ class Register extends Component {
         
     render() {
         return (
-
           <Container className="body">
           <div className="user">
             <h1 className="text-center">Register</h1>
+            <hr></hr>
             <form onSubmit={this.register}>
               <Row>
                 <Col>

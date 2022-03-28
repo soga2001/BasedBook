@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 import axios from 'axios';
 import { FaHeart} from "react-icons/fa";
+import Alert from 'react-bootstrap/Alert';
 import {FiHeart} from "react-icons/fi";
 import {Button, Card, Row, Col} from 'react-bootstrap';
 import moment from 'moment';
@@ -61,29 +62,31 @@ function Postview(props: any) {
 
     return (
         <div>
-            {deleted ? '' : 
-              <Card style={{margin: 'auto', width: '100%'}} className="text-center">
-                <Card.Header as="h3" style={{background: '#FFDBEC'}}> {props.title}</Card.Header>
-                <Card.Body style={{background: '#FDE7F1'}}>
-                    <Row>
-                        <Col>
-                          <Card.Text><strong>Author: </strong> {props.author}</Card.Text>
-                        </Col>
-                        <Col>
-                          <Card.Text><strong>Posted: </strong> {moment(props.date_posted).fromNow()}</Card.Text>
-                        </Col>
-                    </Row>
-                    <Row>
-                      <Col><Card.Text className="posts">{props.content}</Card.Text></Col>
-                    </Row>
-                </Card.Body>
-                <Card.Footer>
-                <span >{<Button id="heart" onClick={() => like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}</span>
-                <span>{props.author === localStorage.getItem('username') ? 
-                    <Button id="button" onClick={() => remove()}>Delete</Button> 
+            {
+              deleted ? '' : <Card key={props._id} border="light" className="text-center" id="card">
+              <Card.Header  id="card-header" as="h3"> {props.title}</Card.Header>
+              <Card.Body id="card-body">
+                <Row>
+                  <Col>
+                      <Card.Text><strong>Author: </strong> {props.author}</Card.Text>
+                      <input type="text" id="post_id" value={props._id} hidden readOnly></input>
+                  </Col>
+                  <Col>
+                      <Card.Text><strong>Posted: </strong> {moment(props.date_posted).fromNow()} </Card.Text>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col><Card.Text className="posts">{props.content}</Card.Text></Col>
+                </Row>
+              </Card.Body>
+              <Card.Footer id="card-footer">
+                  <span >{<Button id="heart" onClick={() => like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}</span>
+                  <span>{props.author === localStorage.getItem('username') ? 
+                      <Button id="button" onClick={() => remove()}>Delete</Button> 
                     : '' }</span>
-            </Card.Footer>
-            </Card>}
+              </Card.Footer>
+            </Card>
+            }
         </div>
     )
 }

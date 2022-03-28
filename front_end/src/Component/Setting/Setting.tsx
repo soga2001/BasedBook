@@ -4,6 +4,7 @@ import Logout from '../Logout';
 import {Container, Button, Row, Col} from 'react-bootstrap';
 import axios from 'axios';
 import Alert from 'react-bootstrap/Alert';
+import NavBar from '../Navbar';
 
 class Setting extends Component {
     state = {err: "", passMes: "", passErr: "", userMes: "", userErr: "", numMes: "", numErr: "", delMes: "", delErr: "", 
@@ -21,15 +22,15 @@ class Setting extends Component {
             }, { headers: {'Authorization': 'Bearer' + localStorage.getItem('token')}})
             .then((res) => {
                 if(res.data.success) {
-                    this.setState({userMes: "Username has been changed. Logging out..."})
-                    this.setState({userErr: ""})
-                    this.setState({userLoad: false})
-                    setTimeout(Logout, 2000);
+                    this.setState({userMes: "Username has been changed. Logging out..."});
+                    this.setState({userErr: ""});
+                    this.setState({userLoad: false});
+                    setTimeout(Logout, 1000);
                 }
                 else {
-                    this.setState({userErr: res.data.message})
-                    this.setState({userMes: ""})
-                    this.setState({userLoad: false})
+                    this.setState({userErr: res.data.message});
+                    this.setState({userMes: ""});
+                    this.setState({userLoad: false});
                 }
             })
         };
@@ -85,7 +86,7 @@ class Setting extends Component {
         var pass = (document.getElementById("delPass") as HTMLInputElement).value
         var cpass = (document.getElementById("delCPass") as HTMLInputElement).value
         if(pass === cpass) {
-            var confirmed = window.confirm('Are you sure you wish to delete your account?');
+            var confirmed = window.confirm('Are you sure you wish to delete your account? It will be permanently deleted.');
             if(confirmed)
             {
                 console.log("confirmed")
@@ -138,7 +139,7 @@ class Setting extends Component {
                             <Col><label>Password:</label></Col>
                             <Col><input type="password" id="userPass" required></input> </Col>
                         </Row>
-                        {this.state.userLoad ? <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/> : <Button type="submit" variant="primary">Change</Button>}
+                        {this.state.userLoad ? <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/> : <Button type="submit" variant="primary" className="button">Change</Button>}
                         {this.state.userMes !== "" && <Alert >{this.state.userMes}</Alert>}
                         {this.state.userErr !== "" && <Alert variant='danger' >{this.state.userErr}</Alert>}
                     </form>
@@ -163,7 +164,7 @@ class Setting extends Component {
                             <Col><label>Confirm Password:</label></Col>
                             <Col><input type='password' id='confirmPass' required></input></Col>
                         </Row>
-                        {this.state.passLoad ? <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/> : <Button type="submit" variant="primary">Change</Button>}
+                        {this.state.passLoad ? <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/> : <Button type="submit" variant="primary" className="button">Change</Button>}
                         {this.state.passMes !== "" && <Alert >{this.state.passMes}</Alert>}
                         {this.state.passErr !== "" && <Alert variant='danger' >{this.state.passErr}</Alert>}
                     </form>
@@ -180,7 +181,7 @@ class Setting extends Component {
                             <Col><label>Confirm Phone:</label></Col>
                             <Col><input type='text' id='cphone' required></input></Col>
                         </Row>
-                        {this.state.numLoad ? <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/> : <Button type="submit" variant="primary">Change</Button>}
+                        {this.state.numLoad ? <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/> : <Button type="submit" variant="primary" className='button'>Change</Button>}
                     </form>
                 </div>
                 <hr></hr>
@@ -196,7 +197,7 @@ class Setting extends Component {
                             <Col><label>Confirm Password:</label></Col>
                             <Col><input type="password" id="delCPass" required></input></Col>
                         </Row>
-                        {this.state.numLoad ? <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/> : <Button type="submit" variant="primary">Delete</Button>}
+                        {this.state.numLoad ? <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/> : <Button type="submit" variant="primary" className='button'>Delete</Button>}
                         {this.state.delMes !== "" && <Alert >{this.state.delMes}</Alert>}
                         {this.state.delErr !== "" && <Alert variant='danger' >{this.state.delErr}</Alert>}
                     </form>

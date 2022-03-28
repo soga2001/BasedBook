@@ -9,8 +9,11 @@ function Profile() {
   return (
     <Container className="body">
       <h1 className="header">Profile</h1>
+      <hr></hr>
       <Pageview />
+      <hr></hr>
       <h1 className="header">Your Posts</h1>
+      <hr></hr>
       <FadeIn>
         <UserPosted_Pageview />
       </FadeIn>

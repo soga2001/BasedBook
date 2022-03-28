@@ -126,11 +126,13 @@ form {
 /* Home Page */
 
 .posts {
-  text-align: justify;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-align: left;
+  overflow: hidden;
   text-indent: 50px;
-  word-wrap: break-word;
-  hyphens: auto;
-  white-space: pre-wrap;
+
 }
 
 .date, .author {
@@ -142,10 +144,23 @@ form {
 
 #heart {
   background-color: transparent;
-  border-style: hidden;
+  border: none;
   color: red;
-  padding: 2%;
   font-size: 15px;
+}
+
+#heart:focus {
+  border: none;
+  outline: none;
+}
+
+span {
+  padding: 5px;
+}
+
+span:focus {
+  border: none;
+  outline: none;
 }
 
 #card-header {
@@ -158,7 +173,7 @@ form {
 
 #card-footer {
   background-color: #DFFDFF;
-  padding: 0;
+  padding: 4px;
 }
 
 
@@ -171,8 +186,9 @@ form {
 }
 
 #card {
-  margin: 1%;
-  width: 100%;
+  margin: auto;
+  margin-bottom: 10px;
+  width: 80%;
 }
 
 #message {
@@ -187,4 +203,12 @@ form {
 
 .loading {
   margin: auto;
+}
+
+
+/* About */
+
+#question {
+  font-weight: bold;
+  font-size: 20px;
 }

@@ -1,4 +1,3 @@
-from fileinput import filename
 from flask_cors import CORS, cross_origin
 from flask import Flask, jsonify, request
 from flask_pymongo import DESCENDING, PyMongo
@@ -6,6 +5,7 @@ from datetime import datetime
 from bson import ObjectId
 from flask_praetorian import Praetorian, auth_required, current_user
 import gridfs
+import time
 
 #create the app
 app = Flask(__name__)
@@ -291,6 +291,7 @@ def delete_post(post_id):
 @auth_required
 def protected():
     return jsonify(True)
+
 
 # Refresh token if possible
 @app.route("/refresh-token", methods=['POST'])

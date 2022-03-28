@@ -24,6 +24,7 @@ import Profile from './Profile/Profile';
 import Setting from './Setting/Setting';
 import Liked from './Liked';
 import Logout from './Logout';
+import About from './About';
 
 function NavBar() {
   const checkToken = async() => {
@@ -44,7 +45,7 @@ function NavBar() {
                 width="30"
                 height="30"
                 className="d-inline-block align-top"
-              />{' '}Social Media</Navbar.Brand>
+              />{' '}</Navbar.Brand>
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav variant="pills" className="me-auto">
@@ -102,7 +103,7 @@ function NavBar() {
             
           </Container>
         </Navbar>}
-          <Route exact path="/"><Home/></Route>
+          <Route exact path="/"><About/></Route>
           <Route exact path="/Home"><Home/> </Route>
           <Route exact path="/Post"><Post/></Route>
           <Route exact path="/Login"><Login/></Route>

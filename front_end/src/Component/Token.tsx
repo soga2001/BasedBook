@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Logout from './Logout';
 
 function Check_token() {
     try {
@@ -7,17 +8,8 @@ function Check_token() {
                 'Authorization': 'Bearer' + localStorage.getItem('token')
             }
         })
-        .then((res)=> {
-            return true;
-        })
-        .catch((err => {
-            return false;
-        }))
     } 
     catch {
-        if(!localStorage.getItem("token")) {
-            return false;
-        }
         axios.post("/refresh-token", {}, {
             headers: {
                 'Authorization': 'Bearer' + localStorage.getItem('token')
@@ -25,15 +17,11 @@ function Check_token() {
         })
         .then((res)=> {
             localStorage.setItem('token', res.data);
-            return true;
         })
         .catch((error) =>{
-            localStorage.removeItem("token")
-            localStorage.removeItem("username")
-            return false;
+            Logout();
         })
     }
-    return false;
 }
 
 export {Check_token};

@@ -37,6 +37,7 @@ class Login extends Component {
         <Container className="body">
           <div className="user">
             <h1 className="text-center">Login</h1>
+            <hr></hr>
             <form onSubmit={this.login}>
               <Row>
                 <Col>

@@ -4,7 +4,6 @@ import {Card, Row, Col} from 'react-bootstrap';
 import axios from "axios";
 
 function hideEmail(emailAddress: string) {
-    const strLength = emailAddress.length;
     const [first, last] = emailAddress.split('@')
     return first.substring(0,1) + first.substr(1, first.length - 1).replace(/\w/g, '*') + first.substr(-1, 1) + '@' + last;
 }

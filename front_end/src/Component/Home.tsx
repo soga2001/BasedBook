@@ -7,6 +7,7 @@ function Home() {
   return (
     <Container className="body">
       <h1 className="header">Home Page</h1>
+      <hr></hr>
       <FadeIn>
         <Pageview />
       </FadeIn>

@@ -8,6 +8,7 @@ function Liked() {
     return (
         <Container className="body">
             <h1 className="header">Liked Post</h1>
+            <hr></hr>
             <Pageview />
         </Container>
     )
