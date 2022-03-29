@@ -4,6 +4,8 @@
   "proxy": "https://guarded-citadel-70687.herokuapp.com/",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.12.3",
+    "@material-ui/lab": "^4.0.0-alpha.60",
     "@popperjs/core": "^2.9.3",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
@@ -35,6 +37,7 @@
     "react-loading": "^2.0.3",
     "react-native": "^0.65.1",
     "react-native-flash-message": "^0.1.23",
+    "react-rating": "^2.0.5",
     "react-redux": "^7.2.4",
     "react-router-dom": "^5.2.0",
     "react-router-hash-link": "^2.4.3",
@@ -75,6 +78,7 @@
   "devDependencies": {
     "@babel/plugin-transform-typescript": "^7.15.0",
     "@types/prop-types": "^15.7.4",
+    "@types/react-star-rating-component": "^1.4.1",
     "xxxxx": "^1.0.3"
   }
 }

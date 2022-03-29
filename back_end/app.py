@@ -257,10 +257,17 @@ def liked_posts():
 def get_all_post():
     page = int(request.args['page'])
     limit = int(request.args['limit'])
-    offset = page * 10
+    currCount = int(request.args['count'])
+    plus = 0
+    count = mongo.db.post.find().count()
+    print(count)
+    if(currCount > 0 and count - currCount > 0):
+        plus = count - currCount
+    offset = (page * 10) + plus
     posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING).limit(limit).skip(offset)]
+    
     if(posts):
-        return jsonify({"posts": posts})
+        return jsonify({"posts": posts, "count": count})
     return jsonify({"hasMore": False})
 
 # For Profile

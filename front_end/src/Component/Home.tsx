@@ -1,8 +1,8 @@
+import {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import {Container} from 'react-bootstrap';
 import FadeIn from 'react-fade-in';
-import Pageview from './Home/PageView'
-
+import Pageview from './Home/PageView';
 function Home() {
   return (
     <Container className="body">

@@ -6,13 +6,14 @@ import {FiHeart} from "react-icons/fi";
 import {Button, Card, Row, Col} from 'react-bootstrap';
 import moment from 'moment';
 
+
 function Postview(props: any) {
     const [likes, setLikes] = useState(0);
     const [message, setMessage] = useState('');
     const [error, setError] = useState(false);
     const [deleted, setDeleted] = useState(false);
     const [liked, setLiked] = useState<Boolean>();
-    const [token] = useState(localStorage.getItem("token"))
+    const [token] = useState(localStorage.getItem("token"));
   
     const remove = () => {
       setDeleted(true);

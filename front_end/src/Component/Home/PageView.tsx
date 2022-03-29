@@ -8,9 +8,10 @@ function Pageview() {
     const [posts, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const [message] = useState('You have reached the end.'); 
+    const [message] = useState('You have reached the end.');
   
     const [page, setPage] = useState<number>(0);
+    const [count, setCount] = useState(0);
     const [limit] = useState(10);
   
     function handleScroll() {
@@ -23,11 +24,12 @@ function Pageview() {
     const post = async () => {
       if(hasMore) {
         setLoading(true);
-        const getPostsRes = await axios.get(`/post?limit=${limit}&page=${page}`)
+        const getPostsRes = await axios.get(`/post?limit=${limit}&page=${page}&count=${count}`)
         const postsInPage = getPostsRes.data.posts;
         await postsInPage && setData((prev) =>
           [...new Set([...prev, ...postsInPage])]
         );
+        console.log(setCount(getPostsRes.data.count))
         if((postsInPage < 10) || (getPostsRes.data.hasMore === false)) {
           window.removeEventListener('scroll', handleScroll);
           setLoading(false);
