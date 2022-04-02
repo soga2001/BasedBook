@@ -1,3 +1,4 @@
+import json
 from flask_cors import CORS, cross_origin
 from flask import Flask, jsonify, request
 from flask_pymongo import DESCENDING, PyMongo
@@ -196,6 +197,19 @@ def post():
     Post.deserialize(mongo.db.post.find_one({"author": author}))
     return jsonify({"success": 'Posted'})
 
+# edit post
+@app.route('/edit_post', methods=['PUT'])
+@auth_required
+def edit_post():
+    try:
+        title = request.json["title"]
+        content = request.json["content"]
+        id = request.json["id"]
+        mongo.db.post.update({"_id": ObjectId(id)}, {"$set": {"title": title, "content": content}})
+        return jsonify({"success": True})
+    except:
+        return jsonify({"error": True})
+
 # Dislike a post
 @app.route("/dislike", methods=["POST"])
 @auth_required
@@ -260,8 +274,7 @@ def get_all_post():
     currCount = int(request.args['count'])
     plus = 0
     count = mongo.db.post.find().count()
-    print(count)
-    if(currCount > 0 and count - currCount > 0):
+    if(currCount > 0 and count - currCount != 0):
         plus = count - currCount
     offset = (page * 10) + plus
     posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING).limit(limit).skip(offset)]

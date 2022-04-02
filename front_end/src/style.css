@@ -81,9 +81,9 @@ label {
 
 #button {
   font-size: 13px;
-  color: black;
-  border-color: darkblue;
-  background-color: transparent;
+  color: white;
+  /* border-color: darkblue; */
+  /* background-color: transparent; */
 }
 
 #button:hover {
@@ -126,9 +126,9 @@ form {
 /* Home Page */
 
 .posts {
-  display: -webkit-box;
+  /* display: -webkit-box;
   -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  -webkit-box-orient: vertical; */
   text-align: left;
   overflow: hidden;
   text-indent: 50px;

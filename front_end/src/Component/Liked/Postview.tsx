@@ -82,7 +82,7 @@ function Postview(props: any) {
               <Card.Footer id="card-footer">
                   <span >{<Button id="heart" onClick={() => like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}</span>
                   <span>{props.author === localStorage.getItem('username') ? 
-                      <Button id="button" onClick={() => remove()}>Delete</Button> 
+                      <Button id="button" variant="danger" onClick={() => remove()}>Delete</Button> 
                     : '' }</span>
               </Card.Footer>
             </Card>

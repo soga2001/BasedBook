@@ -11,11 +11,11 @@ class Register extends Component {
     e.preventDefault();
     this.setState({loading: true})
     var email = (document.getElementById("email") as HTMLInputElement).value;
-    if(email.split('@')[0].length < 4) {
-      this.setState({loading: false})
-      this.setState({err: "Email is too short. Please try again."});
-    }
-    else {
+    // if(email.split('@')[0].length < 4) {
+    //   this.setState({loading: false})
+    //   this.setState({err: "Email is too short. Please try again."});
+    // }
+    // else {
       axios.post("/register", {
         firstname: (document.getElementById("firstname") as HTMLInputElement).value,
         lastname: (document.getElementById("lastname") as HTMLInputElement).value,
@@ -37,7 +37,7 @@ class Register extends Component {
           setTimeout(()=>window.location.href = '/Login', 800)
         }
       });
-    }
+    // }
 }
         
     render() {

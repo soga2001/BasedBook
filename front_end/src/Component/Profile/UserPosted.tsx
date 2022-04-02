@@ -91,7 +91,7 @@ function UserPosted(props: any) {
                 <Card.Footer id="card-footer">
                     <span >{<Button id="heart" onClick={() => like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}</span>
                     <span>{error && <Alert variant="danger" className="message">{message}</Alert>}</span>
-                    <span><Button id="button" variant="outline-primary" onClick={() => remove()}>Delete</Button> </span>
+                    <span><Button id="button" variant="danger" onClick={() => remove()}>Delete</Button> </span>
                 </Card.Footer>
             </Card>}
         </>
