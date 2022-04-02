@@ -65,17 +65,6 @@ html {
   background: transparent;
 }
 
-#logout {
-  color: white;
-  text-decoration: none;
-  /* width: 100px; */
-  text-align: center;
-}
-
-#logout:hover {
-  color: skyblue;
-}
-
 #brand {
   color: white;
 }
