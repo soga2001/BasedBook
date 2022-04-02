@@ -29,7 +29,6 @@ function Pageview() {
         await postsInPage && setData((prev) =>
           [...new Set([...prev, ...postsInPage])]
         );
-        console.log(setCount(getPostsRes.data.count))
         if((postsInPage < 10) || (getPostsRes.data.hasMore === false)) {
           window.removeEventListener('scroll', handleScroll);
           setLoading(false);

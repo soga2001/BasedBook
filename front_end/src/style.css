@@ -38,16 +38,42 @@ html {
   background-color:hsla(120,0%,70%,0.3);
 }
 
-#drop-item {
+#dropdown {
+  background-color: black;
+}
+
+#toggle {
+  background-color: darkblue;
+}
+
+#link {
   color: white;
   text-decoration: none;
-  width: 100px;
+  /* width: 100px; */
   text-align: center;
 }
 
+#link:hover {
+  color: skyblue;
+}
 
-#drop-item.active {
-  color: red;
+#link.active {
+  color: lightcoral;
+}
+
+#drop-item {
+  background: transparent;
+}
+
+#logout {
+  color: white;
+  text-decoration: none;
+  /* width: 100px; */
+  text-align: center;
+}
+
+#logout:hover {
+  color: skyblue;
 }
 
 #brand {

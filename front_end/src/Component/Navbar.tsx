@@ -6,7 +6,9 @@ import {
   Nav, 
   NavDropdown,
   Row,
-  Col 
+  Col,
+  Dropdown,
+  DropdownButton
 } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Check_token} from './Token';
@@ -64,40 +66,39 @@ function NavBar() {
                 {!localStorage.getItem('token') && <NavLink to='/Login' id="item" activeClassName="active">Login {<LogIn/>}</NavLink>}
                 {!localStorage.getItem('token') && <NavLink to='/Register' id="item" activeClassName="active">Register</NavLink>}
                 {localStorage.getItem("token") && 
-                    <NavDropdown title={localStorage.getItem("username")}  id="item" menuVariant="dark">
-                      <NavDropdown.Item>
-                        <NavLink to="/Profile" id="drop-item" activeClassName="active">
-                            <Row>
-                              <Col>Profile</Col> 
-                              <Col>{<BsFillPersonLinesFill />}</Col>
-                            </Row>
-                          </NavLink>
-                      </NavDropdown.Item>
-                      <NavDropdown.Item >
-                        <NavLink to="/Setting" id="drop-item" activeClassName="active">
-                          <Row>
-                            <Col>Setting</Col> 
-                            <Col>{<BsFillGearFill />}</Col>
-                          </Row>
-                        </NavLink>
-                      </NavDropdown.Item>
-                      <NavDropdown.Item>
-                        <NavLink to="/Liked" id="drop-item" activeClassName="active">
-                          <Row>
-                            <Col>Liked</Col>
-                            <Col><FaHeart id="heart"/></Col>
-                          </Row>
-                        </NavLink>
-                      </NavDropdown.Item>
-                      <NavDropdown.Divider/>
-                      <NavDropdown.Item onClick={Logout}>
+                  <Dropdown>
+                    <Dropdown.Toggle variant="secondary" id="toggle">
+                      {localStorage.getItem("username") + " "}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu id="dropdown">
+                      <NavLink to="/Profile" id="link" activeClassName="active">
                         <Row>
+                          <Col>Profile</Col> 
+                          <Col>{<BsFillPersonLinesFill />}</Col>
+                          </Row>
+                      </NavLink>
+                      <NavLink to="/Setting" id="link" activeClassName="active">
+                        <Row>
+                          <Col>Setting</Col> 
+                          <Col>{<BsFillGearFill />}</Col>
+                        </Row>
+                      </NavLink>
+                      <NavLink to="/Liked" id="link" activeClassName="active">
+                        <Row>
+                          <Col>Liked</Col>
+                          <Col><FaHeart/></Col>
+                        </Row>
+                      </NavLink>
+                      <Dropdown.Divider></Dropdown.Divider>
+                      <Dropdown.Item id="drop-item" onClick={Logout}>
+                        <Row id="link">
                           <Col>LogOut</Col> 
                           <Col>{<LogOut />}</Col>
                         </Row>
-                        </NavDropdown.Item>
-                    </NavDropdown>
-                  }
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                }
               </Nav>
             </Navbar.Collapse>
             
