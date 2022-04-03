@@ -101,11 +101,6 @@ label {
   /* background-color: transparent; */
 }
 
-#button:hover {
-  background-color: darkblue;
-  color: white;
-}
-
 form {
   padding: 2%;
 }

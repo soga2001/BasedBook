@@ -297,6 +297,21 @@ def get_user_posts():
     return jsonify({"hasMore": False})
 
 
+@app.route("/posts_id", methods=["GET"])
+def get_post_id():  
+    page = int(request.args['page'])
+    limit = int(request.args['limit'])
+    offset = (page * 10) 
+    postsId = [Post.deserialize(x)._id for x in mongo.db.post.find().sort("date_posted", DESCENDING).limit(limit).skip(offset)]
+    if(postsId):
+        return jsonify({"posts_id": postsId})
+    return jsonify({"hasMore": False})
+
+@app.route("/posts/<post_id>", methods=["GET"])
+def post_by_id(post_id):
+    return jsonify({"post": Post.deserialize(mongo.db.post.find({"_id": ObjectId(post_id)}))})
+
+
 # Delete Post
 @app.route("/post/<post_id>", methods=['DELETE'])
 @auth_required

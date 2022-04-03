@@ -1,6 +1,6 @@
 import {useState, useEffect } from "react";
 import axios from 'axios';
-import {Button, Card, Row, Col} from 'react-bootstrap';
+import {Button, Card, Row, Col, Form} from 'react-bootstrap';
 import {FaHeart} from "react-icons/fa"
 import {FiHeart} from "react-icons/fi";
 import Alert from 'react-bootstrap/Alert';
@@ -14,6 +14,38 @@ function UserPosted(props: any) {
     const [liked, setLiked] = useState(false);
     const [message, setMessage] = useState('');
     const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+
+    const [title, setTitle] = useState(props.title)
+    const [content, setContent] = useState(props.content)
+
+    const [edit, setEdit] = useState(false);
+
+
+    const editPost = () => {
+      setLoading(true)
+      const title = (document.getElementById("newTitle") as HTMLInputElement).value;
+      const content = (document.getElementById("newContent") as HTMLInputElement).value;
+      setTitle(title)
+      setContent(content)
+      axios.put('/edit_post', {
+        title: title,
+        content: content,
+        id: props._id
+      }, {
+        headers:{
+          'Authorization': 'Bearer' + localStorage.getItem('token')}
+      })
+      .then((res) => {
+        if(res.data.success){
+          setTitle(title)
+          setContent(content)
+        }
+        setLoading(false)
+        setEdit(false)
+      })
+    }
   
     const remove = () => {
       setDeleted(true);
@@ -73,26 +105,32 @@ function UserPosted(props: any) {
     return (
         <>{deleted ? ' ' :
             <Card border="light" className="text-center" id="card" style={{visibility: deleted ? "hidden" : "visible"}}>
-                <Card.Header style={{background: '#C6F5FF'}} as="h3"> {props.title}</Card.Header>
-                <Card.Body style={{background: '#E3FAFF'}}>
-                <Row>
-                    <Col>
-                    <Card.Text><strong>Author: </strong> {props.author}</Card.Text>
-                    <input type="text" id="post_id" value={props._id} hidden readOnly></input>
-                    </Col>
-                    <Col>
-                    <Card.Text><strong>Posted: </strong> {moment(props.date_posted).fromNow()}</Card.Text>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col><Card.Text className="posts">{props.content}</Card.Text></Col>
-                </Row>
-                </Card.Body>
-                <Card.Footer id="card-footer">
-                    <span >{<Button id="heart" onClick={() => like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}</span>
-                    <span>{error && <Alert variant="danger" className="message">{message}</Alert>}</span>
-                    <span><Button id="button" variant="danger" onClick={() => remove()}>Delete</Button> </span>
-                </Card.Footer>
+              {!edit && <Card.Header  id="card-header" as="h3"> {title}</Card.Header>}
+              {edit && <Card.Header  id="card-header" as="h3"><input defaultValue={title} type="text" id="newTitle"></input></Card.Header>}
+              <Card.Body style={{background: '#E3FAFF'}}>
+              <Row>
+                  <Col>
+                  <Card.Text><strong>Author: </strong> {props.author}</Card.Text>
+                  <input type="text" id="post_id" value={props._id} hidden readOnly></input>
+                  </Col>
+                  <Col>
+                  <Card.Text><strong>Posted: </strong> {moment(props.date_posted).fromNow()}</Card.Text>
+                  </Col>
+              </Row>
+              <Row>
+                {!edit && <Col><Card.Text className="posts">{content}</Card.Text></Col>}
+                {edit && <Form.Control defaultValue={content} as="textarea" id="newContent" rows={10} required/>}
+              </Row>
+              <Row>
+                {edit && <span>{!loading ? <Button id="button" onClick={() => editPost()}>Submit</Button> : <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/>}</span>}
+              </Row>
+              </Card.Body>
+              <Card.Footer id="card-footer">
+                  <span >{<Button id="heart" onClick={() => like()}>{liked ? <FaHeart/> : <FiHeart />} {likes}</Button>}</span>
+                  <span>{error && <Alert variant="danger" className="message">{message}</Alert>}</span>
+                  <span><Button id="button" variant="danger" onClick={() => remove()}>Delete</Button> </span>
+                  {!edit && <Button id="button" onClick={() => setEdit(true)}>Edit</Button>}
+              </Card.Footer>
             </Card>}
         </>
     )
