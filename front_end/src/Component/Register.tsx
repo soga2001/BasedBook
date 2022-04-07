@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import axios from "axios";
 import {Button, Row, Col, Container, FloatingLabel, Form} from 'react-bootstrap';
-import Alert from 'react-bootstrap/Alert';
-import ReactLoading from 'react-loading';
+import Alert from '@mui/material/Alert';
+import LoadingButton from '@mui/lab/LoadingButton';
+import SaveIcon from '@mui/icons-material/Save';
 
 class Register extends Component {
   state = {err: "", registered: "", loading: false};
@@ -83,10 +84,10 @@ class Register extends Component {
                   </FloatingLabel>
                 </Col>
               </Row>
-              {this.state.loading ? <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/> : <Button type="submit" variant="outline-primary" className='button'>Register</Button>}
+              {this.state.loading ? <LoadingButton loading loadingPosition="start" startIcon={<SaveIcon />} variant="outlined" className='loadingButton' >Loading</LoadingButton> : <Button type="submit" variant="outline-primary" className='button'>Register</Button>}
             </form>
-            {this.state.err ? <Alert variant="danger"> {this.state.err} </Alert> : 
-            this.state.registered &&  <Alert variant="info">
+            {this.state.err ? <Alert variant="filled" severity="error"> {this.state.err} </Alert> : 
+            this.state.registered &&  <Alert variant="filled" severity="info">
             {this.state.registered}
             </Alert>}
           </div>

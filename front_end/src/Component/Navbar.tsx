@@ -1,14 +1,12 @@
-import { useEffect} from 'react';
+import { useEffect, useState} from 'react';
 import { BrowserRouter as Router, Route, NavLink } from 'react-router-dom';
 import {
   Navbar, 
   Container, 
   Nav, 
-  NavDropdown,
   Row,
   Col,
   Dropdown,
-  DropdownButton
 } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Check_token} from './Token';
@@ -16,7 +14,8 @@ import {Check_token} from './Token';
 import { LogIn, LogOut } from 'react-feather';
 import { BsHouseDoor, BsFillGearFill, BsFillPersonLinesFill } from "react-icons/bs";
 import { FiEdit } from "react-icons/fi";
-import { FaHeart} from "react-icons/fa";
+import { FaHeart, FaUserTie} from "react-icons/fa";
+import LinearProgress from '@mui/material/LinearProgress';
 // Pages
 import Home from './Home';
 import Register from './Register';
@@ -29,8 +28,11 @@ import Logout from './Logout';
 import About from './About';
 
 function NavBar() {
+
+  const [loading, setLoading] = useState(true);
   const checkToken = async() => {
-    await Check_token()
+    await Check_token();
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -39,7 +41,7 @@ function NavBar() {
 
   return (
     <Router>
-        {<Navbar collapseOnSelect expand="sm" bg="dark" id="navbar" fixed="top">
+        {!loading ? <Navbar collapseOnSelect expand="sm" bg="dark" id="navbar" fixed="top">
           <Container>
             <Navbar.Brand id="brand" href="/Home"><img id="logo"
                 alt="Logo"
@@ -68,6 +70,8 @@ function NavBar() {
                 {localStorage.getItem("token") && 
                   <Dropdown>
                     <Dropdown.Toggle variant="secondary" id="toggle">
+                      <FaUserTie/>
+                      {"   "}
                       {localStorage.getItem("username") + " "}
                     </Dropdown.Toggle>
                     <Dropdown.Menu id="dropdown">
@@ -75,7 +79,7 @@ function NavBar() {
                         <Row>
                           <Col>Profile</Col> 
                           <Col>{<BsFillPersonLinesFill />}</Col>
-                          </Row>
+                        </Row>
                       </NavLink>
                       <NavLink to="/Setting" id="link" activeClassName="active">
                         <Row>
@@ -103,7 +107,7 @@ function NavBar() {
             </Navbar.Collapse>
             
           </Container>
-        </Navbar>}
+        </Navbar> : <LinearProgress />}
           <Route exact path="/"><About/></Route>
           <Route exact path="/Home"><Home/> </Route>
           <Route exact path="/Post"><Post/></Route>

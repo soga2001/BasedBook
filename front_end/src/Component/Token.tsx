@@ -3,14 +3,14 @@ import Logout from './Logout';
 
 function Check_token() {
     try {
-        axios.post("/protected", {}, {
+        axios.get("/protected", {
             headers: {
                 'Authorization': 'Bearer' + localStorage.getItem('token')
             }
         })
     } 
     catch {
-        axios.post("/refresh-token", {}, {
+        axios.get("/refresh-token", {
             headers: {
                 'Authorization': 'Bearer' + localStorage.getItem('token')
             }

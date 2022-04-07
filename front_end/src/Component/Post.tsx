@@ -34,6 +34,12 @@ class Post extends Component {
         })
     }
 
+    tab = (event: any) => {
+        if(event.key = "tab") {
+            alert("potato")
+        }
+    }
+
     render() {
         return (
             <Container className="body" style={{padding: '1%'}}>
@@ -44,7 +50,7 @@ class Post extends Component {
                             <Row>
                                 <Col>
                                     <FloatingLabel label="Title" className="mb-3">
-                                    <Form.Control type="text" id="title" placeholder="title" required/>
+                                    <Form.Control type="text" id="title" placeholder="title" required maxLength={50}/>
                                     </FloatingLabel>
                                 </Col>
                             </Row>

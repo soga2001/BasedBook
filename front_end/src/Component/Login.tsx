@@ -1,9 +1,11 @@
 import { Component } from "react";
 import axios from "axios"
-import '../style.css'
-import ReactLoading from 'react-loading';
-import Alert from 'react-bootstrap/Alert';
-import {Button, Card, Row, Col, Container, FloatingLabel, Form} from 'react-bootstrap';
+import {Button, Row, Col, Container, FloatingLabel, Form} from 'react-bootstrap';
+import Alert from '@mui/material/Alert';
+import LoadingButton from '@mui/lab/LoadingButton';
+import SaveIcon from '@mui/icons-material/Save';
+
+
 
 
 class Login extends Component {
@@ -51,11 +53,11 @@ class Login extends Component {
                   </FloatingLabel>
                 </Col>
               </Row>
-              {this.state.loading ? <ReactLoading type={'bars'} color={"purple"} height={30} width={30} className="loading"/> : <Button type="submit" variant="outline-primary" className='button'>Login</Button>}
+              {this.state.loading ? <LoadingButton loading loadingPosition="start" startIcon={<SaveIcon />} variant="outlined" className='loadingButton' >Loading</LoadingButton> : <Button type="submit" variant="outline-primary" className='button'>Login</Button>}
             </form>
             {this.state.err ? 
-              <Alert variant="danger" className="message"> {this.state.err} </Alert> :
-              this.state.logged_in &&  <Alert className="message">
+              <Alert variant="filled" severity="error" className="message"> {this.state.err} </Alert> :
+              this.state.logged_in &&  <Alert variant="filled" severity="info" className="message">
               {this.state.logged_in}
               </Alert> }
           </div>
