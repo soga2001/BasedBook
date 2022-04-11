@@ -1,4 +1,3 @@
-import {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import {Container} from 'react-bootstrap';
 import FadeIn from 'react-fade-in';

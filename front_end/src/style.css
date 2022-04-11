@@ -92,7 +92,8 @@ label {
 }
 
 .button {
-  margin: 0 44.5%;
+  width: fit-content;
+  margin: 0 50%;
 }
 
 #button {
@@ -113,6 +114,9 @@ form {
   padding: 2%;
 }
 
+.edit {
+  background-color: #E0F1F1;
+}
 
 /* Message */
 
@@ -185,13 +189,17 @@ form {
 
 .close {
   cursor: pointer;
-  font-size:  2em !important;
+  font-size:  2rem !important;
   text-align: center;
+}
+
+.close:hover {
+  color: red;
 }
 
 span.footers {
   display: inline;
-  margin-right: 2px;
+  margin-right: 10px;
 }
 
 #delete {
@@ -231,6 +239,19 @@ span:focus {
   size: 2rem !important;
 }
 
+#pagination {
+  margin: 20px;
+}
+
+#mapping {
+  min-height: 760px;
+}
+
+/* #comment-title {
+  width: 20px;
+  max-width: 100px;
+} */
+
 
 /* Profile */
 #info {
@@ -242,7 +263,6 @@ span:focus {
 #card {
   margin: auto;
   margin-bottom: 10px;
-  width: 80%;
   cursor: pointer;
   min-height: 15rem;
 }

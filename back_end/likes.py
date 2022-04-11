@@ -7,8 +7,8 @@ from enum import unique
 
 @dataclass
 class UserPostLikes:
-    post_id: str = unique
-    user_id: str = unique
+    post_id: str
+    user_id: str
     _id: str = field(default_factory=str)
 
     @classmethod

@@ -30,6 +30,7 @@ from user import User
 from post import Post
 from likes import UserPostLikes
 from rating import PostRating
+from comments import Comments
 
 
 guard.init_app(app, User)
@@ -44,6 +45,8 @@ if "users" not in collection:
     mongo.db.users.create_index("email", unique = True)
 if "post" not in collection:
     mongo.db.create_collection("post")
+if "comments" not in collection:
+    mongo.db.create_collection("comments")
 if "rating" not in collection:
     mongo.db.create_collection("rating")
     # create index unique combination
@@ -115,7 +118,7 @@ def delete_user():
             mongo.db.likes.delete_many({"userId": _id})
             mongo.db.post.delete_many({"author": username})
             mongo.db.rating.delete_may({"userId": _id})
-            User.deserialize(mongo.db.users.find_one_and_delete({"_id": ObjectId(_id)}))
+            mongo.db.users.find_one_and_delete({"_id": ObjectId(_id)})
             return jsonify({"success": True})
         return jsonify({"message":"Invalid Username or Password"})
     except:
@@ -125,7 +128,6 @@ def delete_user():
 @app.route("/login", methods=['POST'])
 def login():
     try:
-        time.sleep(2)
         username = request.json["username"]
         username = username.lower()
         password = request.json["password"]
@@ -194,7 +196,6 @@ def post():
         "content": content,
         "date_posted": date
     })
-    Post.deserialize(mongo.db.post.find_one({"author": author}))
     return jsonify({"success": 'Posted'})
 
 # edit post
@@ -234,7 +235,11 @@ def like():
 # Check if the post is liked
 @app.route("/liked/<postId>", methods=["GET"])
 def liked(postId):
-    likes = [x["total"] for x in mongo.db.likes.aggregate([{"$match": {"postId": postId}},{"$group" : {"_id": "$postId", "total": {"$sum": 1}}}])][0]
+    time.sleep(2)
+    total = [x["total"] for x in mongo.db.likes.aggregate([{"$match": {"postId": postId}},{"$group" : {"_id": "$postId", "total": {"$sum": 1}}}])]
+    likes = 0
+    for item in total:
+        likes = item
     token = guard.read_token_from_header()
     try:
         userId = guard.extract_jwt_token(token=token)
@@ -252,7 +257,7 @@ def liked_posts():
     posts = []
     page = int(request.args['page'])
     limit = int(request.args['limit'])
-    offset = page * 10
+    offset = page * limit
     liked = mongo.db.likes.find({"userId": userId}).sort('$natural', -1).limit(limit).skip(offset)
     posts = [Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(x["postId"])})) for x in liked]
     if(posts):
@@ -260,21 +265,21 @@ def liked_posts():
     return jsonify({"message": "You have liked no posts."})
 
     
+@app.route("/post/count", methods=['GET'])
+def count_posts():
+    return jsonify({"count": mongo.db.post.count()})
+
+
 # Get posts from the database
 @app.route("/post", methods=['GET'])
 def get_all_post():
     page = int(request.args['page'])
     limit = int(request.args['limit'])
-    currCount = int(request.args['count'])
-    plus = 0
-    count = mongo.db.post.find().count()
-    if(currCount > 0 and count - currCount != 0):
-        plus = count - currCount
-    offset = (page * 10) + plus
+    offset = (page - 1) * limit
     posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING).limit(limit).skip(offset)]
     
     if(posts):
-        return jsonify({"posts": posts, "count": count})
+        return jsonify({"posts": posts})
     return jsonify({"hasMore": False})
 
 # For Profile
@@ -291,6 +296,7 @@ def get_user_posts():
     return jsonify({"hasMore": False})
 
 
+# no usage
 @app.route("/posts_id", methods=["GET"])
 def get_post_id():  
     page = int(request.args['page'])
@@ -301,9 +307,12 @@ def get_post_id():
         return jsonify({"posts_id": postsId})
     return jsonify({"hasMore": False})
 
-@app.route("/posts/<post_id>", methods=["GET"])
+@app.route("/post/<post_id>", methods=["GET"])
 def post_by_id(post_id):
-    return jsonify({"post": Post.deserialize(mongo.db.post.find({"_id": ObjectId(post_id)}))})
+    try:
+        return jsonify({"post": Post.deserialize(mongo.db.post.find_one({"_id": ObjectId(post_id)}))})
+    except:
+        return jsonify({"error": True})
 
 
 # Delete Post
@@ -326,14 +335,14 @@ def rated(post_id):
             rating = doc["rating"]
             totalCount = doc["count"]
     token = guard.read_token_from_header()
-    if(rating != 0 and totalCount != 0):
+    if(totalCount != 0):
         try:
             userId = guard.extract_jwt_token(token=token)
-            if(mongo.db.rating.find_one({"userId": userId["id"], "postId": post_id})):
-                return jsonify({"rated": True, "rating": round(rating/totalCount,1)})
+            rated = PostRating.deserialize(mongo.db.rating.find_one({"userId": userId["id"], "postId": post_id}))
+            return jsonify({"rated": True, "rating": (round(rating/totalCount,1) or 0), "total": totalCount, "userRating": rated.rating})
         except:
-            return jsonify({"error": False, "rating": round(rating/totalCount, 1)})
-    return jsonify({"error": False, "rating": 0  })
+            return jsonify({"rated": False, "rating": (round(rating/totalCount, 1) or 0), "total": totalCount})
+    return jsonify({"rated": False, "rating": 0, "total": 0})
 
 # Rate a Post
 @app.route("/post/rate", methods=["POST"])
@@ -341,33 +350,51 @@ def rated(post_id):
 def rate_post():
     post_id = request.json["post_id"]
     rating = request.json["rating"]
+    user_id = current_user()._id
     try:
-        mongo.db.rating.insert({"postId": post_id, "userId": current_user()._id,  "rating": rating})
+        mongo.db.rating.insert({"postId": post_id, "userId": user_id,  "rating": rating})
         return jsonify({"rated": True})
     except:
-        print("except")
-        mongo.db.rating.update_one({"postId": post_id}, {"$set": {"rating": rating}})
-        return jsonify({"changed": True})
+        mongo.db.rating.update_one({"postId": post_id, "userId": user_id}, {"$set": {"rating": rating}})
+        return jsonify({"rated": True})
 
-#unrate a post
-# @app.route("/post/change_rating", methods=["PUT"])
-# @auth_required
-# def change_rating():
-#     post_id = request.json["post_id"]
-#     rating = request.json["rating"]
-#     # mongo.db.rating.update({"post_id": post_id}, {"$set": {"rating": rating}})
-#     mongo.db.rating.update_one({"post_id": post_id}, {"$set": {"rating": rating}})
-#     return jsonify({"succes": True})
-#     # mongo.db.rating.find({"_id"})
+# unrate a post
+@app.route("/post/unrate/<post_id>", methods=["Delete"])
+@auth_required
+def unrate_post(post_id):
+    mongo.db.rating.remove({"postId": post_id, "userId": current_user()._id})
+    return jsonify({"success": True})
 
 
+@app.route("/post/comment/<post_id>", methods=["GET"])
+def fetch_comment(post_id):
+    try:
+        return jsonify({"comments": [Comments.deserialize(x) for x in mongo.db.comments.find({"postId": post_id})], "post_id": post_id})
+    except:
+        return jsonify({"message": "There are no comments for this post.", "post_id": post_id})
 
+# comment
+@app.route("/post/comment", methods=["POST"])
+@auth_required
+def comment():
+    username = current_user().username
+    post_id = request.json["post_id"]
+    title = request.json["title"]
+    comment = request.json["comment"]
+    date_posted = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    mongo.db.comments.insert({
+        "username": username,
+        "postId": post_id,
+        "title": title,
+        "comment": comment,
+        "date_posted": date_posted
+    })
+    return jsonify({"success": True})
 
 # To make sure the user token is still valid
 @app.route("/protected", methods=['GET'])
 @auth_required
 def protected():
-    time.sleep(2000)
     return jsonify(True)
 
 
@@ -378,7 +405,7 @@ def refresh():
     try:
         old_token = guard.read_token_from_header()
         new_token = guard.refresh_jwt_token(old_token)
-        return jsonify(new_token)
+        return jsonify({"token": new_token})
     except:
         return jsonify({"error": "Invaid Token"})
 

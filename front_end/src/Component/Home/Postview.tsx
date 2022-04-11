@@ -1,23 +1,13 @@
 import {useState, useEffect} from 'react';
 import axios from 'axios';
-import {Button, Card, Row, Col, Form, Container} from 'react-bootstrap';
+import {Button, Card, Row, Col, Container} from 'react-bootstrap';
 import moment from 'moment';
+import CommentView from './Comments';
 
-import Alert from '@mui/material/Alert';
-import Rating from '@mui/material/Rating';
-import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SaveIcon from '@mui/icons-material/Save';
-import FavoriteBorderSharpIcon from '@mui/icons-material/FavoriteBorderSharp';
-import FavoriteSharpIcon from '@mui/icons-material/FavoriteSharp';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import Stack from '@mui/material/Stack';
-import Modal from '@mui/material/Modal';
-import CloseIcon from '@mui/icons-material/Close';
-
-
-
+import {Alert, Rating, IconButton, Stack, Modal, TextField, Skeleton, SpeedDial, SpeedDialIcon, SpeedDialAction} from '@mui/material';
+import { DeleteForever, Save, Close, Favorite, FavoriteBorder } from '@mui/icons-material';
 
 function Postview(props: any) {
     const [likes, setLikes] = useState(0);
@@ -30,27 +20,41 @@ function Postview(props: any) {
 
 
     const [token] = useState(localStorage.getItem("token"));
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     // Setting data
     const [title, setTitle] = useState(props.title);
     const [content, setContent] = useState(props.content);
     const [rating, setRating] = useState(0);
     const [currRating, setCurr] = useState(0);
+    const [total, setTotal] = useState(0);
+    const [userRating, setUser] = useState(0);
     const [rateLoading, setRateloading] = useState(true);
 
     // Modal
     const [open, setOpen] = useState(false);
+    const handleOpen = () => {
+      !loading && setOpen(true);
+      !loading && window.history.pushState({}, '', `/Share/${props._id}`)
+    }
     const handleClose = () => {
       setOpen(false);
       setEdit(false);
+      window.history.back();
     };
     const [edit, setEdit] = useState(false);
+
+
+    // Comments
+    const [commentLoading, setComLoading] = useState(true);
+    const [comments, setComments] = useState<any[]>([]);
+    const [hasComments, setHas] = useState(false)
 
   
     const remove = () => {
       setDeleted(true);
-      axios.delete(`http://127.0.0.1:5000/post/${props._id}`, {
+      setOpen(false);
+      axios.delete(`/post/${props._id}`, {
         headers:{
           'Authorization': 'Bearer' + localStorage.getItem('token')}
       })
@@ -114,7 +118,9 @@ function Postview(props: any) {
             setLiked(false)
           }
           setLikes(res.data.likes)
+          setLoading(false)
         })
+        .catch((error) => {})
     }
 
     const userRated = async () => {
@@ -123,21 +129,21 @@ function Postview(props: any) {
           'Authorization': 'Bearer' + localStorage.getItem('token')}
         })
         .then((res) => {
-          if(res.data.rated) {
+          if(res.data.rated === true) {
             setRated(true)
+            setUser(res.data.userRating)
           }
           else {
             setRated(false)
           }
-          setCurr(res.data.rating); 
           setRating(res.data.rating);
+          setTotal(res.data.total);
           
         })
       setRateloading(false);
     }
 
     const rate = () => {
-      console.log(currRating)
       setRateloading(true)
       axios.post("/post/rate", {
         post_id: props._id,
@@ -146,44 +152,105 @@ function Postview(props: any) {
         headers:{
           'Authorization': 'Bearer' + localStorage.getItem('token')}
         }).then((res) => {
-          setRated(true)
-          console.log(res.data)
+          setRated(true)  
           userRated();
         })
         .catch((error) => {
+          setRateloading(false)
           setError(true)
           setMessage("You are not logged in.")
         })
     }
+
+    const unrate = () => {
+      setRateloading(true)
+      axios.delete(`/post/unrate/${props._id}`, {
+        headers:{
+          'Authorization': 'Bearer' + localStorage.getItem('token')}
+        }).then((res) => {
+          setRated(false)  
+          userRated();
+        })
+    }
+
+    const postComment = (e: any) => {
+      e.preventDefault();
+      setComLoading(true)
+      const title = (document.getElementById("comment-title") as HTMLInputElement).value
+      const comment = (document.getElementById("comment") as HTMLInputElement).value
+      axios.post("/post/comment", {
+        post_id: props._id,
+        title: title,
+        comment: comment
+      },{
+        headers:{
+          'Authorization': 'Bearer' + localStorage.getItem('token')}
+        }).then((res) => {
+          (document.getElementById("comment-title") as HTMLInputElement).value = "";
+          (document.getElementById("comment") as HTMLInputElement).value = "";
+        })
+        .catch((error) => {
+          alert("Error")
+        })
+    }
+
+    const fetchComment = async () => {
+      setComLoading(true);
+      await axios.get(`/post/comment/${props._id}`,{
+        headers:{
+          'Authorization': 'Bearer' + localStorage.getItem('token')}
+        })
+        .then((res) => {
+          if(res.data.comments.length != 0) {
+            setComments(res.data.comments)
+            setHas(true)
+          }
+          else{
+            setHas(false)
+          }
+          
+        });
+      setComLoading(false);
+    }
   
     useEffect(() => {
+      fetchComment();
       userRated();
       userLiked();
     },[])
+
+    const options = [
+      { icon: <Save />, name: 'Save'},
+      { icon: <DeleteForever />, name: 'Delete'}
+    ];
   
     return (
         <div>
-          {deleted ? "" : <Card onClick={() => setOpen(true)} id="card">
-            <Card.Header  id="card-header" className="text-center" as="h1"> {title}</Card.Header>
-            
+          {deleted ? "" : <Card onClick={handleOpen} id="card">
+            <Stack alignItems="center" id="card-header">
+                {loading ? <Skeleton variant="text" width={100} height={60} animation="wave" sx={{ bgcolor: 'black.300' }} />
+                : <Card.Header  id="card-header" className="text-center" as="h1"> {title}</Card.Header>}
+            </Stack>
             <Card.Body id="card-body">
               <Row className="text-center">
-                <Col><Card.Text><strong>Author: </strong> {props.author}</Card.Text></Col>
-                <Col><Card.Text><strong>Posted: </strong> {moment(props.date_posted).fromNow()} </Card.Text></Col>
+                <Col>{loading ? <Skeleton variant="text" animation="wave" sx={{ bgcolor: 'black.300' }} /> : <Card.Text><strong>Author: </strong> {props.author}</Card.Text>}</Col>
+                <Col>{loading ? <Skeleton variant="text" animation="wave" sx={{ bgcolor: 'black.300' }} /> : <Card.Text><strong>Posted: </strong> {moment(props.date_posted).fromNow()} </Card.Text>}</Col>
               </Row>
               <Row>
-                <Col><Card.Text className="posts">{content}</Card.Text></Col>
+                <Col>{loading ? <Skeleton variant="rectangular" height={93} animation="wave" sx={{ bgcolor: 'black.300' }} /> : <Card.Text className="posts">{content}</Card.Text>}</Col>
               </Row>
+              <div id="checking">
+                </div>
             </Card.Body>
             <Card.Footer id="card-footer">
-              <Stack direction="row" spacing={1} alignItems="center">
-                {<span id="heart" style={{float: "left"}}>{liked ? <FavoriteSharpIcon/> : <FavoriteBorderSharpIcon />}</span>}
-                <span>{likes}</span>
-                <span>{" "}</span>
-                <span>{" "}</span>
-                <span>{" "}</span>
-                <span>{!rateLoading ? <span><strong>Rating:</strong> {rating} out of 5</span> : <LoadingButton loading loadingPosition="start" startIcon={<SaveIcon />} variant="outlined" className='loadingButton' > Loading</LoadingButton>}</span>
-                <span>{!rateLoading ? <Rating size="large" name="simple-controlled" id='rating' defaultValue={rating} precision={.5} readOnly/>: ""}</span>
+              <Stack direction="row" spacing={1} alignItems="center" >
+                {loading ? <Skeleton variant="circular" width={20} height={20} animation="wave" sx={{ bgcolor: 'red.1000' }} /> :<span id="heart" style={{float: "left"}}>{liked ? <Favorite/> : <FavoriteBorder />}</span>}
+                <span>{loading ? <Skeleton variant="text" width={20} height={20} animation="wave" sx={{ bgcolor: 'red.1000' }} /> : ""}</span>
+                <span>{!loading && likes}</span>
+                <span></span>
+                <span>{!loading ? (!rateLoading  ? <span><strong>Rating:</strong> {rating}/5 ({total})</span> : <Skeleton variant="text" width={200} animation="wave" sx={{ bgcolor: 'black.300' }}/>) 
+                : <Skeleton variant="text" width={200} animation="wave" sx={{ bgcolor: 'black.300' }}/>}</span>
+                <span>{!loading && (!rateLoading ? <Rating size="large" name="simple-controlled" id='rating' defaultValue={rating} precision={.5} readOnly/>: "")}</span>
               </Stack>
             </Card.Footer>
           </Card>}
@@ -191,8 +258,12 @@ function Postview(props: any) {
             <Container className="popUp">
               <hr/>
               <Row>
-                <Col md={11} xs={10}>{!edit ? <h1 className='text-center'> {title}</h1> : <h1  className='text-center'><input defaultValue={title} type="text" id="newTitle" maxLength={50}></input></h1> }</Col>
-                <Col md={1} xs={1} className="close" ><CloseIcon onClick={handleClose} fontSize="large"/></Col>
+                <Col md={1} xs={1}></Col>
+                <Col md={10} xs={9}><Stack alignItems="center">
+                  {!edit ? <h1 className='text-center'> {title}</h1> : <h1><TextField className='edit' id="newTitle" label="Title" variant="outlined" defaultValue={title} /></h1> }
+                </Stack></Col>
+                {/* <Col md={10} xs={9}>{!edit ? <h1 className='text-center'> {title}</h1> : <h1><TextField className='edit' id="newTitle" label="Title" variant="outlined" defaultValue={title} /></h1> }</Col> */}
+                <Col md={1} xs={1} ><Close onClick={handleClose} fontSize="large" className="close"/></Col>
               </Row>
               
               <hr/>
@@ -202,33 +273,50 @@ function Postview(props: any) {
               </Row>
               <Row>
                 {!edit && <Col><Card.Text className="popPost">{content}</Card.Text></Col>}
-                {edit && <Form.Control defaultValue={content} as="textarea" id="newContent" rows={10} required/>}
+                {edit && <TextField fullWidth defaultValue={content} className='edit' id="newContent" label="Story" multiline rows={20} variant="outlined" />}
               </Row>
               <Row>
-                {edit && <span id="loading">{!loading ? <Button className="button" onClick={() => editPost()}>Submit</Button> : 
-                <LoadingButton loading loadingPosition="start" startIcon={<SaveIcon />} variant="outlined" className='loadingButton' > Saving</LoadingButton>}</span>}
+                {edit && <span id="loading">{!loading ? <Button className="button" onClick={() => editPost()}>Save</Button> : 
+                <LoadingButton loading loadingPosition="start" startIcon={<Save />} variant="outlined" className='loadingButton' > Saving</LoadingButton>}</span>}
               </Row>
-              <Stack direction="row" spacing={14} alignItems="center">
-                <Stack direction="row" spacing={1} alignItems="center">
-                <span><strong>Rating: </strong>  {rating}</span>
-                  {!rateLoading ? <span > <Rating size="large" name="simple-controlled" id='rating' defaultValue={rating} onChange={(event, newValue: any) => setCurr(newValue)}/></span>
-                  : <LoadingButton loading loadingPosition="start" startIcon={<SaveIcon />} variant="outlined" className='loadingButton' > Loading</LoadingButton>}
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={0} alignItems="center">
+                <span><strong>{rated ? "Rating:" : "Rate:"}</strong>  {rating}</span>
+                <span>{!rateLoading ? <Rating size="large" name="simple-controlled" id='rating' defaultValue={rating} onChange={(event, newValue: any) => {newValue !== null ? setCurr(newValue) : setCurr(0)}}/>
+                : <LoadingButton loading loadingPosition="start" startIcon={<Save />} variant="outlined" className='loadingButton' > Saving</LoadingButton>}</span>
                 </Stack>
-                <Col lg={6} sm={2}>{(<Button id="button" variant='success' onClick={() => rate()}>{rated ? "Change Rating" : "Rate"}</Button>)}</Col>
+              </Stack>
+              <Stack spacing={2} direction="row">
+                {rated && <span>Your rating: {userRating}</span>}
+              </Stack>
+              <Stack direction="row" spacing={2} alignItems="center">
+                {(currRating !== null) ? <Button id="button" variant='success' onClick={() => rate()}>{rated ? "Change Rating" : "Rate"}</Button> : ""}
+                { rated &&  (<Button id="button" variant='success' onClick={() => unrate()}>Unrate</Button>)}
               </Stack>
               <hr/>
               <div>
-                <span className="footers">{<IconButton id="heart" onClick={() => like()}>{liked ? <FavoriteSharpIcon/> : <FavoriteBorderSharpIcon />}</IconButton>} {likes} </span>
+                <span className="footers">{<IconButton id="heart" onClick={() => like()}>{liked ? <Favorite/> : <FavoriteBorder />}</IconButton>}  {likes} </span>
                 {!edit && <span className="footers">{props.author === localStorage.getItem('username') ? <Button id="button" onClick={() => setEdit(true)}> <EditOutlinedIcon /> Edit</Button> 
                   : '' }</span>}
                 <span className='footers' id="delete">{props.author === localStorage.getItem('username') ? 
-                  <Button id="button" variant='danger' onClick={() => remove()}><DeleteIcon /> Delete</Button> 
+                  <Button id="button" variant='danger' onClick={() => remove()}><DeleteForever /> Delete</Button> 
                 : '' }</span>
               </div>
-              <span>{error && <Alert variant="filled" severity="error" className="message">{message}</Alert>}</span>
+              <span>{error && <Alert variant="filled" severity="error" className="message" onClose={() => setError(false)}>{message}</Alert>}</span>
               <hr/>
               <div id="comments">
                 <h3>Comments</h3>
+                <form onSubmit={postComment}>
+                  <Stack spacing={2}>
+                    <TextField size="small" className='comment' id="comment-title" label="Title" variant="outlined" required/>
+                    <TextField size="small" className='comment' id="comment" label="Comment" variant="outlined" multiline rows={5} required/>
+                    <Button type="submit" variant="outline-primary" className='button'>Post</Button>
+                  </Stack>
+                </form>
+                {!hasComments ? "" : comments.map(comment => {
+                  <CommentView key={comment._id} title={comment.title} username={comment.username}/>
+
+                })}
               </div>
             </Container>
           </Modal>

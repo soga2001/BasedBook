@@ -1,5 +1,5 @@
 import { useEffect, useState} from 'react';
-import { BrowserRouter as Router, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Route, NavLink, Link } from 'react-router-dom';
 import {
   Navbar, 
   Container, 
@@ -26,6 +26,7 @@ import Setting from './Setting/Setting';
 import Liked from './Liked';
 import Logout from './Logout';
 import About from './About';
+import Share from './Share';
 
 function NavBar() {
 
@@ -49,7 +50,7 @@ function NavBar() {
                 width="30"
                 height="30"
                 className="d-inline-block align-top"
-              />{' '}</Navbar.Brand>
+              />Socialite</Navbar.Brand>
             <Navbar.Toggle aria-controls="responsive-navbar-nav" />
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav variant="pills" className="me-auto">
@@ -116,6 +117,7 @@ function NavBar() {
           <Route exact path="/Profile"><Profile/></Route>
           <Route exact path="/Liked"><Liked/></Route>
           <Route exact path="/Setting"><Setting/></Route>
+          <Route exact path="/Share/:id"><Share /></Route>
       </Router>
   )
 }

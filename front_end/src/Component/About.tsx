@@ -40,6 +40,7 @@ class About extends Component {
                             <li>Change Username and Password</li>
                             <li>Delete account</li>
                             <li>Edit your stories</li>
+                            <li>Rating system for each posts (story)</li>
                         </ul>
                         <li id="question">Features planned for the future</li>
                         <ul>
@@ -47,7 +48,6 @@ class About extends Component {
                             <li>Comment Section for posts</li>
                             <li>Search for other users and view their posts</li>
                             <li>Search for posts based on genre</li>
-                            <li>Rating system for each posts (story)</li>
                             <li>Roles (admin, operator, mod)</li>
                             <li>Discover page with the ability to filter posts based on likes, comments, latest, oldest, rating, etc</li>
                         </ul>
