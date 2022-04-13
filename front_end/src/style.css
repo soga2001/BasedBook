@@ -8,6 +8,14 @@ html {
 
 /* NavBar */
 
+#nav-toggle {
+  color: white !important;
+}
+
+#nav-toggle:hover {
+  color: lightcoral !important;
+}
+
 #dropdown{
   color: white;
 }
@@ -247,10 +255,10 @@ span:focus {
   min-height: 760px;
 }
 
-/* #comment-title {
-  width: 20px;
-  max-width: 100px;
-} */
+#comments {
+  padding: 10px;
+  margin-bottom: 2px;
+}
 
 
 /* Profile */

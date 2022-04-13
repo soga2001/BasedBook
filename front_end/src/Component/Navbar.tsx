@@ -16,6 +16,7 @@ import { BsHouseDoor, BsFillGearFill, BsFillPersonLinesFill } from "react-icons/
 import { FiEdit } from "react-icons/fi";
 import { FaHeart, FaUserTie} from "react-icons/fa";
 import LinearProgress from '@mui/material/LinearProgress';
+import MenuIcon from '@mui/icons-material/Menu';
 // Pages
 import Home from './Home';
 import Register from './Register';
@@ -27,6 +28,7 @@ import Liked from './Liked';
 import Logout from './Logout';
 import About from './About';
 import Share from './Share';
+
 
 function NavBar() {
 
@@ -42,7 +44,7 @@ function NavBar() {
 
   return (
     <Router>
-        {!loading ? <Navbar collapseOnSelect expand="sm" bg="dark" id="navbar" fixed="top">
+        {!loading ? <Navbar collapseOnSelect expand="sm" bg="light" id="navbar" fixed="top">
           <Container>
             <Navbar.Brand id="brand" href="/Home"><img id="logo"
                 alt="Logo"
@@ -51,7 +53,7 @@ function NavBar() {
                 height="30"
                 className="d-inline-block align-top"
               />Socialite</Navbar.Brand>
-            <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+            <Navbar.Toggle><MenuIcon id="nav-toggle" /></Navbar.Toggle>
             <Navbar.Collapse id="responsive-navbar-nav">
               <Nav variant="pills" className="me-auto">
                   <NavLink to='/Home' id="item" activeClassName="active">

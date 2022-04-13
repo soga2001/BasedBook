@@ -277,7 +277,6 @@ def get_all_post():
     limit = int(request.args['limit'])
     offset = (page - 1) * limit
     posts = [Post.deserialize(x) for x in mongo.db.post.find().sort("date_posted", DESCENDING).limit(limit).skip(offset)]
-    
     if(posts):
         return jsonify({"posts": posts})
     return jsonify({"hasMore": False})
@@ -366,12 +365,15 @@ def unrate_post(post_id):
     return jsonify({"success": True})
 
 
-@app.route("/post/comment/<post_id>", methods=["GET"])
-def fetch_comment(post_id):
-    try:
-        return jsonify({"comments": [Comments.deserialize(x) for x in mongo.db.comments.find({"postId": post_id})], "post_id": post_id})
-    except:
-        return jsonify({"message": "There are no comments for this post.", "post_id": post_id})
+@app.route("/post/comments", methods=["GET"])
+def fetch_comment():
+    post_id = request.args['id']
+    offset = int(request.args['offset'])
+    count = mongo.db.comments.find({"postId": post_id}).count()
+    comments = [Comments.deserialize(x) for x in mongo.db.comments.find({"postId": post_id}).skip(offset)]
+    if(comments):
+        return jsonify({"comments": comments, "count": count})
+    return jsonify({"message": "There are no comments for this post."})
 
 # comment
 @app.route("/post/comment", methods=["POST"])
@@ -379,13 +381,11 @@ def fetch_comment(post_id):
 def comment():
     username = current_user().username
     post_id = request.json["post_id"]
-    title = request.json["title"]
     comment = request.json["comment"]
     date_posted = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     mongo.db.comments.insert({
         "username": username,
         "postId": post_id,
-        "title": title,
         "comment": comment,
         "date_posted": date_posted
     })

@@ -2,12 +2,13 @@ import {useState, useEffect} from 'react';
 import axios from 'axios';
 import {Button, Card, Row, Col, Container} from 'react-bootstrap';
 import moment from 'moment';
-import CommentView from './Comments';
+import Commentview from './Comments';
 
 import LoadingButton from '@mui/lab/LoadingButton';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import {Alert, Rating, IconButton, Stack, Modal, TextField, Skeleton, SpeedDial, SpeedDialIcon, SpeedDialAction} from '@mui/material';
+import {Alert, Rating, IconButton, Stack, Modal, TextField, Skeleton} from '@mui/material';
 import { DeleteForever, Save, Close, Favorite, FavoriteBorder } from '@mui/icons-material';
+import CommentIcon from '@mui/icons-material/Comment';
 
 function Postview(props: any) {
     const [likes, setLikes] = useState(0);
@@ -48,7 +49,7 @@ function Postview(props: any) {
     // Comments
     const [commentLoading, setComLoading] = useState(true);
     const [comments, setComments] = useState<any[]>([]);
-    const [hasComments, setHas] = useState(false)
+    const [commentCount, setCount] = useState(0);
 
   
     const remove = () => {
@@ -176,17 +177,15 @@ function Postview(props: any) {
     const postComment = (e: any) => {
       e.preventDefault();
       setComLoading(true)
-      const title = (document.getElementById("comment-title") as HTMLInputElement).value
       const comment = (document.getElementById("comment") as HTMLInputElement).value
       axios.post("/post/comment", {
         post_id: props._id,
-        title: title,
         comment: comment
       },{
         headers:{
           'Authorization': 'Bearer' + localStorage.getItem('token')}
         }).then((res) => {
-          (document.getElementById("comment-title") as HTMLInputElement).value = "";
+          fetchComment();
           (document.getElementById("comment") as HTMLInputElement).value = "";
         })
         .catch((error) => {
@@ -196,20 +195,12 @@ function Postview(props: any) {
 
     const fetchComment = async () => {
       setComLoading(true);
-      await axios.get(`/post/comment/${props._id}`,{
-        headers:{
-          'Authorization': 'Bearer' + localStorage.getItem('token')}
-        })
-        .then((res) => {
-          if(res.data.comments.length != 0) {
-            setComments(res.data.comments)
-            setHas(true)
-          }
-          else{
-            setHas(false)
-          }
-          
-        });
+      const getComment = await axios.get(`/post/comments?id=${props._id}&offset=${commentCount}`)
+      const fetchedComment = getComment.data.comments;
+      const count = getComment.data.count;
+      await fetchedComment && setComments([...comments, ...fetchedComment])
+
+      await count && setCount(count)
       setComLoading(false);
     }
   
@@ -237,16 +228,19 @@ function Postview(props: any) {
                 <Col>{loading ? <Skeleton variant="text" animation="wave" sx={{ bgcolor: 'black.300' }} /> : <Card.Text><strong>Posted: </strong> {moment(props.date_posted).fromNow()} </Card.Text>}</Col>
               </Row>
               <Row>
-                <Col>{loading ? <Skeleton variant="rectangular" height={93} animation="wave" sx={{ bgcolor: 'black.300' }} /> : <Card.Text className="posts">{content}</Card.Text>}</Col>
+                <Col>{loading ? <Skeleton variant="rectangular" height={80} animation="wave" sx={{ bgcolor: 'black.300' }} /> : <Card.Text className="posts">{content}</Card.Text>}</Col>
               </Row>
               <div id="checking">
                 </div>
             </Card.Body>
             <Card.Footer id="card-footer">
               <Stack direction="row" spacing={1} alignItems="center" >
-                {loading ? <Skeleton variant="circular" width={20} height={20} animation="wave" sx={{ bgcolor: 'red.1000' }} /> :<span id="heart" style={{float: "left"}}>{liked ? <Favorite/> : <FavoriteBorder />}</span>}
-                <span>{loading ? <Skeleton variant="text" width={20} height={20} animation="wave" sx={{ bgcolor: 'red.1000' }} /> : ""}</span>
+                {loading ? <Skeleton variant="circular" width={30} height={30} animation="wave" sx={{ bgcolor: 'red.1000' }} /> :<span id="heart" style={{float: "left"}}>{liked ? <Favorite/> : <FavoriteBorder />}</span>}
+                <span>{loading ? <Skeleton variant="text" width={30} height={30} animation="wave" sx={{ bgcolor: 'red.1000' }} /> : ""}</span>
                 <span>{!loading && likes}</span>
+                <span></span>
+                <span>{loading ? <Skeleton variant="text" width={35} height={40} animation="wave" sx={{ bgcolor: 'red.1000' }} />  : <CommentIcon/>}</span>
+                <span>{loading ? <Skeleton variant="text" width={20} height={40} animation="wave" sx={{ bgcolor: 'red.1000' }} /> : commentCount}</span>
                 <span></span>
                 <span>{!loading ? (!rateLoading  ? <span><strong>Rating:</strong> {rating}/5 ({total})</span> : <Skeleton variant="text" width={200} animation="wave" sx={{ bgcolor: 'black.300' }}/>) 
                 : <Skeleton variant="text" width={200} animation="wave" sx={{ bgcolor: 'black.300' }}/>}</span>
@@ -304,19 +298,18 @@ function Postview(props: any) {
               </div>
               <span>{error && <Alert variant="filled" severity="error" className="message" onClose={() => setError(false)}>{message}</Alert>}</span>
               <hr/>
-              <div id="comments">
+              <div id="postComments">
                 <h3>Comments</h3>
                 <form onSubmit={postComment}>
                   <Stack spacing={2}>
-                    <TextField size="small" className='comment' id="comment-title" label="Title" variant="outlined" required/>
                     <TextField size="small" className='comment' id="comment" label="Comment" variant="outlined" multiline rows={5} required/>
                     <Button type="submit" variant="outline-primary" className='button'>Post</Button>
                   </Stack>
                 </form>
-                {!hasComments ? "" : comments.map(comment => {
-                  <CommentView key={comment._id} title={comment.title} username={comment.username}/>
-
-                })}
+                <hr/>
+                {comments.map(comment => (
+                  <Commentview key={comment._id} _id={comment._id} title={comment.title} username={comment.username} comment={comment.comment} date_posted={comment.date_posted} post_id={comment.postId}/>
+                ))}
               </div>
             </Container>
           </Modal>

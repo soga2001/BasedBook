@@ -40,12 +40,12 @@ class About extends Component {
                             <li>Change Username and Password</li>
                             <li>Delete account</li>
                             <li>Edit your stories</li>
-                            <li>Rating system for each posts (story)</li>
+                            <li>Rate stories</li>
+                            <li>Comment Section for posts (needs formatting)</li>
                         </ul>
                         <li id="question">Features planned for the future</li>
                         <ul>
                             <li>Email verification</li>
-                            <li>Comment Section for posts</li>
                             <li>Search for other users and view their posts</li>
                             <li>Search for posts based on genre</li>
                             <li>Roles (admin, operator, mod)</li>
