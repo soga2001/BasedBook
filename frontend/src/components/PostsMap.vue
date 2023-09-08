@@ -352,7 +352,7 @@ export default defineComponent({
                                             <q-item-label>Report Post</q-item-label>
                                         </q-item-section>
                                     </q-item>
-                                    <q-item class="danger-btn" clickable v-close-popup @click="deleteModal = true" tabindex="0" v-if="post.is_owner || post.user.is_admin || post.user.is_staff">
+                                    <q-item class="danger-btn" clickable v-close-popup @click="deleteModal = true" tabindex="0" v-if="post.is_owner || $store.state.user.is_admin || $store.state.user.user.is_staff">
                                         <q-item-section avatar>
                                             <q-icon color="red" class="danger__icon" name="delete_forever"/>
                                         </q-item-section>

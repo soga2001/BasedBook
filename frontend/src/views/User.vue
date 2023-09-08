@@ -29,6 +29,7 @@ export default defineComponent({
             websocket: new WebSocket(`wss://localhost:8000/ws/user_consumer/${this.$route.params.username}/`),
             headerHeight: '' || 0,
             bannerIntersecting: true,
+            user_name: '',
         };
     },
     methods: {
@@ -77,13 +78,6 @@ export default defineComponent({
         }
     },
     activated() {
-        // if(this.$route.params.username != this.username) {
-        //     this.username = this.$route.params.username
-        //     this.user = {} as User;
-        //     // this.websocketClose()
-        //     this.userInfo();
-        //     // this.websocketOpen()
-        // }
         this.tab = this.$route.name as string
         if(this.user.full_name) {
             document.title = `${this.user.full_name}`
@@ -100,6 +94,9 @@ export default defineComponent({
         user(user) {
             if(user.full_name) {
                 document.title = `${user.full_name}`
+                this.user_name = user.full_name
+            } else {
+                this.user_name = ''
             }
         }
     },
@@ -150,7 +147,7 @@ export default defineComponent({
                 <div class="w-full overflow-hidden">
                     <RouterView v-slot="{ Component }">
                         <KeepAlive :max="2" :include="['user-posted', 'user-liked']">
-                            <component :is="Component" :height="height" :scrollPosition="scrollPosition" :name="user.full_name"/>
+                            <component :is="Component" :height="height" :scrollPosition="scrollPosition" :name="user_name"/>
                         </KeepAlive>
                     </RouterView>
                 </div>

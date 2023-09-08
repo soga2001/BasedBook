@@ -53,6 +53,9 @@ import zoomImg from '@/components/zoomImg.vue';
 import hoverUserData from '@/components/Cards/hoverUserData.vue';
 import ForgotPassword from '@/components/forgotPassword.vue';
 
+// Loaders
+import logoLoader from './components/loaders/logoLoader.vue'
+
 
 
 
@@ -138,6 +141,9 @@ app.component('Input', Input);
 app.component('Textarea', Textarea);
 app.component('Select', Select);
 app.component('forgot-password', ForgotPassword);
+
+// loaders
+app.component('logo-loading', logoLoader);
 
 
 

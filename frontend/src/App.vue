@@ -101,17 +101,19 @@ export default defineComponent({
       <i-spill size="35rem" :fill="$store.state.dark ? 'var(--color-theme-soft)' : 'var(--color-theme-opacity)'" stroke="none"/>
     </div>
     <div :class="{'w-half': !$q.screen.lt.sm}"  class="flex items-center justify-center overflow-scroll">
+      <logo-loading />
       <div :class="{'box-shadow': !$q.screen.lt.sm, 'm-2 px-10': !$q.screen.lt.sm}" class="rounded-sm max-w-md w-full text-left ">
         <router-view />
       </div>
     </div>
   </div>
   <div class="flex items-center justify-center w-full h-viewport text-heading" v-if="$store.state.isLoading">
-    <Loading size="5rem">
+    <!-- <Loading size="5rem">
       <template v-slot:text>
         <p class="text-5xl">Loading</p>
       </template>
-    </Loading>
+    </Loading> -->
+    <logo-loading />
   </div>
   <notifications :max="2" group="auth" classes="bg-theme box-shadow rounded-sm m-2 border p-2"/>
   <notifications :max="2" group="error" class="w-full max-w-xs">

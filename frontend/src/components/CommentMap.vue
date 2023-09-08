@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, ref, getCurrentInstance } from 'vue';
+import { defineComponent, ref } from 'vue';
 import type { Comment } from '@/assets/interfaces'
 import { http } from '@/assets/http';
 import convertTime from '@/assets/convertTime';
@@ -17,7 +17,7 @@ export default defineComponent({
         return {
             user: this.comment.user,
             edit: false,
-            websocket: new WebSocket(`wss://localhost:8000/ws/comment/${this.comment.id}/`),
+            // websocket: new WebSocket(`wss://api.suyogyapoudel.com/ws/comment/${this.comment.id}/`),
             dropdown: false,
             report: ref(false),
             reason: ref(""),
@@ -41,48 +41,46 @@ export default defineComponent({
         reportPost() {
             console.log(this.reason);
         },
-        async websocketOpen() {
-            this.websocket.onopen = (e) => {
-                // console.log('Websocket opened')
-            }
-        },
-        async websocketMessage() {
-            this.websocket.onmessage = (e) => {
-                // console.log(e.data)
-                const data = JSON.parse(e.data)
-                if(data.type == "delete") {
-                    this.$emit("deleted")
-                }
-            }
-        },
-        async websocketClose() {
-            this.websocket.close()
+        // async websocketOpen() {
+        //     this.websocket.onopen = (e) => {
+        //         // console.log('Websocket opened')
+        //     }
+        // },
+        // async websocketMessage() {
+        //     this.websocket.onmessage = (e) => {
+        //         // console.log(e.data)
+        //         const data = JSON.parse(e.data)
+        //         if(data.type == "delete") {
+        //             this.$emit("deleted")
+        //         }
+        //     }
+        // },
+        // async websocketClose() {
+        //     this.websocket.close()
 
-            this.websocket.onclose = (e) => {
-                console.log('Websocket closed')
-            }
-        },
+        //     this.websocket.onclose = (e) => {
+        //         console.log('Websocket closed')
+        //     }
+        // },
     },
     created() {
-        this.websocketOpen()
-        this.websocketMessage()
-        // console.log(this.comment)
-        // console.log(getCurrentInstance())
+        // this.websocketOpen()
+        // this.websocketMessage()
     },
     // mounted() {
     //     this.websocketOpen()
     //     this.websocketMessage()
     // },
     unmounted() {
-        this.websocketClose()
+        // this.websocketClose()
     },
     watch: {
-        deleted(deleted) {
-            if(deleted) {
-                this.$emit('deleted', this.comment.id)
-                this.websocket.close()
-            }
-        }
+        // deleted(deleted) {
+        //     if(deleted) {
+        //         this.$emit('deleted', this.comment.id)
+        //         this.websocket.close()
+        //     }
+        // }
     }
 })
 </script>

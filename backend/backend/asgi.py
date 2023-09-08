@@ -14,12 +14,12 @@ from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from django.urls import re_path
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 from comments.consumers import SpillConsumer, CommentConsumer
 from users.consumers import UserConsumer
 from notification.consumers import NotificationConsumer
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 
 application = ProtocolTypeRouter({
         "http": get_asgi_application(),

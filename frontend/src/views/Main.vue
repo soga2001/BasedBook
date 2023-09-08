@@ -95,7 +95,7 @@ export default defineComponent({
       return this.$q.screen.lt.sm
     },
     async websocketOpen() {
-      this.websocket = new WebSocket(`wss://localhost:8000/ws/user_notif/`)
+      this.websocket = new WebSocket(`wss://api.suyogyapoudel.com/ws/user_notif/`)
       this.websocket.onopen = () => {
         console.log('connected')
       }

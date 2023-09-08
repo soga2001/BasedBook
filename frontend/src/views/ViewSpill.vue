@@ -22,7 +22,7 @@ export default defineComponent({
             date_posted: '',
             page: 0,
             // websocket: new WebSocket(`wss://localhost:8000/ws/spill/${this.$route.params.post_id}/`),
-            websocket: ref<WebSocket | null>(new WebSocket(`wss://localhost:8000/ws/spill/${this.$route.params.post_id}/`)),
+            websocket: ref<WebSocket | null>(new WebSocket(`wss://api.suyogyapoudel.com/ws/spill/${this.$route.params.post_id}/`)),
             dropdown: false,
             persistent: false,
             report: false,
@@ -315,7 +315,7 @@ export default defineComponent({
                                                 <q-item-label>Report Post</q-item-label>
                                             </q-item-section>
                                         </q-item>
-                                        <q-item class="danger-btn" clickable v-close-popup @click="persistent = true" tabindex="0" v-if="spill.is_owner">
+                                        <q-item class="danger-btn" clickable v-close-popup @click="persistent = true" tabindex="0" v-if="spill.is_owner || $store.state.user.is_admin || $store.state.user.user.is_staff">
                                             <q-item-section avatar>
                                                 <q-icon color="red" class="danger__icon" name="delete_forever"/>
                                             </q-item-section>
