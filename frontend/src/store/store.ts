@@ -20,7 +20,7 @@ export const key: InjectionKey<Store<State>> = Symbol()
 
 export const store = createStore<State>({
   state: {
-    authenticated: false,
+    authenticated: true,
     dark: true,
     user: {} as User,
     desktop: true,

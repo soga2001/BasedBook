@@ -62,7 +62,7 @@ export default defineComponent({
     },
     methods: {
         reportPost() {
-            console.log(this.reason);
+            // console.log(this.reason);
         },
         checkLiked() {
             if(!this.$store.state.authenticated) {
@@ -260,6 +260,9 @@ export default defineComponent({
         '$route'() {
             this.divExit()
         },
+        dropdown(dropdown) {
+            // console.log(this.$store.state.user);
+        }
     },
     components: { Timeago, Heart, MentionLink, SpillCard, Favorite }
 })
@@ -352,7 +355,7 @@ export default defineComponent({
                                             <q-item-label>Report Post</q-item-label>
                                         </q-item-section>
                                     </q-item>
-                                    <q-item class="danger-btn" clickable v-close-popup @click="deleteModal = true" tabindex="0" v-if="post.is_owner || $store.state.user.is_admin || $store.state.user.user.is_staff">
+                                    <q-item class="danger-btn" clickable v-close-popup @click="deleteModal = true" tabindex="0" v-if="post.is_owner || $store.state.user && ( $store.state.user.is_staff || $store.state.user.is_admin)">
                                         <q-item-section avatar>
                                             <q-icon color="red" class="danger__icon" name="delete_forever"/>
                                         </q-item-section>
@@ -566,200 +569,3 @@ export default defineComponent({
 
 
 </style>
-
-<!-- <template>
-    <q-card ref="spill" id="spill"  class="grid rounded-none bg-theme bg-hover-mute pointer" @click="$router.push({name: 'view-spill', params: { user: username, post_id: id}})" v-if="!deleted">
-        <div  class="post__main">
-            <Item>
-                <template #avatar>
-                    <div class="hover-darker" @click.stop="$router.push({name: 'user-profile', params: { username: username }})">
-                        <img v-if="avatar" :src="avatar" alt="John Doe" class="rounded-full" />
-                        <img v-else src="https://avatarairlines.com/wp-content/uploads/2020/05/Male-placeholder.jpeg" alt="John Doe" class="rounded-full" />
-                    </div>
-                </template>
-                <template #title><span class="text-xl pointer hover-underline text-heading weight-900" @click.stop="$router.push({name: 'user-profile', params: { username: username }})">@{{ username }}</span></template>
-                <template #caption>
-                    <span><Timeago size="12px" :date="date_posted"/></span>
-                </template>
-                <template #icon>
-                    <div>
-                        <q-btn @click.stop="dropdown = !dropdown" size="13px" class="more__vert" flat round icon="more_horiz" />
-                        <q-menu class="dropdown" v-model="dropdown" transition-show="jump-down" transition-hide="jump-up" self="top middle">
-                            <q-list class="more__option">
-                                <q-item clickable v-close-popup @click="report = true" v-if="username !== $store.state.user.username">
-                                    <q-item-section avatar>
-                                        <q-icon class="danger__icon" name="flag"/>
-                                    </q-item-section>
-                                    <q-item-section>
-                                        <q-item-label>Report Post</q-item-label>
-                                    </q-item-section>
-                                </q-item>
-                                <q-item clickable v-close-popup @click="persistent = true" tabindex="0" v-if="username === $store.state.user.username">
-                                    <q-item-section avatar>
-                                        <q-icon class="danger__icon" name="delete_forever"/>
-                                    </q-item-section>
-                                    <q-item-section>
-                                        <q-item-label>Delete</q-item-label>
-                                    </q-item-section>
-                                </q-item>
-                                <q-item clickable v-close-popup v-if="username === $store.state.user.username">
-                                    <q-item-section avatar>
-                                        <q-icon class="" name="edit_note"/>
-                                    </q-item-section>
-                                    <q-item-section>
-                                        <q-item-label>Edit</q-item-label>
-                                    </q-item-section>
-                                </q-item>
-                            </q-list>
-                        </q-menu>
-
-                        
-                        <q-dialog v-model="persistent" persistent transition-show="scale" transition-hide="scale">
-                            <q-card class="card">
-                                <q-card-section class="row">
-                                    <q-item>
-                                        <q-item-section class="title">Are you sure you want to delete this post?</q-item-section>
-                                    </q-item>
-                                </q-card-section>
-                                <q-card-section>
-                                    <q-item>
-                                        <q-item-section avatar>
-                                        <q-avatar class="red" icon="warning"/>
-                                        </q-item-section>
-                                        <q-item-section class="red alert">This action is permanent and irreversible.</q-item-section>
-                                    </q-item>
-                                </q-card-section>
-
-                                <q-card-actions align="right" class="buttons">
-                                    <q-btn flat label="Cancel"  v-close-popup />
-                                    <q-btn flat label="Confirm" @click="deletePost" v-close-popup />
-                                </q-card-actions>
-                            </q-card>
-                        </q-dialog>
-
-
-                        <q-dialog v-model="report" persistent>
-                            <q-card class="card">
-                                <q-card-section>
-                                    <q-item>
-                                        <q-item-section class="title">Report</q-item-section>
-                                        <q-item-section avatar>
-                                        <q-avatar class="red" icon="flag"/>
-                                        </q-item-section>
-                                    </q-item>
-                                </q-card-section>
-                                <q-card-section class="q-pt-none">
-                                    <q-input
-                                        v-model="reason"
-                                        filled
-                                        clearable
-                                        type="textarea"
-                                        label="Reason"
-                                        :dark="$store.state.dark"                                
-                                    />
-                                </q-card-section>
-
-                                <q-card-actions align="right" class="buttons">
-                                    <q-btn flat label="Cancel" v-close-popup />
-                                    <q-btn flat label="Report" v-close-popup @click="reportPost" />
-                                </q-card-actions>
-                            </q-card>
-                        </q-dialog>
-                    </div>
-                    
-                </template>
-            </Item>
-
-            
-        </div> 
-        <q-img :src="img_url" @click.stop=""/>
-        <Item title-size="16px" caption-size="13px">
-            <template #caption>
-                <div class="text-base w-fit" @click.stop="" >
-                    <MentionLink   :mention="caption"/>
-                </div>
-            </template>
-        </Item>
-
-        <q-separator :dark="$store.state.dark"/>
-        <q-card-actions class="p-0 m-0 flex gap-2 justify-center z-2">
-            <div>
-                <div class="flex justify-center items-center gap-1">
-                    <div>
-                        <q-btn flat round :class="'action like__btn ' + (liked ? 'liked' : '')"  @click.stop="like">
-                            <q-tooltip :offset="[0,0]">
-                                Like
-                            </q-tooltip>
-                            <i-heart size="1.5rem" :fill="liked ? 'red' : 'var(--color-text)'"  stroke="red" />
-                        </q-btn>
-                    </div>
-                    <div>
-                        <span :style="{color: liked ? 'red' : 'none'}">{{abbreviateLikes}}</span>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <div class="flex justify-center items-center gap-2">
-                    <div>
-                        <q-btn flat round class="action comment" @click.stop="commentToggle">
-                            <q-tooltip :offset="[0,0]">
-                                Comment
-                            </q-tooltip>
-                            <i-comment fill="var(--color-text)" />
-                        </q-btn>
-                    </div>
-                    <div>
-                        <label>{{abbreviateComments}}</label>
-                    </div>
-                </div>
-
-                <q-dialog class="min-h-sm" v-model="showComments" persistent>
-                    <div class="bg-theme box-theme-soft w-full min-h-fit max-w-sm h-fit overflow-visible" >
-                        <div class="p-2">
-                            <Item dense :vert-icon-center="true">
-                                <template #title>
-                                    <div class="text-2xl weight-900">Comment</div>
-                                </template>
-                                <template #icon>
-                                    <i-close size="2rem" class="pointer" @click="showComments = false"/>
-                                </template>
-                            </Item>
-                        </div>
-                        <hr class="border"/>
-                        <div class="">
-                            <Spills  placeholder="Reply to the spill" btnString="Reply" isComment :spillId="id" :rows="4"/>
-                        </div>
-                    </div>
-                </q-dialog>
-            </div>
-
-            <div>
-                <div class="flex justify-center items-center gap-1">
-                    <div>
-                        <q-btn round flat @click.stop="">
-                            <q-tooltip :offset="[0,0]">
-                                Views
-                            </q-tooltip>
-                            <q-icon class="text-body" name="visibility"/>
-                        </q-btn>
-                    </div>
-                    <transition name="fade" mode="out-in">
-                        <span class="text-heading" v-if="total_views % 2 == 0">{{ abbreviateViews }}</span>
-                        <span class="text-heading" v-else>{{ abbreviateViews }}</span>
-                    </transition>
-                </div>
-            </div>
-
-            <q-btn round flat>
-                <q-tooltip :offset="[0,0]">
-                    Copy Link
-                </q-tooltip>
-                <i-share fill="var(--color-text)" />
-            </q-btn>  
-        </q-card-actions>
-    </q-card>
-    <q-card class="deleted" v-else>
-        <span class="deleted__msg">This post has been deleted.</span>
-    </q-card>
-</template> -->
-

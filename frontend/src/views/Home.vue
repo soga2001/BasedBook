@@ -101,7 +101,7 @@ export default defineComponent({
           </div> -->
         <!-- </q-infinite-scroll> -->
         <div>
-          <div class="post_map" v-if="posts.length > 0" v-for="(post, index) in posts" :id="post.id.toString" :key="post.id">
+          <div class="post_map" v-if="posts.length > 0" v-for="(post, index) in posts" :id="post.id" :key="post.id">
             <PostsMap :post="post" />
           </div>
           <div class="w-full flex justify-center p-5" v-if="loading">

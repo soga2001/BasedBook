@@ -51,7 +51,10 @@ export default defineComponent({
           </q-route-tab>
           <q-route-tab v-if="$store.state.authenticated" class="relative" active-class="text-heading" to="/notifications" replace>
             <i-notif size="2rem" :fill="$route.matched[0].name == `notifications` ? 'var(--color-heading)' : 'none'" stroke="var(--color-heading)" />
-            <q-badge class="bg-web-theme" rounded floating />
+            <q-avatar class="relative p-0 m-0">
+              <i-notif size="2rem" :fill="$route.matched[0]?.name == `notifications` ? 'var(--color-heading)' : 'none'" :stroke="'var(--color-heading)'" />
+              <q-badge v-if="$store.state.allNotifications.length > 0" class="bg-web-theme" rounded floating />
+            </q-avatar>
           </q-route-tab>
           <q-route-tab v-if="$store.state.authenticated" to="/settings" exact replace>
             <i-settings size="2rem" :fill="$route.fullPath == `/settings` ? 'var(--color-heading)' : 'none'" :stroke="$route.fullPath == `/settings` ? 'none' : 'var(--color-heading)'" />

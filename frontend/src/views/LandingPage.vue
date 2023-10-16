@@ -72,6 +72,12 @@ export default defineComponent({
                 <li>Websocket isn't functioning in production version</li>
             </ul>
         </div>
+        <div class="flex flex-col gap-2">
+            <span class="text-heading text-lg weight-700">Update 1.0 (Mon Oct 16 2024)</span>
+            <ul class="text-heading">
+                <li>Fixed issue where user couldn't see dropdown menu when clicked on more_vert icon on posts.</li>
+            </ul>
+        </div>
         <div class="flex flex-row gap-10 justify-center">
             <RouterLink to="/login" class="px-10 py-2 text-heading no-decor hover-underline hover-text-theme weight-900 text-xl">
                 Login

@@ -169,10 +169,10 @@ def explore(request, timestamp, page):
     try:
         user = request.user
         query = None
-        if(user.is_anonymous):
-            query = (Q(date_posted__lt=timestamp) & (Q(user__private=False)))
-        else:
-            query = (Q(date_posted__lt=timestamp) & (Q(user__private=False)) | Q(user=user) | Q(user__followers__following_user_id=user.id))
+        # if user.is_anonymous:
+        #     query = (Q(date_posted__lt=timestamp) & (Q(user__private=False)))
+        # else:
+        query = (Q(date_posted__lt=timestamp) & (Q(user__private=False)) | Q(user=user) | Q(user__followers__following_user_id=user.id))
         post = Post.objects.filter(query)[offset:offset+10]
     except Post.DoesNotExist:
         return JsonResponse({"error": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
